@@ -27,7 +27,11 @@ skills locais. Não substitui a especificação nem pressupõe que esses artefat
 **Desdobramento SDD (2026-10-17):** a avaliação e a divisão deste plano em seis specs
 estão no [índice de especificações](../specs/README.md), com descrições de entrada,
 dependências, contratos e cobertura de R01–R18. Cada spec tem `spec.md` e checklist de
-qualidade revisados. Planos técnicos, tarefas, implementação e avaliações reais
+qualidade revisados. O [plano técnico da spec 001](../specs/001-preparar-experimentos/plan.md)
+foi concluído com pesquisa, modelo de dados, contrato e guia de validação. Suas
+[28 tarefas](../specs/001-preparar-experimentos/tasks.md) foram geradas por história e
+dependência. A análise SDD da 001 foi concluída e seus três achados foram corrigidos
+e revalidados. Planos/tarefas das demais specs, implementação e avaliações reais
 permanecem pendentes; o conteúdo operacional deste plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório

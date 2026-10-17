@@ -2,8 +2,18 @@
 
 **Data:** 2026-10-17
 
-**Estado:** seis especificações iniciais revisadas; planejamento técnico, tarefas,
-implementação e experimentos ainda pendentes.
+**Estado:** seis especificações iniciais revisadas; planejamento técnico,
+[tarefas da 001](001-preparar-experimentos/tasks.md) e análise de consistência com
+correções concluídos. Planos e tarefas das demais specs, implementação e experimentos pendentes.
+
+O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
+com pesquisa, modelo dos registros, contrato operacional e guia de validação.
+As 28 tarefas da 001 cobrem as três histórias, os pré-requisitos e a revisão final.
+A criação desses artefatos não comprova instalação, acessos, modelos ou prontidão real.
+Os achados I1, A1 e I2 da análise da 001 foram corrigidos: seleção de modelos antes
+da validação da configuração, distinção entre contexto comprovado e projeto ainda
+ausente, e remoção do caractere isolado no plano. Dependências e rastreabilidade
+foram atualizadas sem executar as tarefas de preparação.
 
 ## Avaliação do plano e decisão de divisão
 
@@ -129,8 +139,9 @@ deve ser registrada e resolvida antes de qualquer proposta de mudança nesses ma
 
 ## Artefatos iniciais e continuação do SDD
 
-Foram criados somente `spec.md` e `checklists/requirements.md` por feature, além deste
-índice. As descrições estão nos campos `Input`. O template ativo foi resolvido pela
+Na especificação inicial foram criados `spec.md` e `checklists/requirements.md` por
+feature, além deste índice. A 001 agora também tem os artefatos de planejamento e tarefas
+listados acima. As descrições estão nos campos `Input`. O template ativo foi resolvido pela
 pilha local do Spec Kit e suas seções obrigatórias foram mantidas, com premissas e
 dependências. A revisão de cada checklist registra 16/16 itens de qualidade atendidos,
 sem dúvidas bloqueantes; isso não significa implementação ou avaliação concluída.
@@ -154,4 +165,7 @@ Troque o valor pelo diretório da spec desejada; não presuma que a branch selec
 feature. Prossiga com `$speckit-plan`, `$speckit-tasks` e `$speckit-analyze` por feature,
 antes de `$speckit-implement`, respeitando as dependências de execução. Use
 `$speckit-clarify` apenas se aparecer lacuna que altere escopo ou aceite. Planos e
-tarefas ainda não foram gerados e a Fase 0 do plano mestre permanece parcialmente pendente.
+tarefas das demais specs ainda não foram gerados; plano e `tasks.md` da 001 estão
+concluídos, e os três achados da análise foram corrigidos e revalidados.
+A próxima etapa da 001 é `$speckit-implement`.
+A Fase 0 do plano mestre permanece parcialmente pendente.
