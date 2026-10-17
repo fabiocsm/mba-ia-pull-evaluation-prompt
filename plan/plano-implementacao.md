@@ -24,6 +24,12 @@ Este documento é o plano mestre solicitado para a pasta `plan`. Na execução d
 ele deve orientar a especificação e os artefatos da feature em `specs/`, gerados pelas
 skills locais. Não substitui a especificação nem pressupõe que esses artefatos já existam.
 
+**Desdobramento SDD (2026-10-17):** a avaliação e a divisão deste plano em seis specs
+estão no [índice de especificações](../specs/README.md), com descrições de entrada,
+dependências, contratos e cobertura de R01–R18. Cada spec tem `spec.md` e checklist de
+qualidade revisados. Planos técnicos, tarefas, implementação e avaliações reais
+permanecem pendentes; o conteúdo operacional deste plano continua sendo referência.
+
 ## 2. Diagnóstico do repositório
 
 | Item | Situação observada | Trabalho necessário |
@@ -98,7 +104,8 @@ das validações de cada fase; este quadro não declara implementação concluí
 
 **Dependência:** nenhuma etapa de implementação.
 
-- [ ] Usar `$speckit-specify` para especificar o fluxo completo e os critérios da seção 6.
+- [x] Usar `$speckit-specify` para especificar o fluxo completo e os critérios da seção 6,
+  desdobrados nas [seis specs iniciais](../specs/README.md).
 - [ ] Usar `$speckit-clarify` somente para lacunas que alterem o comportamento ou o aceite.
 - [ ] Usar `$speckit-plan` para detalhar contratos YAML/CLI, decisões e guia de execução.
 - [ ] Usar `$speckit-tasks` para decompor as fases em tarefas dependentes e verificáveis.
