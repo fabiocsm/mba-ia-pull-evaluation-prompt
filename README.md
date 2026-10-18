@@ -413,7 +413,9 @@ Confira a presença sem revelar valores. Variáveis exportadas têm precedência
 python - <<'PY'
 import os
 from dotenv import load_dotenv
+from langsmith.utils import get_env_var, tracing_is_enabled
 load_dotenv('.env', override=False)
+get_env_var.cache_clear()  # Reavaliar o ambiente depois de carregar dotenv.
 required = ('LANGSMITH_API_KEY', 'LANGSMITH_PROJECT', 'USERNAME_LANGSMITH_HUB',
             'LANGSMITH_TRACING', 'LLM_PROVIDER', 'LLM_MODEL', 'EVAL_MODEL', 'OPENAI_API_KEY')
 missing = [name for name in required if not os.getenv(name, '').strip()]
@@ -422,9 +424,14 @@ assert not missing, 'Resolver configuração antes das chamadas'
 assert os.getenv('USERNAME_LANGSMITH_HUB') == 'fabiocsm'
 assert os.getenv('LLM_PROVIDER') == 'openai'
 assert os.getenv('LANGSMITH_TRACING', '').lower() == 'true'
+assert tracing_is_enabled() is True, 'Tracing efetivo desabilitado'
 assert os.getenv('LLM_MODEL') == os.getenv('EVAL_MODEL') == 'gpt-4.1-2025-04-14'
 PY
 ```
+
+O gate também verifica o tracing efetivo do SDK: aliases `LANGSMITH_TRACING_V2`
+ou `LANGCHAIN_TRACING_V2` podem prevalecer sobre `LANGSMITH_TRACING`. Resolva
+qualquer configuração conflitante antes das consultas ou chamadas mínimas.
 
 Copie e execute o [roteiro de contexto e traces](docs/preparacao.md#roteiro-executavel).
 Ele consulta a ajuda do CLI, carrega dotenv sem sobrescrever variáveis exportadas,

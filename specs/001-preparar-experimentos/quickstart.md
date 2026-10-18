@@ -97,7 +97,9 @@ substituir `.env` pelo template. Só então executar a validação abaixo.
 python - <<'PY'
 import os
 from dotenv import load_dotenv
-load_dotenv('.env')
+from langsmith.utils import get_env_var, tracing_is_enabled
+load_dotenv('.env', override=False)
+get_env_var.cache_clear()  # Reavaliar o ambiente depois de carregar dotenv.
 required = ('LANGSMITH_API_KEY', 'LANGSMITH_PROJECT', 'USERNAME_LANGSMITH_HUB',
             'LANGSMITH_TRACING', 'LLM_PROVIDER', 'LLM_MODEL', 'EVAL_MODEL', 'OPENAI_API_KEY')
 missing = [name for name in required if not os.getenv(name, '').strip()]
@@ -106,12 +108,16 @@ assert not missing, 'Configuração incompleta'
 assert os.getenv('USERNAME_LANGSMITH_HUB') == 'fabiocsm', 'Handle divergente'
 assert os.getenv('LLM_PROVIDER') == 'openai', 'Validar condição inicial OpenAI'
 assert os.getenv('LANGSMITH_TRACING', '').lower() == 'true', 'Tracing desabilitado'
+assert tracing_is_enabled() is True, 'Tracing efetivo desabilitado'
 print('presença e configuração inicial OK; validade remota ainda a comprovar')
 PY
 ```
 
 Esperado: nenhuma ausente e asserções satisfeitas. Esse teste não autentica, não prova
 saldo/permissão e não aceita o fallback implícito de `EVAL_MODEL`.
+Aliases `LANGSMITH_TRACING_V2`/`LANGCHAIN_TRACING_V2` podem prevalecer sobre
+`LANGSMITH_TRACING`; conflitos devem ser resolvidos antes de avançar. O cache do SDK
+é limpo após dotenv para validar o ambiente efetivamente carregado.
 
 ## 4. Contexto LangSmith e contratos instalados
 
@@ -155,7 +161,10 @@ O exemplo usa entrada sintética curta, não os 15 casos de avaliação.
 ```bash
 PYTHONPATH=src python - <<'PY'
 from dotenv import load_dotenv
-load_dotenv('.env')
+from langsmith.utils import get_env_var, tracing_is_enabled
+load_dotenv('.env', override=False)
+get_env_var.cache_clear()
+assert tracing_is_enabled() is True, 'Tracing efetivo desabilitado'
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.tracers.langchain import wait_for_all_tracers
 from utils import get_llm, get_eval_llm

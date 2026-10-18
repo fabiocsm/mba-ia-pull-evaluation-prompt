@@ -518,6 +518,12 @@ a seleção só é automática quando há exatamente um workspace acessível. Ha
 configure localmente o ID correto antes de repetir. Nenhum perfil ou `.env` é alterado
 pelo bloco; o ID selecionado é passado ao SDK/CLI apenas neste processo.
 
+Antes de qualquer consulta ou chamada mínima, o gate exige tracing efetivo do SDK
+igual a `True`. Os aliases `LANGSMITH_TRACING_V2` e `LANGCHAIN_TRACING_V2` têm
+precedência no SDK e podem desabilitá-lo mesmo com `LANGSMITH_TRACING=true`.
+O cache de leitura do ambiente é limpo após dotenv para considerar a configuração
+recém-carregada; nenhuma variável exportada é sobrescrita.
+
 ```bash
 source venv/bin/activate
 python - <<'PY'
@@ -534,9 +540,10 @@ from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from langsmith import Client
-from langsmith.utils import LangSmithNotFoundError
+from langsmith.utils import LangSmithNotFoundError, get_env_var, tracing_is_enabled
 
 load_dotenv('.env', override=False)
+get_env_var.cache_clear()  # Reavaliar o ambiente depois de carregar dotenv.
 logging.disable(logging.CRITICAL)  # Não registrar corpos/headers de erros HTTP.
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 stage = 'configuracao'
@@ -574,6 +581,7 @@ try:
     check(os.environ['USERNAME_LANGSMITH_HUB'] == 'fabiocsm', 'handle_configurado_divergente')
     check(os.environ['LLM_PROVIDER'] == 'openai', 'provider_divergente_da_condicao')
     check(os.environ['LANGSMITH_TRACING'].lower() == 'true', 'tracing_desabilitado')
+    check(tracing_is_enabled() is True, 'tracing_desabilitado')
     check(os.environ['LLM_MODEL'] == os.environ['EVAL_MODEL'] == 'gpt-4.1-2025-04-14',
           'modelos_divergentes_da_condicao')
     check(os.environ['LANGSMITH_PROJECT'] == 'mba-ia-pull-evaluation-prompt',
