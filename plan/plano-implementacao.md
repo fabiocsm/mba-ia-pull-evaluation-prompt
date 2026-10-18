@@ -10,8 +10,10 @@ Reprodução automatizada na mesma máquina concluída com ocorrência de leitur
 Recuperação da spec 002 concluída, com pull e fidelidade comprovados no
 [registro](../docs/recuperacao-v1.md). Planejamento e geração de tarefas da spec 003
 concluídos; análise realizada com I1 corrigido e revalidado. Ela é a spec ativa.
-Implementação da 003, implementação das specs
-004–006 e avaliações acadêmicas reais permanecem pendentes.
+A 003 está implementada e validada localmente: 30/30 tarefas, 188 testes da v2 e
+266 regressões aprovados, revisão semântica e integridade comprovadas no
+[registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
+Implementação das specs 004–006 e avaliações acadêmicas reais permanecem pendentes.
 
 ## 1. Objetivo e referências
 
@@ -44,13 +46,15 @@ análise e execução concluídos, registrados no índice e na recuperação aci
 O [plano técnico da 003](../specs/003-otimizar-validar-v2/plan.md), concluído em
 2026-10-18, detalha as Fases 3–4 com pesquisa, modelo de dados, contrato e guia de
 validação. Suas [30 tarefas](../specs/003-otimizar-validar-v2/tasks.md) foram geradas
-por história e dependência; todas permanecem pendentes. A análise da 003 identificou
+por história e dependência e foram concluídas. A análise da 003 identificou
 I1, corrigido no contrato e em T018/T020 com política explícita para falso positivo
-de TODO e controles de regressão, sem alterar o helper protegido. Implementação da 003,
-planos/tarefas das specs 004–006 e
+de TODO e controles de regressão, sem alterar o helper protegido. O adaptador
+e os testes foram comprovados localmente na 003. Planos/tarefas das specs 004–006 e
 avaliações reais permanecem pendentes; este plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório
+
+Snapshot inicial de 2026-10-17; o estado atual e suas evidências estão acima.
 
 | Item | Situação observada | Trabalho necessário |
 | --- | --- | --- |
@@ -191,28 +195,28 @@ válido, não vazio e equivalente às mensagens da semente, mantendo `{bug_repor
 
 **Dependência:** Fase 2.
 
-- [ ] Analisar os problemas reais da v1: instruções vagas, repetição de entrada,
+- [X] Analisar os problemas reais da v1: instruções vagas, repetição de entrada,
   ausência de exemplos, falta de critérios de resposta e de tratamento de ambiguidades.
-- [ ] Criar `prompts/bug_to_user_story_v2.yml`, com a chave `bug_to_user_story_v2` e
+- [X] Criar `prompts/bug_to_user_story_v2.yml`, com a chave `bug_to_user_story_v2` e
   campos `description`, `system_prompt`, `user_prompt`, `version`, `tags` e
   `techniques_applied`; usar `version: v2`.
-- [ ] Definir persona de Product Manager/analista de produto, contexto e objetivo.
-- [ ] Especificar saída em português, Markdown e User Story no formato
+- [X] Definir persona de Product Manager/analista de produto, contexto e objetivo.
+- [X] Especificar saída em português, Markdown e User Story no formato
   “Como... eu quero... para que...”, com critérios de aceitação verificáveis.
-- [ ] Usar estrutura proporcional ao relato: casos simples com resposta concisa;
+- [X] Usar estrutura proporcional ao relato: casos simples com resposta concisa;
   relatos complexos com cobertura de todos os problemas e critérios agrupados.
-- [ ] Incluir 2–3 exemplos próprios de entrada/saída, cobrindo relatos simples,
+- [X] Incluir 2–3 exemplos próprios de entrada/saída, cobrindo relatos simples,
   ambíguos e/ou com múltiplos problemas. Não copiar as respostas do dataset como
   exemplos de treinamento nem inserir respostas específicas aos casos de avaliação.
-- [ ] Aplicar Few-shot, Role Prompting e o esqueleto de resposta. Separar regras e
+- [X] Aplicar Few-shot, Role Prompting e o esqueleto de resposta. Separar regras e
   exemplos no System e entrada no User, com `{bug_report}` como única variável exigida.
-- [ ] Tratar entrada vazia, informação insuficiente, problemas múltiplos, logs e
+- [X] Tratar entrada vazia, informação insuficiente, problemas múltiplos, logs e
   instruções conflitantes dentro do relato. Distinguir fatos, dúvidas e recomendações;
   não inventar métricas, causas, arquitetura ou decisões de negócio como fatos.
-- [ ] Validar carregamento YAML, campos não vazios, ausência de pendências e
+- [X] Validar carregamento YAML, campos não vazios, ausência de pendências e
   `ChatPromptTemplate.input_variables == ["bug_report"]` após montar as mensagens.
   Escapar chaves literais de exemplos quando necessário para evitar variáveis espúrias.
-- [ ] Documentar técnicas e exemplos na seção `Técnicas Aplicadas (Fase 2)` do README.
+- [X] Documentar técnicas e exemplos na seção `Técnicas Aplicadas (Fase 2)` do README.
 
 **Critério de saída:** v2 renderizável com um relato qualquer, com técnicas realmente
 presentes e regras verificáveis, pronta para testes e publicação.
@@ -232,17 +236,23 @@ Implementar os seis testes obrigatórios carregando o YAML v2 real:
 | `test_prompt_no_todos` | Nenhuma pendência no texto dos prompts, incluindo `[TODO]` |
 | `test_minimum_techniques` | Lista com duas ou mais técnicas distintas; inclui Few-shot |
 
-- [ ] Remover os corpos vazios e usar fixtures/helpers para carregar o artefato correto.
-- [ ] Validar também System/User, campos e variável de entrada, sem dependência de rede.
+- [X] Remover os corpos vazios e usar fixtures/helpers para carregar o artefato correto.
+- [X] Validar também System/User, campos e variável de entrada, sem dependência de rede.
 - [ ] Cobrir falhas concretas dos scripts quando necessário: YAML inválido, credencial
   ausente, template incompatível e falha do cliente ou da persistência.
-- [ ] Usar dublês apenas para testar integração e erros dos scripts; notas acadêmicas
+- [X] Usar dublês apenas para testar integração e erros dos scripts; notas acadêmicas
   e evidências finais devem vir de chamadas reais.
-- [ ] Executar `pytest tests/test_prompts.py -v` e conferir que os seis testes foram
+- [X] Executar `pytest tests/test_prompts.py -v` e conferir que os seis testes foram
   coletados e executados, sem `skip`, `xfail` ou aprovação incondicional.
 
 **Critério de saída:** seis testes obrigatórios efetivos aprovados e contratos locais
 validados. Esse resultado não substitui a aprovação nas métricas.
+
+**Execução local das Fases 3–4 (003):** concluída conforme
+[registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução), com
+188 testes da v2 e 266 regressões aprovados. A recuperação e suas falhas estão
+comprovadas na 002; contratos remotos/persistência do push continuam na 004.
+O checkbox transversal de falhas dos scripts permanece aberto até essa conclusão.
 
 ### Fase 5 — Push público e conferência do round-trip
 

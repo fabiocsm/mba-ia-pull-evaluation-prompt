@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-17
 
-**Status**: Draft — validada para planejamento; implementação pendente
+**Status**: Implementada e validada localmente — [30/30 tarefas e evidências](tasks.md#registro-de-execução); publicação e avaliação real pendentes nas próximas specs
 
 **Input**: User description: "Criar a v2 para transformar relatos de bugs em User Stories claras em português, com persona de produto, Few-shot Learning obrigatório, Role Prompting e estrutura explícita de resposta, regras contra invenções e tratamento de casos de borda. Validar o artefato real com os seis testes obrigatórios e documentar as técnicas, mantendo a v1 e os materiais de avaliação intactos."
 

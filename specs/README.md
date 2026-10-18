@@ -13,8 +13,9 @@ sequência incremental de validação alinhada e caminho do contrato em T005 cor
 A 002 foi implementada e comprovada: pull real, comparação de 2/2 mensagens idênticas,
 236 testes offline do pull e integridade preservada. Planejamento e geração de
 tarefas da 003 concluídos; análise realizada com I1 corrigido e revalidado.
-Ela é a spec ativa. Implementação da 003, planos/tarefas das specs
-004–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
+Ela é a spec ativa e foi implementada: 30/30 tarefas, 188 testes da v2 e
+266 regressões aprovados, revisão semântica/documental e integridade conferidas.
+Planos/tarefas das specs 004–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
 [preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
@@ -29,16 +30,19 @@ O [plano da 003](003-otimizar-validar-v2/plan.md) detalha as Fases 3–4, com
 [pesquisa](003-otimizar-validar-v2/research.md),
 [modelo de dados](003-otimizar-validar-v2/data-model.md),
 [contrato](003-otimizar-validar-v2/contracts/otimizacao-v2.md) e
-[guia de validação](003-otimizar-validar-v2/quickstart.md). Prevê três exemplos próprios,
+[guia de validação](003-otimizar-validar-v2/quickstart.md). Entrega três exemplos próprios,
 Few-shot Learning e Role Prompting, os seis testes efetivos e negativos offline,
 preservando a v1 e separando validação local de publicação/avaliação.
-As [30 tarefas da 003](003-otimizar-validar-v2/tasks.md), todas pendentes, cobrem
+As [30 tarefas da 003](003-otimizar-validar-v2/tasks.md), concluídas, cobrem
 Setup (2), Foundational (2), US1 (7), US2 (6), US3 (8) e revisão final (5).
 Os seis testes obrigatórios são introduzidos por história e consolidados com
 negativos na US3; seis marcadores de paralelismo formam três pares sem conflito
 de escrita. A análise SDD identificou I1 (falso positivo de TODO no helper);
 o contrato e T018/T020 agora definem o adaptador restrito e controles de regressão,
-preservando `src/utils.py`. O desenho foi revalidado; a implementação é a próxima etapa.
+preservando `src/utils.py`. O adaptador e seus controles passaram na implementação;
+comandos, resultados e limites no [registro da 003](003-otimizar-validar-v2/tasks.md#registro-de-execução).
+A v2 está pronta localmente para o planejamento da 004; publicação e métricas ainda
+não foram executadas.
 As [25 tarefas da 002](002-recuperar-prompt-v1/tasks.md), concluídas, cobrem
 Setup (2), Foundational (2), US1 (9), US2 (7) e revisão final (5). Elas separam
 validação offline de falhas e comprovação real da fidelidade da v1.

@@ -364,12 +364,13 @@ A [matriz atual por pré-requisito e operação](docs/preparacao.md#matriz-atual
 registra V01–V16, datas e evidências: os pré-requisitos da 001 passaram; a prova
 de escrita pública V15 pertence ao push da 004. A recuperação da 002 foi concluída;
 seu [registro de execução](docs/recuperacao-v1.md) comprova o acesso à origem.
-As operações das specs 003–006 continuam pendentes.
+A otimização e os testes da 003 foram concluídos localmente; as operações das
+specs 004–006 continuam pendentes.
 A instalação, a integridade e a autenticação LangSmith passaram. A API key local
 confirmou o workspace com handle `fabiocsm`; os dois papéis de modelo responderam
 com temperatura zero e seus traces foram conferidos. Não há resultados de avaliação
 acadêmica obtidos nesta etapa. O pull tem comprovação própria na 002;
-otimização/testes, push e experimentos pertencem às specs 003–006
+publicação, experimentos e evidências finais pertencem às specs 004–006
 e dependem de suas implementações e dos respectivos pré-requisitos.
 
 Pré-requisitos: Git, Python 3.10+ (validado com CPython 3.11.14), LangSmith CLI,
@@ -495,6 +496,124 @@ Metadados do repositório são um snapshot observado separadamente; datas/tags d
 arquivo ilustrativo foram substituídas apenas pelos valores efetivamente retornados.
 
 A 002 passou em 236 testes offline e na comparação real da revisão recuperada.
-Os seis testes obrigatórios de qualidade da v2 em `tests/test_prompts.py` pertencem
-à 003 e ainda aguardam implementação. Não há notas, publicação v2 ou experimentos
+Os seis testes obrigatórios da v2 em `tests/test_prompts.py` foram implementados
+na 003, com resultados locais abaixo. Não há notas, publicação v2 ou experimentos
 acadêmicos comprovados nesta etapa.
+
+### Otimização e validação offline — spec 003
+
+Use o venv preparado acima, Python 3.10+ e os pins de `requirements.txt`. Para
+validar a [v2 local](prompts/bug_to_user_story_v2.yml), execute da raiz:
+
+```bash
+source venv/bin/activate
+python -m pip check
+pytest tests/test_prompts.py --collect-only -q
+pytest tests/test_prompts.py -v -rA
+pytest tests/test_preparation_checks.py tests/test_pull_prompts.py -q
+```
+
+Em 2026-10-18: coleta de **188 testes**, **188 aprovados** na suíte v2, incluindo
+os seis métodos obrigatórios de `TestPrompts`, e **266 aprovados** nas regressões
+de preparação/pull. A execução conjunta `pytest tests -q` confirmou **454 aprovados**.
+Nenhum skip/xfail. Os seis carregam o YAML real e compartilham
+suas asserções com defeitos em cópias isoladas; YAML ausente/inválido, persona só
+nos exemplos, pares incompletos, técnicas duplicadas e variáveis extras reprovam.
+A suíte bloqueia rede e criação de cliente/modelos, isola o ambiente e desabilita
+dotenv; os testes não precisam das chaves locais. O YAML é comparado byte a byte
+antes/depois. A política delimitada de pendências aceita `TODOS`, `todos` e `todo`
+em prosa e rejeita marcadores reais, sem mudar `src/utils.py` nem ocultar seus
+outros erros. Detalhes e comandos incrementais estão no
+[registro da 003](specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
+
+Saída zero comprova o contrato estrutural e a sensibilidade dos testes. A revisão
+semântica está abaixo; comportamento de LLM e notas reais continuam por verificar.
+A v2 está pronta localmente para o planejamento da 004. O push ainda deve ser
+implementado e conferido nessa spec; só depois a 005 executará `python src/evaluate.py`
+com a revisão publicada. Cada alteração futura exige testar, publicar novamente e
+avaliar. As 3–5 iterações e a exigência de cada métrica e média >= 0.8 permanecem.
+
+## Técnicas Aplicadas (Fase 2)
+
+### Diagnóstico da v1 e regras da v2 — spec 003
+
+A [v1 recuperada](prompts/bug_to_user_story_v1.yml), revisão
+`2950c33dbd7ffaed2e440b50adfd7769d183f90faf0bae5aa4864354f88e4073`, define um
+assistente genérico, pede uma User Story sem formato e repete o relato em System
+e User. Não define critérios de aceitação, exemplos ou regras para lacunas.
+Nenhuma nota numérica foi obtida para essa baseline; as notas do início deste
+README são ilustrações do enunciado.
+
+A [v2](prompts/bug_to_user_story_v2.yml) coloca as regras em System e somente
+`{bug_report}` em User. Exige português, Markdown, história Como… eu quero… para
+que… e critérios verificáveis, com extensão proporcional ao problema. Distingue
+contexto informado, comportamento desejado, dúvidas e recomendações. As regras
+cobrem entrada vazia, ambiguidade, incompletude, múltiplos problemas, logs e
+instruções conflitantes: pedem dados mínimos quando necessários, preservam os
+fatos e impedem que instruções no relato substituam a tarefa. A verificação de
+mensagens apenas formata texto offline; não é resposta de um modelo.
+
+### Técnicas escolhidas e demonstradas
+
+**Role Prompting.** A abertura “Você é um Product Manager e analista de produto”
+define responsabilidade de produto. O objetivo é preservar fatos e descrever a
+necessidade do usuário com critérios verificáveis, evitando diagnósticos técnicos
+sem evidência. A regra “Não invente causa, arquitetura, solução técnica, versão,
+números, prioridade ou prazo” limita essa atuação.
+
+**Few-shot Learning.** Três pares próprios completos em System demonstram decisões
+e saídas: audioguia do museu (simples), ficha do acervo (ambíguo/incompleto) e mapa
+de trilhas (múltiplos problemas, log e instrução conflitante). No primeiro, a entrada
+“aperto Pausar e a narração continua tocando” resulta no critério “Dada uma narração
+em reprodução, ao acionar Pausar, o áudio deixa de tocar”. No segundo, a saída pede
+“Qual conteúdo da ficha fica errado e qual deveria aparecer?”, sem fabricar história.
+No terceiro, critérios separados cobrem legenda e escala, enquanto o log permanece
+contexto e a tentativa de trocar a tarefa não é seguida. São exemplos redigidos
+para o prompt, não saídas obtidas de um LLM.
+
+Os nomes em `techniques_applied` são exatamente `Few-shot Learning` e
+`Role Prompting`. Títulos organizam a resposta; não se declara outra técnica
+apenas por essa organização.
+
+### Revisão semântica das regras e dos exemplos
+
+| Grupo | Cobertura revisada na v2 |
+| --- | --- |
+| Vazio | Regra pede ação, comportamento observado e esperado; não cria história |
+| Ambíguo | Exemplo 2 não decide qual conteúdo da ficha está errado |
+| Incompleto | Exemplo 2 solicita conteúdo esperado e passos de retorno |
+| Múltiplos problemas | Exemplo 3 cobre legenda e escala em critérios agrupados |
+| Logs | Exemplo 3 conserva o JSON como contexto, sem inferir causa |
+| Instruções conflitantes | Exemplo 3 mantém a tarefa apesar do pedido para responder APROVADO |
+
+A revisão das três entradas/saídas e das regras encontrou zero fatos inventados:
+benefícios e critérios descrevem o comportamento desejado; o papel de visitante
+está explícito na entrada do audioguia e os demais papéis são genéricos. Não se afirmam
+causas, números ou soluções ausentes. As dúvidas permanecem perguntas; recomendações
+são opcionais, identificadas nas regras e não foram necessárias nessas demonstrações.
+Os exemplos foram redigidos para domínios próprios e comparados às 15 entradas e
+referências do dataset, sem reprodução. Essa revisão do conteúdo e os testes
+estruturais não comprovam a resposta futura de um modelo.
+
+| Aspecto | v1 recuperada | v2 local |
+| --- | --- | --- |
+| Persona | Assistente genérico | Product Manager/analista de produto com limites |
+| Entrada | Relato repetido em System e User | Somente User, variável única |
+| Saída | Pedido genérico de User Story | Português, Markdown, história e critérios verificáveis |
+| Exemplos | Ausentes | Três pares completos de entrada/saída |
+| Bordas | Não orientadas | Seis grupos com fundamentação e perguntas |
+| Evidência numérica | Sem baseline real | Avaliação real pendente na 005 |
+
+## Resultados Finais
+
+A spec 003 está concluída **somente no aceite local**: prompt com três exemplos e
+duas técnicas, 188 testes da v2 e 266 regressões aprovados, documentação e revisão
+semântica. A v1 e os quatro arquivos protegidos mantêm seus hashes, preservando
+os 15 exemplos/referências e a distribuição 5/7/3. A comparação qualitativa está
+na seção anterior; não há comparação numérica v1/v2 executada.
+
+Publicação pública da v2 e revisão do Hub: **pendentes na 004**. Experimentos,
+cinco métricas, média >= 0.8 e ciclos reais: **pendentes na 005**. Link público do
+dataset/experimentos, screenshots das cinco notas e tracing detalhado de três
+exemplos: **pendentes na 006**. Não há link público nem nota acadêmica da v2 para
+apresentar ainda. As ilustrações do enunciado não representam resultados desta entrega.

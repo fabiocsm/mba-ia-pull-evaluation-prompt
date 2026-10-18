@@ -2,9 +2,11 @@
 
 **Feature**: [spec.md](spec.md) | **Contrato**: [otimizacao-v2.md](contracts/otimizacao-v2.md)
 
-Este roteiro será executado após a implementação. No encerramento do planejamento,
-a v2 ainda não existe e os seis testes ainda são esqueletos; comandos futuros não
-são evidência de aprovação. Não executar push ou avaliação para validar esta spec.
+Roteiro executado na implementação em 2026-10-18: V01–V12 satisfeitos conforme
+[registro de execução](tasks.md#registro-de-execução), com 188 testes da v2 e
+266 regressões aprovados. Os comandos abaixo permitem repetir a validação;
+uma nova execução exige registrar seu próprio resultado. Não executar push
+ou avaliação para validar esta spec.
 
 ## Pré-requisitos e ambiente
 

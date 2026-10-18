@@ -6,7 +6,9 @@
 R04/R05/R06/R11/R12/R14 do [plano mestre](../../plan/plano-implementacao.md).
 
 **Estado**: planejamento, tarefas e análise SDD concluídos; achado I1 corrigido no
-desenho e revalidado. Implementação pendente.
+desenho e revalidado. Implementação concluída localmente: 30/30 tarefas,
+188 testes da v2 e 266 regressões aprovados. Evidências no
+[registro de execução](tasks.md#registro-de-execução); publicação e notas pendentes.
 O setup retornou `BRANCH=003-otimizar-validar-v2` como identificador da feature;
 a branch Git continua `dev`. O ponteiro local `.specify/feature.json` seleciona
 `specs/003-otimizar-validar-v2`. Nenhuma branch foi criada ou trocada.
@@ -76,8 +78,9 @@ nesta spec; revalidar documentação e acesso antes da execução correspondente
 
 ## Constitution Check
 
-Gate avaliado antes da pesquisa e reavaliado após o desenho. PASS indica
-conformidade do plano; resultados da futura implementação permanecem pendentes.
+Gate avaliado antes da pesquisa e reavaliado após o desenho. A implementação
+foi conferida contra essas regras; resultados locais no registro de execução.
+PASS não representa aprovação nas métricas reais.
 
 | Regra | Antes da Fase 0 | Após a Fase 1 |
 | --- | --- | --- |
@@ -111,15 +114,15 @@ specs/003-otimizar-validar-v2/
 
 As [30 tarefas](tasks.md) foram geradas por `$speckit-tasks` em 2026-10-18:
 Setup (2), Foundational (2), US1 (7), US2 (6), US3 (8) e revisão final (5).
-Todas permanecem pendentes; a análise identificou I1, corrigido em C04 e T018/T020.
-A próxima etapa é `$speckit-implement`.
+Todas foram executadas e marcadas `[X]`; I1 está implementado com controles
+positivos/negativos, preservando o helper. Próximo trabalho: planejar a 004.
 
 ### Source Code (repository root)
 
 ```text
 prompts/bug_to_user_story_v1.yml     # referência recuperada, somente leitura
-prompts/bug_to_user_story_v2.yml     # criar na implementação
-tests/test_prompts.py               # implementar seis métodos + contratos/negativos
+prompts/bug_to_user_story_v2.yml     # criado e validado localmente
+tests/test_prompts.py               # seis métodos + contratos/negativos aprovados
 README.md                           # técnicas, comparação qualitativa e execução local
 src/utils.py                        # reutilizar load_yaml/validate_prompt_structure
 src/push_prompts.py                 # consumidor futuro, implementação na 004
@@ -195,7 +198,8 @@ continua reprovando. Não sanitizar o prompt nem alterar o helper.
 
 T018/T020 exigem controles positivos de prosa comum, marcadores reais e falso
 positivo combinado com outro defeito. A política foi conferida offline na correção;
-a implementação do adaptador e seus testes pytest continuam pendentes na 003.
+a implementação do adaptador e seus testes pytest ainda estavam pendentes nesse
+ensaio; agora estão comprovados no registro de execução.
 
 Revalidação de I1 em 2026-10-18: 13 cenários da política passaram em ensaio em
 memória, com entrada intacta (três palavras comuns, seis marcadores, marcador em
@@ -215,6 +219,17 @@ ambiente confirmaram a 003 ativa; a branch Git permanece `dev`.
 
 Conferidos 72 links locais em sete documentos e a sintaxe de sete blocos de comandos,
 incluindo o Python embutido no guia. `git diff --check` aprovado; quatro protegidos
-iguais ao manifesto da 001 e v1 igual ao hash da recuperação da 002. Testes da v2,
-implementação, publicação e notas reais continuam pendentes; nenhum comando futuro
-do quickstart representa evidência executada.
+iguais ao manifesto da 001 e v1 igual ao hash da recuperação da 002. Na conferência do planejamento, testes da v2 e implementação ainda estavam
+pendentes. A execução posterior está registrada abaixo; publicação e notas reais
+continuam pendentes.
+
+
+## Aceite da implementação — 2026-10-18
+
+Concluídas as 30 tarefas, V01–V12 e FR-001–FR-009/SC-001–SC-005 conforme
+[registro detalhado](tasks.md#registro-de-execução). YAML real com três pares próprios,
+Few-shot Learning e Role Prompting, System/User separados e variável única.
+188 testes da v2 e 266 regressões offline aprovados, sem skip/xfail. Revisão
+semântica/documental no [README](../../README.md#técnicas-aplicadas-fase-2).
+Hashes da v1 e quatro protegidos intactos. Sem chamadas remotas nesta spec.
+A 003 continua ativa e a branch continua `dev`; planejar 004 antes de publicar.
