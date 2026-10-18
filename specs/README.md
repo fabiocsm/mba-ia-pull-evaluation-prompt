@@ -10,8 +10,10 @@ com ocorrência na conferência de traces registrada e resolvida por reconsulta.
 Planejamento e geração de tarefas da 002 concluídos; ela permanece ativa.
 A análise da 002 foi realizada e seus achados I1/I2 corrigidos e revalidados:
 sequência incremental de validação alinhada e caminho do contrato em T005 corrigido.
-Implementação da 002, planos/tarefas das specs 003–006 e experimentos permanecem pendentes.
-Evidências e limites no [registro](../docs/preparacao.md).
+A 002 foi implementada e comprovada: pull real, comparação de 2/2 mensagens idênticas,
+236 testes offline do pull e integridade preservada. Planos/tarefas das specs 003–006
+e experimentos permanecem pendentes. Evidências e limites nos registros de
+[preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
 com pesquisa, modelo dos registros, contrato operacional e guia de validação.
@@ -19,9 +21,9 @@ O [plano da 002](002-recuperar-prompt-v1/plan.md) detalha a recuperação fiel d
 com [pesquisa](002-recuperar-prompt-v1/research.md),
 [modelo de dados](002-recuperar-prompt-v1/data-model.md),
 [contrato](002-recuperar-prompt-v1/contracts/recuperacao-v1.md) e
-[guia de validação](002-recuperar-prompt-v1/quickstart.md). Esses artefatos não
-comprovam que a semente já foi recuperada.
-As [25 tarefas da 002](002-recuperar-prompt-v1/tasks.md), ainda abertas, cobrem
+[guia de validação](002-recuperar-prompt-v1/quickstart.md). A execução e a comparação
+real estão comprovadas no registro de recuperação acima.
+As [25 tarefas da 002](002-recuperar-prompt-v1/tasks.md), concluídas, cobrem
 Setup (2), Foundational (2), US1 (9), US2 (7) e revisão final (5). Elas separam
 validação offline de falhas e comprovação real da fidelidade da v1.
 As 30 tarefas da 001, incluindo duas de convergência, cobrem as três histórias, os pré-requisitos e a revisão final.
@@ -188,9 +190,10 @@ antes de `$speckit-implement`, respeitando as dependências de execução. Use
 `$speckit-clarify` apenas se aparecer lacuna que altere escopo ou aceite. Planos e
 tarefas das specs 003–006 ainda não foram gerados; plano e `tasks.md` da 001 estão
 concluídos, e os três achados da análise foram corrigidos e revalidados.
-A 001 foi concluída com a baseline preservada. A feature ativa é a 002, com plano
-e tarefas concluídos como artefatos e achados da análise corrigidos: a próxima etapa
-é a implementação do pull.
+A 001 e a 002 foram concluídas com a baseline preservada. A feature ativa continua
+sendo a 002, sem troca automática do ponteiro. A dependência de recuperação da 003
+está atendida: a próxima etapa é seu planejamento, tarefas e análise antes da
+implementação do prompt otimizado e dos seis testes obrigatórios.
 A reprodução da 001 usa um executor Python separado na mesma máquina; não equivale
 a revisão humana independente nem comprova portabilidade para outro SO.
 A Fase 0 do plano mestre permanece parcialmente pendente.

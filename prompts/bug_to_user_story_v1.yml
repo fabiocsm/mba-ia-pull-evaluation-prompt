@@ -1,25 +1,61 @@
-# Este arquivo contém o prompt inicial de BAIXA QUALIDADE que você deve otimizar.
-# Os problemas são intencionais (ex: {bug_report} duplicado no system e user prompt,
-# instruções vagas, falta de exemplos, sem persona definida).
-# Use-o como base para entender o que precisa ser melhorado na v2.
-
 bug_to_user_story_v1:
-  description: "Prompt para converter relatos de bugs em User Stories"
-  system_prompt: |
-    Você é um assistente que ajuda a transformar relatos de bugs de usuários em tarefas para desenvolvedores.
+  system_prompt: 'Você é um assistente que ajuda a transformar relatos de bugs de
+    usuários em tarefas para desenvolvedores.
+
 
     Analise o relato de bug abaixo e crie uma user story a partir dele.
 
+
     Relato de Bug:
+
     ---
+
     {bug_report}
+
     ---
+
 
     User Story gerada:
 
-  user_prompt: "{bug_report}"
-
-  # Metadados
-  version: "v1"
-  created_at: "2025-01-15"
-  tags: ["bug-analysis", "user-story", "product-management"]
+    '
+  user_prompt: '{bug_report}'
+  version: v1
+  input_variables:
+  - bug_report
+  description: ''
+  tags: &id001
+  - ChatPromptTemplate
+  source:
+    identifier: leonanluppi/bug_to_user_story_v1
+    commit_hash: 2950c33dbd7ffaed2e440b50adfd7769d183f90faf0bae5aa4864354f88e4073
+    retrieved_at: '2026-10-18T08:09:43.707861+00:00'
+    template_metadata:
+      lc_hub_owner: leonanluppi
+      lc_hub_repo: bug_to_user_story_v1
+      lc_hub_commit_hash: 2950c33dbd7ffaed2e440b50adfd7769d183f90faf0bae5aa4864354f88e4073
+    template_tags: null
+    repository_observed_at: '2026-10-18T08:09:43.929044+00:00'
+    repository_metadata:
+      repo_handle: bug_to_user_story_v1
+      description: ''
+      readme: ''
+      id: e506aed4-c44c-4e24-85bd-eb8433b8318c
+      tenant_id: 9858ac0e-2ee8-47d2-bf23-2b9160692537
+      created_at: '2025-11-19T19:31:30.951363'
+      updated_at: '2025-11-19T19:31:32.700361'
+      is_public: true
+      is_archived: false
+      tags: *id001
+      original_repo_id: null
+      upstream_repo_id: null
+      owner: leonanluppi
+      full_name: leonanluppi/bug_to_user_story_v1
+      num_likes: 6
+      num_downloads: 3386
+      num_views: 509
+      liked_by_auth_user: false
+      last_commit_hash: 2950c33dbd7ffaed2e440b50adfd7769d183f90faf0bae5aa4864354f88e4073
+      num_commits: 1
+      original_repo_full_name: null
+      upstream_repo_full_name: null
+  created_at: '2025-11-19T19:31:30.951363'

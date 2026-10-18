@@ -362,12 +362,14 @@ o [manifesto de integridade](docs/integridade-inicial.json) e o
 [inventário de dependências instalado](docs/dependencias-preparacao.txt).
 A [matriz atual por pré-requisito e operação](docs/preparacao.md#matriz-atual)
 registra V01–V16, datas e evidências: os pré-requisitos da 001 passaram; a prova
-de escrita pública V15 pertence ao push da 004. As operações das specs 002–006
-continuam pendentes, incluindo o acesso efetivo à origem no pull.
+de escrita pública V15 pertence ao push da 004. A recuperação da 002 foi concluída;
+seu [registro de execução](docs/recuperacao-v1.md) comprova o acesso à origem.
+As operações das specs 003–006 continuam pendentes.
 A instalação, a integridade e a autenticação LangSmith passaram. A API key local
 confirmou o workspace com handle `fabiocsm`; os dois papéis de modelo responderam
 com temperatura zero e seus traces foram conferidos. Não há resultados de avaliação
-acadêmica obtidos nesta etapa. Pull, otimização/testes, push e experimentos pertencem às specs 002–006
+acadêmica obtidos nesta etapa. O pull tem comprovação própria na 002;
+otimização/testes, push e experimentos pertencem às specs 003–006
 e dependem de suas implementações e dos respectivos pré-requisitos.
 
 Pré-requisitos: Git, Python 3.10+ (validado com CPython 3.11.14), LangSmith CLI,
@@ -461,3 +463,38 @@ repetir os gates e contabilizar as duas novas chamadas. A reprodução automatiz
 seus resultados, a ocorrência na conferência de traces e os limites dessa prova
 estão no registro. Quatro chamadas mínimas consumiram 100 tokens, com custo
 estimado de US$ 0,000248; cobrança observada não disponível.
+
+### Recuperação do prompt original — spec 002
+
+Com o ambiente virtual ativo e a configuração acima conferida, execute da raiz:
+
+```bash
+source venv/bin/activate
+pytest tests/test_pull_prompts.py -v
+python src/pull_prompts.py
+```
+
+O script usa `Client.pull_prompt` na origem obrigatória
+`leonanluppi/bug_to_user_story_v1`, com `dangerously_pull_public_prompt=True`,
+`include_model=False` e `skip_cache=True`. A configuração exportada prevalece
+sobre `.env`, inclusive valores vazios; configure as variáveis sem espaços em branco.
+O pull confere configuração de provedor e modelos, sem executar inferência.
+
+O código de saída **0** confirma a persistência e imprime origem, revisão e destino
+`prompts/bug_to_user_story_v1.yml`. O código **1** informa categoria, etapa e ação
+para falhas de configuração, acesso, disponibilidade, representação ou escrita.
+Falhas anteriores à substituição atômica conservam a cópia anterior byte a byte;
+sem cópia anterior, não criam uma referência parcial no destino. Eventual resíduo
+temporário é diagnosticado separadamente e deve ser removido antes de repetir.
+
+O [registro da recuperação](docs/recuperacao-v1.md) guarda revisão, SHA-256,
+versões, comandos, cenários de falha e a comparação real de 2/2 mensagens idênticas.
+O [guia V12](specs/002-recuperar-prompt-v1/quickstart.md#recuperação-real-e-comparação--v12)
+permite repetir a comparação fixando a revisão salva, sem recuperar outra latest.
+Metadados do repositório são um snapshot observado separadamente; datas/tags do
+arquivo ilustrativo foram substituídas apenas pelos valores efetivamente retornados.
+
+A 002 passou em 236 testes offline e na comparação real da revisão recuperada.
+Os seis testes obrigatórios de qualidade da v2 em `tests/test_prompts.py` pertencem
+à 003 e ainda aguardam implementação. Não há notas, publicação v2 ou experimentos
+acadêmicos comprovados nesta etapa.
