@@ -7,7 +7,11 @@
 **Estado:** preparação da spec 001 concluída (30/30 tarefas, incluindo duas de convergência): ambiente, baseline,
 fork público, configuração/contexto LangSmith, chamadas mínimas e tracing comprovados.
 Reprodução automatizada na mesma máquina concluída com ocorrência de leitura registrada.
-Implementações das specs 002–006 e avaliações acadêmicas reais pendentes.
+Recuperação da spec 002 concluída, com pull e fidelidade comprovados no
+[registro](../docs/recuperacao-v1.md). Planejamento e geração de tarefas da spec 003
+concluídos; análise realizada com I1 corrigido e revalidado. Ela é a spec ativa.
+Implementação da 003, implementação das specs
+004–006 e avaliações acadêmicas reais permanecem pendentes.
 
 ## 1. Objetivo e referências
 
@@ -35,7 +39,15 @@ foi concluído com pesquisa, modelo de dados, contrato e guia de validação. Su
 [30 tarefas](../specs/001-preparar-experimentos/tasks.md) foram geradas por história e
 dependência. A análise SDD da 001 foi concluída e seus três achados foram corrigidos
 e revalidados. A implementação está no [registro de preparação](../docs/preparacao.md)
-e no [manifesto](../docs/integridade-inicial.json). Planos/tarefas das demais specs e
+e no [manifesto](../docs/integridade-inicial.json). A 002 também tem plano, tarefas,
+análise e execução concluídos, registrados no índice e na recuperação acima.
+O [plano técnico da 003](../specs/003-otimizar-validar-v2/plan.md), concluído em
+2026-10-18, detalha as Fases 3–4 com pesquisa, modelo de dados, contrato e guia de
+validação. Suas [30 tarefas](../specs/003-otimizar-validar-v2/tasks.md) foram geradas
+por história e dependência; todas permanecem pendentes. A análise da 003 identificou
+I1, corrigido no contrato e em T018/T020 com política explícita para falso positivo
+de TODO e controles de regressão, sem alterar o helper protegido. Implementação da 003,
+planos/tarefas das specs 004–006 e
 avaliações reais permanecem pendentes; este plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório

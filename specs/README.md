@@ -7,12 +7,14 @@ da 001 concluídos. Preparação implementada: 30/30 tarefas (incluindo duas de 
 fork público, API key/contexto LangSmith, modelos com temperatura zero e tracing
 comprovados. Reprodução automatizada em novo venv na mesma máquina concluída,
 com ocorrência na conferência de traces registrada e resolvida por reconsulta.
-Planejamento e geração de tarefas da 002 concluídos; ela permanece ativa.
+Planejamento e geração de tarefas da 002 concluídos.
 A análise da 002 foi realizada e seus achados I1/I2 corrigidos e revalidados:
 sequência incremental de validação alinhada e caminho do contrato em T005 corrigido.
 A 002 foi implementada e comprovada: pull real, comparação de 2/2 mensagens idênticas,
-236 testes offline do pull e integridade preservada. Planos/tarefas das specs 003–006
-e experimentos permanecem pendentes. Evidências e limites nos registros de
+236 testes offline do pull e integridade preservada. Planejamento e geração de
+tarefas da 003 concluídos; análise realizada com I1 corrigido e revalidado.
+Ela é a spec ativa. Implementação da 003, planos/tarefas das specs
+004–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
 [preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
@@ -23,6 +25,20 @@ com [pesquisa](002-recuperar-prompt-v1/research.md),
 [contrato](002-recuperar-prompt-v1/contracts/recuperacao-v1.md) e
 [guia de validação](002-recuperar-prompt-v1/quickstart.md). A execução e a comparação
 real estão comprovadas no registro de recuperação acima.
+O [plano da 003](003-otimizar-validar-v2/plan.md) detalha as Fases 3–4, com
+[pesquisa](003-otimizar-validar-v2/research.md),
+[modelo de dados](003-otimizar-validar-v2/data-model.md),
+[contrato](003-otimizar-validar-v2/contracts/otimizacao-v2.md) e
+[guia de validação](003-otimizar-validar-v2/quickstart.md). Prevê três exemplos próprios,
+Few-shot Learning e Role Prompting, os seis testes efetivos e negativos offline,
+preservando a v1 e separando validação local de publicação/avaliação.
+As [30 tarefas da 003](003-otimizar-validar-v2/tasks.md), todas pendentes, cobrem
+Setup (2), Foundational (2), US1 (7), US2 (6), US3 (8) e revisão final (5).
+Os seis testes obrigatórios são introduzidos por história e consolidados com
+negativos na US3; seis marcadores de paralelismo formam três pares sem conflito
+de escrita. A análise SDD identificou I1 (falso positivo de TODO no helper);
+o contrato e T018/T020 agora definem o adaptador restrito e controles de regressão,
+preservando `src/utils.py`. O desenho foi revalidado; a implementação é a próxima etapa.
 As [25 tarefas da 002](002-recuperar-prompt-v1/tasks.md), concluídas, cobrem
 Setup (2), Foundational (2), US1 (9), US2 (7) e revisão final (5). Elas separam
 validação offline de falhas e comprovação real da fidelidade da v1.
@@ -162,8 +178,8 @@ deve ser registrada e resolvida antes de qualquer proposta de mudança nesses ma
 ## Artefatos iniciais e continuação do SDD
 
 Na especificação inicial foram criados `spec.md` e `checklists/requirements.md` por
-feature, além deste índice. A 001 agora também tem planejamento e tarefas;
-a 002 tem os cinco artefatos de planejamento e `tasks.md` listados acima.
+feature, além deste índice. A 001 e a 002 também têm planejamento e tarefas;
+a 003 tem os cinco artefatos de planejamento e `tasks.md` listados acima.
 As descrições estão nos campos `Input`. O template ativo foi resolvido pela
 pilha local do Spec Kit e suas seções obrigatórias foram mantidas, com premissas e
 dependências. A revisão de cada checklist registra 16/16 itens de qualidade atendidos,
@@ -174,13 +190,13 @@ foram verificados e não havia hooks a executar. Nenhuma branch foi criada ou tr
 `dev` é a branch de trabalho existente, independente dos diretórios de spec.
 
 O ponteiro local `.specify/feature.json` foi atualizado em cada aplicação e agora
-seleciona `specs/002-recuperar-prompt-v1`, conforme solicitação do autor. Esse
+seleciona `specs/003-otimizar-validar-v2`, conforme solicitação do autor. Esse
 arquivo é ignorado pelo Git por ser estado local. Para selecionar explicitamente uma
 spec antes da próxima skill, use a raiz do repositório e a variável reconhecida pelos
 scripts locais:
 
 ```bash
-export SPECIFY_FEATURE_DIRECTORY=specs/002-recuperar-prompt-v1
+export SPECIFY_FEATURE_DIRECTORY=specs/003-otimizar-validar-v2
 # Em seguida, invocar $speckit-implement nesta conversa para essa feature.
 ```
 
@@ -188,12 +204,11 @@ Troque o valor pelo diretório da spec desejada; não presuma que a branch selec
 feature. Prossiga com `$speckit-plan`, `$speckit-tasks` e `$speckit-analyze` por feature,
 antes de `$speckit-implement`, respeitando as dependências de execução. Use
 `$speckit-clarify` apenas se aparecer lacuna que altere escopo ou aceite. Planos e
-tarefas das specs 003–006 ainda não foram gerados; plano e `tasks.md` da 001 estão
-concluídos, e os três achados da análise foram corrigidos e revalidados.
-A 001 e a 002 foram concluídas com a baseline preservada. A feature ativa continua
-sendo a 002, sem troca automática do ponteiro. A dependência de recuperação da 003
-está atendida: a próxima etapa é seu planejamento, tarefas e análise antes da
-implementação do prompt otimizado e dos seis testes obrigatórios.
+tarefas das specs 004–006 ainda não foram gerados. A 001 e a 002 foram concluídas
+com a baseline preservada; o planejamento e as tarefas da 003 foram concluídos em 2026-10-18.
+A feature ativa é a 003, selecionada explicitamente pelo autor, sem trocar `dev`.
+A dependência de recuperação está atendida e a análise I1 foi corrigida/revalidada:
+a próxima etapa é `$speckit-implement` para o prompt e os seis testes obrigatórios.
 A reprodução da 001 usa um executor Python separado na mesma máquina; não equivale
 a revisão humana independente nem comprova portabilidade para outro SO.
 A Fase 0 do plano mestre permanece parcialmente pendente.
