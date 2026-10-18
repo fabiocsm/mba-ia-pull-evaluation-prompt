@@ -352,3 +352,105 @@ Rode uma vez e guarde o endereço: ao compartilhar de novo, o link muda.
 - Não altere os datasets de avaliação - apenas os prompts em prompts/bug_to_user_story_v2.yml
 - Itere, itere, itere - é normal precisar de 3-5 iterações para atingir 0.8 em todas as métricas
 - Documente seu processo - a jornada de otimização é tão importante quanto o resultado final
+
+## Como Executar
+
+### Preparação — spec 001
+
+Consulte o [registro de prontidão](docs/preparacao.md),
+o [manifesto de integridade](docs/integridade-inicial.json) e o
+[inventário de dependências instalado](docs/dependencias-preparacao.txt).
+A [matriz atual por pré-requisito e operação](docs/preparacao.md#matriz-atual)
+registra V01–V16, datas e evidências: os pré-requisitos da 001 passaram; a prova
+de escrita pública V15 pertence ao push da 004. As operações das specs 002–006
+continuam pendentes, incluindo o acesso efetivo à origem no pull.
+A instalação, a integridade e a autenticação LangSmith passaram. A API key local
+confirmou o workspace com handle `fabiocsm`; os dois papéis de modelo responderam
+com temperatura zero e seus traces foram conferidos. Não há resultados de avaliação
+acadêmica obtidos nesta etapa. Pull, otimização/testes, push e experimentos pertencem às specs 002–006
+e dependem de suas implementações e dos respectivos pré-requisitos.
+
+Pré-requisitos: Git, Python 3.10+ (validado com CPython 3.11.14), LangSmith CLI,
+acesso ao workspace/handle `fabiocsm` e chaves locais LangSmith/OpenAI. Execute da raiz.
+Selecione um Python compatível; neste ambiente, `uv python find 3.11` localiza o
+interpretador já instalado. Crie e ative o ambiente antes de instalar:
+
+```bash
+python3 -m venv venv  # Use o Python 3.11 selecionado, quando disponível.
+source venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pip check
+python -c 'import langsmith, langchain_core, langchain_openai, langchain_google_genai, dotenv, yaml, pydantic, pytest; print("imports OK")'
+```
+
+No PowerShell, use `venv\Scripts\Activate.ps1`. Não copie o template sobre o `.env`
+existente. Preserve as credenciais; configure-as somente nesse arquivo local ignorado,
+sem incluí-las no Git ou no terminal. Valores não secretos escolhidos:
+
+```dotenv
+LANGSMITH_ENDPOINT=https://api.smith.langchain.com
+LANGSMITH_PROJECT=mba-ia-pull-evaluation-prompt
+LANGSMITH_WORKSPACE_ID=15dd5852-a835-4163-826c-e78668fd2a9c
+USERNAME_LANGSMITH_HUB=fabiocsm
+LANGSMITH_TRACING=true
+LLM_PROVIDER=openai
+LLM_MODEL=gpt-4.1-2025-04-14
+EVAL_MODEL=gpt-4.1-2025-04-14
+```
+
+Os modelos foram selecionados após consulta à documentação oficial e devem ser
+comprovados em chamadas reais com `temperature=0`. Ambos os papéis passaram nessa
+verificação mínima; isso não mede a qualidade das User Stories ou dos juízes.
+O [modelo](https://developers.openai.com/api/docs/models/gpt-4.1) tem
+[desligamento anunciado para 2027-01-14](https://developers.openai.com/api/docs/deprecations):
+reconsulte as fontes antes de repetir. Uma troca exige nova condição experimental.
+O suporte a `LLM_PROVIDER=google` permanece disponível; exige seleção documentada de
+modelos e `GOOGLE_API_KEY` quando usado.
+
+Confira a presença sem revelar valores. Variáveis exportadas têm precedência sobre `.env`:
+
+```bash
+python - <<'PY'
+import os
+from dotenv import load_dotenv
+load_dotenv('.env', override=False)
+required = ('LANGSMITH_API_KEY', 'LANGSMITH_PROJECT', 'USERNAME_LANGSMITH_HUB',
+            'LANGSMITH_TRACING', 'LLM_PROVIDER', 'LLM_MODEL', 'EVAL_MODEL', 'OPENAI_API_KEY')
+missing = [name for name in required if not os.getenv(name, '').strip()]
+print('Variáveis ausentes:', missing)
+assert not missing, 'Resolver configuração antes das chamadas'
+assert os.getenv('USERNAME_LANGSMITH_HUB') == 'fabiocsm'
+assert os.getenv('LLM_PROVIDER') == 'openai'
+assert os.getenv('LANGSMITH_TRACING', '').lower() == 'true'
+assert os.getenv('LLM_MODEL') == os.getenv('EVAL_MODEL') == 'gpt-4.1-2025-04-14'
+PY
+```
+
+Copie e execute o [roteiro de contexto e traces](docs/preparacao.md#roteiro-executavel).
+Ele consulta a ajuda do CLI, carrega dotenv sem sobrescrever variáveis exportadas,
+seleciona o workspace, confere o handle autenticado e consulta o projeto pelo SDK.
+Por padrão, valida os quatro run IDs existentes com **zero novas chamadas LLM**,
+conferindo tenant/projeto, modelo, temperatura, término, uso e metadados da condição.
+As saídas são filtradas; erros de acesso não são tratados como projeto ausente.
+
+O ID de workspace acima é o desta entrega. Se a variável não for definida, o roteiro
+só seleciona automaticamente quando há um único workspace acessível. Em outro
+contexto, escolha explicitamente o workspace que possui o handle esperado.
+
+Para uma nova reprodução integral, siga os checks locais do
+[guia de validação](specs/001-preparar-experimentos/quickstart.md), em outro venv limpo,
+e execute o mesmo bloco documentado com `PREPARACAO_NOVAS_CHAMADAS=1` no processo.
+Essa opção executa a dupla mínima real pelos utilitários, com captura de run IDs,
+modelos e uso, espera de tracing e até quatro consultas para confirmar os traces.
+Ela consome API; registre novas tentativas, tokens e custo no relatório. Projeto
+confirmadamente ausente pode surgir após as chamadas; autenticação inválida bloqueia
+o avanço. O modo de leitura dos quatro traces não substitui essa nova reprodução.
+
+Estados do registro: `pronto` exige evidência; `impedido` exige causa e próxima ação;
+`pendente` identifica prova ainda não realizada. Leitura de recurso público não
+comprova posse do handle nem permissão de push. Para reproduzir em outro ambiente,
+outro executor deve seguir o guia com um venv limpo separado, sem apagar `venv/`,
+repetir os gates e contabilizar as duas novas chamadas. A reprodução automatizada foi concluída em um venv separado na mesma máquina;
+seus resultados, a ocorrência na conferência de traces e os limites dessa prova
+estão no registro. Quatro chamadas mínimas consumiram 100 tokens, com custo
+estimado de US$ 0,000248; cobrança observada não disponível.

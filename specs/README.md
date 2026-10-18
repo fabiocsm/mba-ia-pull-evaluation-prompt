@@ -2,18 +2,25 @@
 
 **Data:** 2026-10-17
 
-**Estado:** seis especificações iniciais revisadas; planejamento técnico,
-[tarefas da 001](001-preparar-experimentos/tasks.md) e análise de consistência com
-correções concluídos. Planos e tarefas das demais specs, implementação e experimentos pendentes.
+**Estado:** seis especificações iniciais revisadas; planejamento, tarefas e análise
+da 001 concluídos. Preparação implementada: 30/30 tarefas (incluindo duas de convergência), ambiente, integridade,
+fork público, API key/contexto LangSmith, modelos com temperatura zero e tracing
+comprovados. Reprodução automatizada em novo venv na mesma máquina concluída,
+com ocorrência na conferência de traces registrada e resolvida por reconsulta.
+Planos/tarefas das demais specs e experimentos permanecem pendentes.
+Evidências e limites no [registro](../docs/preparacao.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
 com pesquisa, modelo dos registros, contrato operacional e guia de validação.
-As 28 tarefas da 001 cobrem as três histórias, os pré-requisitos e a revisão final.
-A criação desses artefatos não comprova instalação, acessos, modelos ou prontidão real.
+As 30 tarefas da 001, incluindo duas de convergência, cobrem as três histórias, os pré-requisitos e a revisão final.
+A criação desses artefatos não comprova prontidão. A execução registrada agora comprova
+instalação/pip check/imports, contratos SDK, comparação com origem, 15 casos e fork público;
+modelos foram selecionados documentalmente e comprovados em quatro chamadas reais,
+duas iniciais e duas na reprodução, com quatro traces no projeto/workspace esperado.
 Os achados I1, A1 e I2 da análise da 001 foram corrigidos: seleção de modelos antes
 da validação da configuração, distinção entre contexto comprovado e projeto ainda
 ausente, e remoção do caractere isolado no plano. Dependências e rastreabilidade
-foram atualizadas sem executar as tarefas de preparação.
+foram atualizadas antes da implementação; os resultados atuais estão no registro acima.
 
 ## Avaliação do plano e decisão de divisão
 
@@ -45,8 +52,9 @@ Pontos que o planejamento técnico deve manter explícitos:
 2. Planejar 3–5 ciclos não garante aprovação. Aprovação antecipada deve ser justificada;
    reprovação após cinco ciclos permanece pendente e exige continuidade planejada.
    Essa interpretação já consta no plano e não elimina o registro das iterações reais.
-3. Nomes e disponibilidade atuais dos modelos serão pesquisados na execução da spec
-   001; nenhuma escolha foi presumida ou verificada remotamente nesta etapa.
+3. A spec 001 reconsultou fontes oficiais e selecionou `gpt-4.1-2025-04-14` nos dois
+   papéis; compatibilidade documental com temperatura zero não comprova acesso da conta.
+   As duas chamadas iniciais e sua reprodução passaram, com traces verificados.
 4. Comparação qualitativa v1/v2 é obrigatória. Baseline numérica da v1 é opcional e
    exige experimento real adicional; os números ilustrativos do README não a substituem.
 5. Uma execução não deve alterar o prompt publicado enquanto ele estiver sendo avaliado.
@@ -167,5 +175,8 @@ antes de `$speckit-implement`, respeitando as dependências de execução. Use
 `$speckit-clarify` apenas se aparecer lacuna que altere escopo ou aceite. Planos e
 tarefas das demais specs ainda não foram gerados; plano e `tasks.md` da 001 estão
 concluídos, e os três achados da análise foram corrigidos e revalidados.
-A próxima etapa da 001 é `$speckit-implement`.
+A 001 foi concluída com a baseline preservada. A próxima feature é a 002: selecionar
+seu diretório e aplicar plano, tarefas e análise antes da implementação do pull.
+A reprodução da 001 usa um executor Python separado na mesma máquina; não equivale
+a revisão humana independente nem comprova portabilidade para outro SO.
 A Fase 0 do plano mestre permanece parcialmente pendente.

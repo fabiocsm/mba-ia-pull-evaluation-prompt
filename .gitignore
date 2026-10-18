@@ -48,3 +48,10 @@ ENV/
 screenshots/
 results/
 .claude/
+
+# Preparação local e arquivos temporários
+.venv/
+.env*
+!.env.example
+*.tmp
+Thumbs.db

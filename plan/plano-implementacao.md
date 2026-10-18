@@ -4,7 +4,10 @@
 
 **Data:** 2026-10-17
 
-**Estado:** planejamento; as atividades de implementação e avaliação abaixo estão pendentes.
+**Estado:** preparação da spec 001 concluída (30/30 tarefas, incluindo duas de convergência): ambiente, baseline,
+fork público, configuração/contexto LangSmith, chamadas mínimas e tracing comprovados.
+Reprodução automatizada na mesma máquina concluída com ocorrência de leitura registrada.
+Implementações das specs 002–006 e avaliações acadêmicas reais pendentes.
 
 ## 1. Objetivo e referências
 
@@ -29,10 +32,11 @@ estão no [índice de especificações](../specs/README.md), com descrições de
 dependências, contratos e cobertura de R01–R18. Cada spec tem `spec.md` e checklist de
 qualidade revisados. O [plano técnico da spec 001](../specs/001-preparar-experimentos/plan.md)
 foi concluído com pesquisa, modelo de dados, contrato e guia de validação. Suas
-[28 tarefas](../specs/001-preparar-experimentos/tasks.md) foram geradas por história e
+[30 tarefas](../specs/001-preparar-experimentos/tasks.md) foram geradas por história e
 dependência. A análise SDD da 001 foi concluída e seus três achados foram corrigidos
-e revalidados. Planos/tarefas das demais specs, implementação e avaliações reais
-permanecem pendentes; o conteúdo operacional deste plano continua sendo referência.
+e revalidados. A implementação está no [registro de preparação](../docs/preparacao.md)
+e no [manifesto](../docs/integridade-inicial.json). Planos/tarefas das demais specs e
+avaliações reais permanecem pendentes; este plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório
 
@@ -122,26 +126,35 @@ Não criar uma interface web, serviços ou persistência adicionais para este de
 
 **Dependência:** Fase 0.
 
-- [ ] Registrar a referência Git e a integridade dos quatro arquivos protegidos.
-- [ ] Confirmar que o repositório remoto é um fork público do repositório base.
-- [ ] Selecionar um interpretador Python 3.10+ compatível com as dependências fixadas.
-- [ ] Criar/ativar `venv`, instalar `requirements.txt` e executar `python -m pip check`.
-- [ ] Validar presença de `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`,
+- [x] Registrar a referência Git e a integridade dos quatro arquivos protegidos.
+- [x] Confirmar que o repositório remoto é um fork público do repositório base.
+- [x] Selecionar um interpretador Python 3.10+ compatível com as dependências fixadas.
+- [x] Criar/ativar `venv`, instalar `requirements.txt` e executar `python -m pip check`.
+- [x] Validar presença de `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`,
   `USERNAME_LANGSMITH_HUB=fabiocsm`, `LANGSMITH_TRACING=true`, `LLM_PROVIDER=openai`,
   `LLM_MODEL`, `EVAL_MODEL` e `OPENAI_API_KEY`, sem imprimir segredos.
-- [ ] Reutilizar a chave OpenAI existente. Confirmar acesso ao workspace e ao handle
+- [x] Reutilizar a chave OpenAI existente. Confirmar acesso ao workspace e ao handle
   informado; não tentar criar um novo handle.
-- [ ] Consultar documentação oficial dos modelos e conferir chamadas mínimas de geração
+- [x] Consultar documentação oficial dos modelos e conferir chamadas mínimas de geração
   e avaliação com o provedor configurado, mensagens compatíveis e `temperature=0`.
-- [ ] Conferir os contratos da versão instalada do SDK: retorno do pull, serialização
+- [x] Conferir os contratos da versão instalada do SDK: retorno do pull, serialização
   das mensagens, parâmetros do push, metadados e recuperação da revisão publicada.
-- [ ] Consultar `langsmith --help` e a ajuda de cada subcomando usado. O CLI pode apoiar
+- [x] Consultar `langsmith --help` e a ajuda de cada subcomando usado. O CLI pode apoiar
   a inspeção de projeto, dataset, prompt, experimento e trace; seu ambiente precisa
   receber a autenticação, pois não se deve presumir leitura automática do `.env`.
 
 **Critério de saída:** ambiente funcional, configuração válida, contratos confirmados
 e modelos escolhidos e registrados. Se houver incompatibilidade, registrar o erro e
 resolver o pré-requisito sem modificar silenciosamente os arquivos protegidos.
+
+**Execução da Fase 1 concluída:** Python 3.11.14, instalação dos pins, `pip check`, imports
+dos dois providers e contratos SDK aprovados. Quatro materiais iguais à origem e 15
+casos preservados. API key LangSmith validada e contexto `fabiocsm` confirmado.
+Quatro chamadas mínimas (duas iniciais e duas em reprodução com processo/venv separados)
+com temperatura zero e traces comprovados no projeto/tenant esperado: 100 tokens,
+estimativa US$ 0,000248; cobrança observada não disponível. Reprodução na mesma máquina,
+sem revisor humano; ocorrência na conferência de traces registrada e resolvida por
+reconsulta sem novas chamadas LLM. Nenhum experimento acadêmico executado.
 
 ### Fase 2 — Pull real e preservação da v1
 
