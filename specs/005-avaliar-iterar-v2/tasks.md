@@ -105,7 +105,7 @@ respostas e feedbacks (V03–V07), sem depender de ciclos posteriores ou da 006.
 - [X] T010 [US1] Escrever o bloco `AVALIACAO_DATASET` em `docs/avaliacao-v2.md` conforme C02: localizar por nome exato; se ausente, importar `evaluate` de `src/` e chamar `create_evaluation_dataset(client, dataset_name, "datasets/bug_to_user_story.jsonl")` uma vez; comparar multiconjunto canônico `json.dumps({"inputs":…, "outputs":…}, sort_keys=True, ensure_ascii=False)` remoto × local com multiplicidade; exigir 15; emitir `dataset_id`, `example_map` (`example_id → índice local, complexidade`) e estado `idêntico`/`divergente`, com as linhas `AVALIACAO_DATASET_ID=…` e `AVALIACAO_DATASET=…` para exportação; em divergência instruir D03 sem apagar nada.
 - [X] T011 [US1] Escrever o bloco `AVALIACAO_AUDITORIA` em `docs/avaliacao-v2.md` conforme C04/C05: ler `AVALIACAO_LOG`, extrair URL e `selectedSessions`; ler o projeto do experimento e conferir `reference_dataset_id` contra `AVALIACAO_DATASET_ID`; reler esse dataset somente por leitura e reconstruir o `example_map` pela comparação canônica de C02; listar runs raiz e runs do template; listar feedback dos 15 runs; validar regras de D06; conferir HEAD e hashes da v2 e dos quatro protegidos depois; calcular por dificuldade (via `example_map` reconstruído) as médias `by_complexity` e as três menores notas por métrica base com comentário (`lowest`); somar tokens dos runs LLM da geração e das árvores dos runs do avaliador (via `source_run_id` do feedback ou projeto do avaliador), marcando como `estimado` o que não tiver contagem, e estimar custo a US$ 2/M entrada e US$ 8/M saída; emitir JSON com tabela por exemplo e estado. Sem URL no log, listar somente para registro projetos com `reference_dataset_id` do dataset auditado, prefixo `fabiocsm-bug_to_user_story_v2` e início posterior ao comando, sem avaliá-los, e emitir `falha_execução`.
 - [X] T012 [US1] Executar `pytest tests/test_evaluation_audit.py -v` até T006–T008 passarem, depois `pytest -q` para regressão (base 732); registrar contagens e a falha pertinente observada antes dos blocos em `specs/005-avaliar-iterar-v2/tasks.md`.
-- [X] T013 [US1] Executar V04: bloco `AVALIACAO_DATASET` real (criação única + auditoria); registrar `dataset_id`, contagem, igualdade e distribuição 5/7/3 em `docs/avaliacao-v2.md` e exportar `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` emitidos. Divergência → registrar, declarar nova condição `COND-00N` com novo `LANGSMITH_PROJECT` na seção de condições de `docs/avaliacao-v2.md` (D03), exportar `AVALIACAO_CONDICAO=COND-00N` antes de qualquer LLM e repetir T013.
+- [X] T013 [US1] Executar V04: bloco `AVALIACAO_DATASET` real (criação única + auditoria); registrar `dataset_id`, contagem, igualdade e distribuição 5/7/3 em `docs/avaliacao-v2.md` e exportar `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` emitidos. Divergência → registrar, declarar nova condição `COND-00N` com novo `LANGSMITH_PROJECT` na seção de condições de `docs/avaliacao-v2.md` (D03), exportar `AVALIACAO_CONDICAO=COND-00N` antes de qualquer LLM, executar o bootstrap opcional `AVALIACAO_PROJETO` e repetir T013.
 - [X] T014 [US1] Executar V03: bloco `AVALIACAO_GATE` real para `CIC-01`, depois de T013, com `AVALIACAO_CONDICAO` (padrão `COND-001`), `AVALIACAO_DATASET_ID` e `AVALIACAO_DATASET` de T013, `AVALIACAO_HUB_COMMIT=4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`, `AVALIACAO_V2_FILE_SHA256=49ffb35893ae86769d22b555b9b0017e1910e08c49373e89a1931f58ec06c46d`, `AVALIACAO_V2_DEFINITION_SHA256=ab661782f912303d01a38d45d8a0f89074b84a1a5756fd6d6df7aa7f0489b89c`, `AVALIACAO_TESTES=aprovado` (T012), `AVALIACAO_DASHBOARD=conferido` (inspeção visual de 2026-10-18 registrada em `docs/publicacao-v2.md`) e `AVALIACAO_CUSTO_ACUMULADO_USD=0`; registrar JSON sanitizado em `docs/avaliacao-v2.md`. Falha → parar e seguir a matriz de falhas do contrato.
 - [X] T015 [US1] Executar V05 para `CIC-01` após o gate `gate_ok` de T014, sem editar a v2, preservando o código do avaliador (não o do `tee`), em bash ou zsh: `LOG="results/CIC-01-$(date +%Y%m%dT%H%M%S).log"; set -o pipefail; python src/evaluate.py 2>&1 | tee "$LOG"; export AVALIACAO_EXIT_CODE=$?; set +o pipefail; echo "AVALIACAO_EXIT_CODE=$AVALIACAO_EXIT_CODE" >> "$LOG.exit"`; registrar em `docs/avaliacao-v2.md` início/fim ISO 8601, `AVALIACAO_EXIT_CODE`, URL, nome do experimento e médias impressas (sem copiar conteúdo bruto com dados sensíveis). Sem retry automático.
 - [X] T016 [US1] Executar V06: bloco `AVALIACAO_AUDITORIA` real sobre o log de T015, com `AVALIACAO_LOG` e `AVALIACAO_EXIT_CODE` de T015 e `AVALIACAO_DATASET_ID` de T013; registrar `Experimento` e `RegistroCusto` de `CIC-01` em `docs/avaliacao-v2.md`, incluindo confirmação de `lc_hub_commit_hash` por run (D04). Estado `incompleto`/`invalidado`/`falha_execução` → diagnosticar pela matriz, registrar (inclusive projeto parcial listado sem URL) e só repetir após corrigir a causa, mantendo a tentativa anterior.
@@ -488,3 +488,31 @@ Pedido do autor: “Open CIC-03 to stop invented thresholds like the 1-second on
 - **V11 após CIC-03**: protegidos e v1 inalterados; v2 `692df6ae…8974` igual à revisão
   avaliada; `git diff --check` aprovado; nenhum segredo nos arquivos alterados; links locais
   resolvidos; `pytest -q` → **817 passed**.
+
+### Revisão dos commits — 2026-10-19
+
+Escopo solicitado: commits da 005 contra `main`, uma iteração de `review-loop`, com
+commit local das correções após os gates. Revisão por três subagentes, com triagem
+e conferência do orquestrador. Os resultados de CIC-01–03 são históricos; esta revisão
+não executa novos experimentos nem altera o prompt avaliado.
+
+- [X] T036 Corrigir R1-1 (C10): suprimir a saída bruta do helper de criação em
+  `docs/avaliacao-v2.md`, com regressão de sentinelas em `tests/test_evaluation_audit.py`.
+- [X] T037 Corrigir R1-2 (C01.4): bloquear handle divergente antes das consultas do
+  gate e da auditoria, com testes negativos nos mesmos arquivos.
+- [X] T038 Corrigir R1-3 (D03/C01.6): viabilizar a inicialização explícita do projeto
+  isolado antes do gate somente leitura, atualizar o roteiro/contrato/pesquisa e testar
+  projeto inexistente com um dublê fiel ao SDK.
+- [X] T039 Corrigir R1-4 (FR-008/RegistroCusto/C09): registrar e usar tarifas por papel
+  da condição ativa, rejeitar configuração de preço ausente/inválida e testar custo
+  de condição alternativa e seu efeito no gate.
+- [X] T040 Revisar as correções, executar a suíte completa offline, conferir integridade,
+  sintaxe, links e `git diff --check main <árvore>`, registrar evidências da revisão
+  e criar o commit local autorizado sobre a mesma árvore validada.
+
+Resultado da revisão: R1-1–R1-4 corrigidos; propagação documental H1-1 resolvida;
+revisão adicional das correções sem novos achados. Suíte completa: **855 aprovados**
+(baseline 817); testes da auditoria: 123. Sintaxe, integridade dos protegidos/v1/v2,
+dataset 15/5/7/3, links locais, sigilo e diff-check contra `main` aprovados. Evidências
+e retornos literais dos fixers no [relatório da revisão](../../docs/revisao-spec005.md).
+Nenhum experimento ou chamada LLM nova; nenhuma publicação ou push Git nesta revisão.

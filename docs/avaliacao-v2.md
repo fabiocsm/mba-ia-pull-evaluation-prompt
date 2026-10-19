@@ -43,13 +43,17 @@ Cada condição é declarada **antes** de qualquer execução que a use, num blo
 Resultados de condições diferentes não são comparados diretamente.
 
 ```json condicao
-{"condicao": "COND-001", "provider": "openai", "llm_model": "gpt-4.1-2025-04-14", "eval_model": "gpt-4.1-2025-04-14", "temperature": 0, "langsmith_project": "mba-ia-pull-evaluation-prompt", "dataset_name": "mba-ia-pull-evaluation-prompt-eval", "workspace_id": "15dd5852-a835-4163-826c-e78668fd2a9c", "endpoint": "https://api.smith.langchain.com"}
+{"condicao": "COND-001", "provider": "openai", "llm_model": "gpt-4.1-2025-04-14", "eval_model": "gpt-4.1-2025-04-14", "temperature": 0, "langsmith_project": "mba-ia-pull-evaluation-prompt", "dataset_name": "mba-ia-pull-evaluation-prompt-eval", "workspace_id": "15dd5852-a835-4163-826c-e78668fd2a9c", "endpoint": "https://api.smith.langchain.com", "rates_usd_per_million": {"geracao": {"entrada": 2, "saida": 8}, "juizes": {"entrada": 2, "saida": 8}}}
 ```
 
 `COND-001` vem da [preparação](preparacao.md#condição-experimental): temperatura `0`
 fixada pelo código fornecido, SDK `langsmith` 0.13.0 e `langchain-core` 1.6.4, hashes
 dos protegidos iguais ao [manifesto](integridade-inicial.json). Preços oficiais usados
-nas estimativas: US$ 2/M tokens de entrada e US$ 8/M de saída.
+nas estimativas: US$ 2/M tokens de entrada e US$ 8/M de saída em ambos os papéis,
+registrados em `rates_usd_per_million`. Ao declarar uma condição futura, consulte os
+preços oficiais dos respectivos modelos e registre as tarifas de geração e juízes
+antes da execução; nenhuma tarifa é herdada automaticamente. Gate e auditoria rejeitam
+tarifas ausentes, não numéricas, booleanas, infinitas ou negativas antes de acessar o SDK.
 
 ## Formatos de registro
 
@@ -78,6 +82,72 @@ Execute da raiz com o venv ativo. Ordem obrigatória em **todo** ciclo: dataset 
 gate (C01) → avaliação (C03) → auditoria (C04–C07). Entradas não secretas por variáveis
 de ambiente; o `.env` é carregado sem sobrescrever variáveis exportadas.
 
+### Bloco AVALIACAO_PROJETO — D03 (opcional)
+
+Ao isolar uma divergência, declare a nova condição acima e exporte
+`AVALIACAO_CONDICAO` e `LANGSMITH_PROJECT`. Execute este bootstrap **antes de C02**
+para inicializar o projeto vazio: criar um dataset não cria um projeto de tracing.
+O cliente seleciona explicitamente o workspace da condição. Projeto existente é
+somente lido; apenas `LangSmithNotFoundError` permite criação, sem upsert. Falhas de
+autenticação, transporte, conflito ou workspace bloqueiam; diagnostique antes de
+repetir. Nenhuma chamada LLM, alteração de projeto existente ou avaliação é feita.
+O gate C01 permanece somente leitura e exige o projeto já inicializado.
+
+```bash
+source venv/bin/activate
+python - <<'PY'
+# AVALIACAO_PROJETO — D03: bootstrap opcional do projeto vazio da condição declarada.
+import json
+import logging
+import os
+import re
+from pathlib import Path
+
+from dotenv import load_dotenv
+from langsmith import Client
+from langsmith.utils import LangSmithNotFoundError, get_env_var
+
+load_dotenv('.env', override=False)
+get_env_var.cache_clear()
+logging.disable(logging.CRITICAL)
+stage = 'condicao'
+report = {'bloco': 'AVALIACAO_PROJETO', 'ciclo': os.getenv('AVALIACAO_CICLO', '')}
+try:
+    condition_id = os.getenv('AVALIACAO_CONDICAO', '').strip() or 'COND-001'
+    text = Path('docs/avaliacao-v2.md').read_text(encoding='utf-8')
+    blocks = re.findall(r'^```json condicao\n(.*?)^```$', text, flags=re.M | re.S)
+    conditions = {item['condicao']: item for item in map(json.loads, blocks)}
+    condition = conditions[condition_id]
+    report['condicao'] = condition_id
+    stage = 'configuracao'
+    project_name = os.getenv('LANGSMITH_PROJECT', '')
+    endpoint = os.getenv('LANGSMITH_ENDPOINT', 'https://api.smith.langchain.com').rstrip('/')
+    if (not os.getenv('LANGSMITH_API_KEY', '').strip()
+            or project_name != condition['langsmith_project']
+            or endpoint != condition['endpoint']):
+        raise ValueError('configuracao_divergente')
+    client = Client(timeout_ms=15000, workspace_id=condition['workspace_id'])
+    stage = 'projeto'
+    created = False
+    try:
+        project = client.read_project(project_name=project_name)
+    except LangSmithNotFoundError:
+        project = client.create_project(project_name=project_name, upsert=False)
+        created = True
+    stage = 'workspace'
+    if str(project.tenant_id) != condition['workspace_id']:
+        raise ValueError('workspace_divergente')
+    report.update(estado='pronto', projeto=project_name, project_id=str(project.id),
+                  workspace_id=str(project.tenant_id), criado=created)
+except Exception as error:
+    report.update(estado='bloqueado', causa=stage, categoria=type(error).__name__,
+                  http_status=getattr(error, 'status_code', None))
+    print(json.dumps(report, ensure_ascii=False))  # Sem mensagem bruta da exceção.
+    raise SystemExit(1)
+print(json.dumps(report, ensure_ascii=False))
+PY
+```
+
 ### Bloco AVALIACAO_DATASET — C02
 
 Localiza `{LANGSMITH_PROJECT}-eval` pelo nome exato. Se ausente, chama uma única vez a
@@ -85,6 +155,8 @@ função fornecida `evaluate.create_evaluation_dataset` (importada, sem alteraç
 em seguida; se presente, apenas lê. Compara o multiconjunto canônico remoto × local (D02)
 e emite `dataset_id`, `example_map` e estado, mais as linhas de exportação. Nunca apaga,
 edita ou compartilha. Divergência: código 1 e isolamento por D03.
+Durante a chamada de criação, stdout e stderr do helper são descartados, pois suas
+mensagens de erro podem conter dados sensíveis; o resultado é conferido pela auditoria.
 
 ```bash
 source venv/bin/activate
@@ -95,6 +167,7 @@ import json
 import logging
 import os
 import sys
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -135,7 +208,9 @@ try:
     if not found:
         sys.path.insert(0, 'src')
         import evaluate
-        evaluate.create_evaluation_dataset(client, name, JSONL)  # Uma única chamada.
+        with open(os.devnull, 'w', encoding='utf-8') as sink:
+            with redirect_stdout(sink), redirect_stderr(sink):
+                evaluate.create_evaluation_dataset(client, name, JSONL)  # Uma única chamada.
         created = True
         found = find()
     report.update(dataset_name=name, criado=created)
@@ -161,7 +236,8 @@ try:
                       example_map=example_map, estado='idêntico' if matches else 'divergente')
     if report['estado'] != 'idêntico':
         report['acao'] = ('D03: não apagar nem editar; declarar COND-00N com novo '
-                          'LANGSMITH_PROJECT, exportar AVALIACAO_CONDICAO e repetir este bloco')
+                          'LANGSMITH_PROJECT, exportar AVALIACAO_CONDICAO, executar '
+                          'AVALIACAO_PROJETO e repetir este bloco')
 except Exception as error:
     report.update(estado='erro', categoria=type(error).__name__,
                   http_status=getattr(error, 'status_code', None))
@@ -185,6 +261,7 @@ Somente leituras, nenhuma chamada LLM. Entradas: `AVALIACAO_CICLO`, `AVALIACAO_C
 anterior, `AVALIACAO_TESTES=aprovado` (testes da revisão comprovados pela tarefa
 anterior), `AVALIACAO_DASHBOARD=conferido` (inspeção registrada) e
 `AVALIACAO_CUSTO_ACUMULADO_USD`. Qualquer falha: código 1, `bloqueado` e `causa`.
+O handle deve ser exatamente `fabiocsm`; outro valor bloqueia antes de criar o cliente.
 
 ```bash
 source venv/bin/activate
@@ -240,12 +317,28 @@ def declared_conditions():
     return {item['condicao']: item for item in map(json.loads, blocks)}
 
 
+def condition_rates(condition):
+    rates = condition.get('rates_usd_per_million')
+    if not isinstance(rates, dict):
+        raise ValueError('tarifas_ausentes_ou_invalidas')
+    for role in ('geracao', 'juizes'):
+        if not isinstance(rates.get(role), dict):
+            raise ValueError('tarifas_ausentes_ou_invalidas')
+        for direction in ('entrada', 'saida'):
+            value = rates[role].get(direction)
+            if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                    or not math.isfinite(value) or value < 0):
+                raise ValueError('tarifas_ausentes_ou_invalidas')
+    return rates
+
+
 try:
     condition_id = os.getenv('AVALIACAO_CONDICAO', '').strip() or 'COND-001'
     conditions = declared_conditions()
     check(condition_id in conditions, 'condicao', 'condicao_nao_declarada')
     condition = conditions[condition_id]
     report['condicao'] = condition_id
+    report['rates_usd_per_million'] = condition_rates(condition)
 
     stage = 'configuracao'
     provider = os.getenv('LLM_PROVIDER', '').strip()
@@ -258,6 +351,8 @@ try:
     missing = [name for name in required if not os.getenv(name, '').strip()]
     report['variaveis_ausentes'] = missing
     check(not missing, 'configuracao', 'variavel_ausente')
+    check(os.environ['USERNAME_LANGSMITH_HUB'] == 'fabiocsm', 'configuracao',
+          'handle_divergente')
     check(tracing_is_enabled() is True, 'configuracao', 'tracing_desabilitado')
     check(provider == condition['provider'], 'configuracao', 'provider_divergente')
     check(os.environ['LLM_MODEL'] == condition['llm_model'], 'configuracao',
@@ -366,7 +461,8 @@ mkdir -p results && export AVALIACAO_INICIO="$(date -u +%Y-%m-%dT%H:%M:%S+00:00)
 
 Somente leituras, nenhuma chamada LLM. Entradas: `AVALIACAO_LOG`, `AVALIACAO_EXIT_CODE` e
 `AVALIACAO_INICIO` da execução, `AVALIACAO_DATASET_ID`, `AVALIACAO_HUB_COMMIT` e os dois
-hashes da v2 do ciclo. Identifica o experimento por `selectedSessions` (D05), confere o
+hashes da v2 do ciclo. Handle diferente de `fabiocsm` encerra com `falha_auditoria`,
+etapa `configuracao`, antes de criar o cliente. Identifica o experimento por `selectedSessions` (D05), confere o
 dataset de referência e reconstrói `example_map`, valida 15 runs e 75 notas (D06),
 estabilidade e vínculo com a revisão (D04), calcula `by_complexity`, `lowest`, tokens e
 custo, e aplica C06: médias recalculadas como em `evaluate.py`, conferência com as médias,
@@ -403,7 +499,6 @@ JSONL = 'datasets/bug_to_user_story.jsonl'
 V1_SHA256 = '2cddcf8f8183b4d29a5bca4d4efca17601962aa98ac75323f7dabbfa905c0d70'  # 002
 V2_PATH = 'prompts/bug_to_user_story_v2.yml'
 PROMPT = 'bug_to_user_story_v2'
-PRICE = {'entrada': 2 / 1_000_000, 'saida': 8 / 1_000_000}  # US$/token, COND-001
 ESTIMATE = {'geracao': (1800, 533), 'juizes': (4533, 467)}  # D08, por exemplo sem contagem
 stage = 'log'
 report = {'bloco': 'AVALIACAO_AUDITORIA', 'ciclo': os.getenv('AVALIACAO_CICLO', ''),
@@ -440,7 +535,36 @@ def note(target, code):
         target.append(code)
 
 
+def condition_rates(condition):
+    rates = condition.get('rates_usd_per_million')
+    if not isinstance(rates, dict):
+        raise ValueError('tarifas_ausentes_ou_invalidas')
+    for role in ('geracao', 'juizes'):
+        if not isinstance(rates.get(role), dict):
+            raise ValueError('tarifas_ausentes_ou_invalidas')
+        for direction in ('entrada', 'saida'):
+            value = rates[role].get(direction)
+            if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                    or not math.isfinite(value) or value < 0):
+                raise ValueError('tarifas_ausentes_ou_invalidas')
+    return rates
+
+
+def declared_conditions():
+    text = Path('docs/avaliacao-v2.md').read_text(encoding='utf-8')
+    blocks = re.findall(r'^```json condicao\n(.*?)^```$', text, flags=re.M | re.S)
+    return {item['condicao']: item for item in map(json.loads, blocks)}
+
+
 try:
+    stage = 'configuracao'
+    if os.getenv('USERNAME_LANGSMITH_HUB') != 'fabiocsm':
+        raise ValueError('handle_divergente')
+    stage = 'condicao'
+    condition = declared_conditions()[report['condicao']]
+    rates = condition_rates(condition)
+    report['rates_usd_per_million'] = rates
+    stage = 'log'
     log = Path(os.environ['AVALIACAO_LOG']).read_text(encoding='utf-8')
     dataset_id = os.getenv('AVALIACAO_DATASET_ID', '').strip()
     hub_commit = os.getenv('AVALIACAO_HUB_COMMIT', '').strip()
@@ -615,8 +739,8 @@ try:
         tokens['juizes']['entrada'] += judge_in
         tokens['juizes']['saida'] += judge_out
     tokens['estimado'] = any(part['estimados'] for part in tokens.values())
-    cost = sum(part['entrada'] * PRICE['entrada'] + part['saida'] * PRICE['saida']
-               for part in (tokens['geracao'], tokens['juizes']))
+    cost = sum(tokens[role][direction] * rates[role][direction] / 1_000_000
+               for role in ('geracao', 'juizes') for direction in ('entrada', 'saida'))
 
     stage = 'decisao'  # C06: agregação de evaluate.py, regra integral e sinal do avaliador.
     means = overall = None

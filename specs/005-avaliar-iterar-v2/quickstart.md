@@ -8,6 +8,8 @@ cenários e resultados esperados. Executar da raiz, com o venv da 001.
 
 Ordem de execução de cada ciclo: V04 (dataset) → V03 (gate) → V05 → V06. A numeração
 segue o documento; a auditoria do dataset sempre precede o gate.
+No isolamento por nova condição D03, executar primeiro o bootstrap opcional
+`AVALIACAO_PROJETO` de `docs/avaliacao-v2.md`, antes de V04.
 
 ## Pré-requisitos
 
@@ -61,7 +63,11 @@ primeira vez cria o dataset com a função fornecida; depois apenas audita.
 Esperado: `example_count=15`, `matches_local=true`, distribuição 5/7/3, `dataset_id`
 registrado e exportado em `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET`. Em divergência:
 código 1, nada apagado, isolamento conforme D03 com nova condição declarada e
-`AVALIACAO_CONDICAO` atualizada.
+`AVALIACAO_CONDICAO` atualizada. Antes de repetir V04, executar `AVALIACAO_PROJETO`:
+esperado `estado=pronto`, workspace igual à condição e criação do projeto vazio
+somente se ausente (`LangSmithNotFoundError`). Repetição lê o projeto existente,
+sem upsert, alteração ou chamada LLM. Workspace divergente ou outra falha bloqueia.
+O gate V03 continua somente leitura e não cria projetos.
 
 ## V05 — Experimento real
 

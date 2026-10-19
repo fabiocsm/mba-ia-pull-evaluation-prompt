@@ -23,9 +23,10 @@ avaliada, decidir pela regra integral (cinco médias e média geral `>= 0.8`) e 
 a v2 em 3–5 ciclos registrados, sem alterar avaliador, juízes, dados ou limiar.
 
 Abordagem: um roteiro executável em `docs/avaliacao-v2.md`, no padrão da
-[preparação](../../docs/preparacao.md#roteiro-executavel), com três blocos: gate de
+[preparação](../../docs/preparacao.md#roteiro-executavel), com três blocos principais: gate de
 entrada (somente leitura), dataset (criação única pela função fornecida e auditoria)
-e auditoria do experimento (somente leitura). Testes offline em
+e auditoria do experimento (somente leitura). No isolamento D03, um bootstrap opcional
+inicializa o projeto vazio antes do dataset e do gate. Testes offline em
 `tests/test_evaluation_audit.py` exercitam esses blocos com dublês. As notas vêm
 exclusivamente de `python src/evaluate.py`; a auditoria só lê e recalcula.
 

@@ -50,9 +50,15 @@ O estado pode mudar até a execução; a auditoria C02 e o gate C01 do
 - **Decision**: se o dataset remoto divergir, não apagar nem editar. Definir localmente
   um novo `LANGSMITH_PROJECT` (ex.: `mba-ia-pull-evaluation-prompt-c2`), registrar
   nova condição `COND-00N` em `docs/avaliacao-v2.md` antes de executar, informá-la ao
-  gate por `AVALIACAO_CONDICAO` e repetir D01/D02 no novo nome.
+  gate por `AVALIACAO_CONDICAO`, executar o bootstrap opcional `AVALIACAO_PROJETO`
+  antes de C02 e repetir D01/D02 no novo nome. O bootstrap usa
+  `Client(workspace_id=condition['workspace_id'])`, lê o projeto e cria um projeto
+  vazio somente em `LangSmithNotFoundError`, com `upsert=False`; confirma `tenant_id`.
+  Projeto existente nunca é alterado; outras falhas bloqueiam, sem chamadas LLM.
 - **Rationale**: FR-001/FR-008 e a constituição exigem preservar dados e experimentos;
-  o nome do dataset deriva de `LANGSMITH_PROJECT` no avaliador.
+  o nome do dataset deriva de `LANGSMITH_PROJECT` no avaliador. Criar o dataset não
+  cria o projeto de tracing exigido por C01; inicializá-lo antes evita bloquear a
+  recuperação. O gate permanece somente leitura.
 - **Alternatives considered**: excluir/recriar o dataset (destrói histórico);
   alterar `evaluate.py` para outro nome (arquivo protegido).
 
@@ -100,7 +106,8 @@ O estado pode mudar até a execução; a auditoria C02 e o gate C01 do
 
 - **Decision**: implementar a auditoria como blocos `python - <<'PY'` em
   `docs/avaliacao-v2.md` (gate de entrada, dataset, auditoria do experimento),
-  somente leitura exceto a criação explícita de D01; cobrir os blocos com testes
+  somente leitura exceto a criação explícita de D01 e o bootstrap opcional de D03;
+  cobrir os blocos com testes
   offline em `tests/test_evaluation_audit.py`, seguindo o padrão de
   `tests/test_preparation_checks.py`.
 - **Rationale**: segue o precedente da [preparação](../../docs/preparacao.md#roteiro-executavel)

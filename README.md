@@ -571,8 +571,9 @@ Outras falhas continuam retornando 1; não há repetição automática de push.
 
 ### Avaliação e iterações — spec 005
 
-O [registro da avaliação](docs/avaliacao-v2.md) contém três blocos executáveis e o
-histórico dos ciclos. Em **todo** ciclo, da raiz com o venv ativo e nesta ordem: bloco
+O [registro da avaliação](docs/avaliacao-v2.md) contém três blocos principais, o
+bootstrap opcional `AVALIACAO_PROJETO` para inicializar um projeto isolado antes do
+dataset, e o histórico dos ciclos. Em **todo** ciclo, da raiz com o venv ativo e nesta ordem: bloco
 `AVALIACAO_DATASET` (cria o dataset uma vez pela função fornecida e audita os 15 exemplos),
 bloco `AVALIACAO_GATE` (integridade, revisão publicada, condição, workspace, dataset,
 testes, inspeção e custo, sem chamadas LLM), a avaliação e o bloco `AVALIACAO_AUDITORIA`

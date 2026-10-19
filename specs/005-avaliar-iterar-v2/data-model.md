@@ -16,6 +16,7 @@ ignoradas pelo Git e nunca a única evidência.
 | `langsmith_project`, `dataset_name` | `mba-ia-pull-evaluation-prompt` e `{project}-eval` |
 | `workspace_id`, `endpoint` | Iguais ao preflight da 004 |
 | `protected_hashes` | SHA-256 dos quatro protegidos iguais ao [manifesto](../../docs/integridade-inicial.json) |
+| `rates_usd_per_million` | Objeto com `geracao` e `juizes`, cada um com `entrada`/`saida` em US$/milhão; valores numéricos finitos ≥ 0, sem booleanos; obrigatório no gate e auditoria antes de acesso remoto |
 | `sdk_versions` | `langsmith`, `langchain-core` instalados |
 
 Mudança de qualquer campo, exceto revisão do prompt, cria nova condição registrada
@@ -154,5 +155,6 @@ Uma edição após `aprovado` abre novo ciclo e marca o experimento anterior com
 | Campo | Regra |
 | --- | --- |
 | `experiment_id`, `input_tokens`, `output_tokens` | Lidos dos runs de geração e dos juízes; estimativa marcada como tal se indisponível |
-| `estimated_usd`, `cumulative_usd` | Preços oficiais da condição |
+| `rates_usd_per_million` | Tarifas oficiais da condição ativa, por papel (`geracao`, `juizes`) e direção (`entrada`, `saida`); COND-001 preserva 2/8 nos dois papéis |
+| `estimated_usd`, `cumulative_usd` | Soma de `tokens[role][direction] × rates_usd_per_million[role][direction] / 1_000_000`, e acumulado dos experimentos; novas condições exigem consulta oficial e declaração prévia das tarifas |
 | `gate` | Acumulado > US$ 4 sem aprovação: `Experimento` seguinte `bloqueado` com `block_cause=custo` até decisão do autor |

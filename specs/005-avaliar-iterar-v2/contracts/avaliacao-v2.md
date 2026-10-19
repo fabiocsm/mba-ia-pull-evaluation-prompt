@@ -26,7 +26,11 @@ Executado antes de cada experimento, logo depois da auditoria C02 do mesmo ciclo
    A condição ativa é `AVALIACAO_CONDICAO` (padrão `COND-001`); outro valor só é aceito
    se a condição estiver declarada na seção de condições de `docs/avaliacao-v2.md`
    **antes** da execução, e seus campos passam a ser a referência. Condição não declarada
-   bloqueia com `causa=condicao`.
+   bloqueia com `causa=condicao`. A condição deve declarar `rates_usd_per_million`,
+   com `geracao` e `juizes`, cada qual com `entrada` e `saida` em US$/milhão de tokens.
+   Gate e auditoria validam valores numéricos finitos não negativos (booleanos não
+   aceitos), antes de criar o cliente; tarifa ausente/inválida bloqueia o gate com
+   `causa=condicao` e encerra a auditoria com `falha_auditoria`, etapa `condicao`.
 6. Projeto igual à condição e workspace igual ao da condição pelo `tenant_id` do projeto
    (`Client.read_project`); dataset `{LANGSMITH_PROJECT}-eval` localizado por nome com ID
    igual a `AVALIACAO_DATASET_ID` e `AVALIACAO_DATASET=idêntico`, ambos emitidos pelo
@@ -48,7 +52,12 @@ Cada bloqueio emite `causa` (`integridade`, `revisao`, `configuracao`, `condicao
 - `idêntico` exige 15 exemplos e multiconjunto canônico igual (D02); distribuição
   5/7/3 pelo mapeamento local.
 - `divergente`: nada é apagado ou editado; registrar, isolar por novo
-  `LANGSMITH_PROJECT` e nova condição (D03). Datasets anteriores permanecem.
+  `LANGSMITH_PROJECT` e nova condição (D03). Antes de repetir C02, executar o bloco
+  opcional `AVALIACAO_PROJETO`: cliente com workspace explícito da condição, leitura
+  do projeto e criação vazia apenas em `LangSmithNotFoundError`, sem upsert, com
+  conferência de `tenant_id`. Projeto existente não é alterado; outras falhas
+  bloqueiam. Sem chamadas LLM. C01 continua somente leitura e exige o projeto
+  inicializado. Datasets e experimentos anteriores permanecem.
 - Compartilhamento público (`share_dataset`) é proibido nesta feature (pertence à 006).
 
 ## C03 — Execução
@@ -136,6 +145,11 @@ push Git) → C02 (auditoria) → C01 → C03 → C04–C07 → conclusão.
   final e novo experimento exige decisão do autor. Todas as execuções ficam no
   histórico; nenhuma é escolhida por ser favorável.
 - Edição após aprovação: novo ciclo completo antes de herdar a conclusão (FR-010).
+
+O custo é a soma dos tokens de entrada/saída de cada papel multiplicados por sua
+própria tarifa da condição ativa, divididos por um milhão. `COND-001` conserva os
+preços históricos 2/8 nos dois papéis; uma condição futura exige consulta aos preços
+oficiais e tarifas explícitas antes da execução, sem herança de preços.
 
 ## C10 — Sigilo e preservação
 

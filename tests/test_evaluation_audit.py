@@ -71,8 +71,12 @@ class FakeClient:
         self.examples = {}
         self.prompt = SimpleNamespace(last_commit_hash=HUB, is_public=True)
         self.prompt_heads = []
+        self.prompt_identifiers = []
         self.main_project = SimpleNamespace(id=str(uuid.uuid4()), name=PROJECT,
                                             tenant_id=WORKSPACE)
+        self.named_projects = {PROJECT: self.main_project}
+        self.workspace_id = WORKSPACE
+        self.client_options = []
         self.projects = {}
         self.runs = {}
         self.feedback = []
@@ -111,8 +115,19 @@ class FakeClient:
     def read_project(self, project_name=None, project_id=None, **kwargs):
         if project_id is not None:
             return self.projects[str(project_id)]
-        return SimpleNamespace(id=self.main_project.id, name=project_name,
-                               tenant_id=self.main_project.tenant_id)
+        if project_name not in self.named_projects:
+            raise langsmith_utils.LangSmithNotFoundError("Projeto ausente")
+        return self.named_projects[project_name]
+
+    def create_project(self, project_name, *, upsert=False):
+        assert upsert is False
+        self.writes.append("create_project")
+        if project_name in self.named_projects:
+            raise langsmith_utils.LangSmithConflictError("Projeto existente")
+        project = SimpleNamespace(id=str(uuid.uuid4()), name=project_name,
+                                  tenant_id=self.workspace_id)
+        self.named_projects[project_name] = project
+        return project
 
     def list_projects(self, reference_dataset_id=None, **kwargs):
         return iter([item for item in self.projects.values()
@@ -120,7 +135,7 @@ class FakeClient:
                      or str(item.reference_dataset_id) == str(reference_dataset_id)])
 
     def get_prompt(self, identifier):
-        assert identifier == "fabiocsm/bug_to_user_story_v2"
+        self.prompt_identifiers.append(identifier)
         if self.prompt_heads:
             return SimpleNamespace(last_commit_hash=self.prompt_heads.pop(0),
                                    is_public=self.prompt.is_public)
@@ -174,8 +189,13 @@ def audit(monkeypatch, tmp_path):
         raise ExternalBoundary("subprocess")
 
     client = FakeClient(calls)
+    def fake_client(*args, **kwargs):
+        client.client_options.append(kwargs)
+        client.workspace_id = kwargs.get("workspace_id", WORKSPACE)
+        return client
+
     monkeypatch.setattr(subprocess, "run", fake_run)
-    monkeypatch.setattr(langsmith, "Client", lambda *args, **kwargs: client)
+    monkeypatch.setattr(langsmith, "Client", fake_client)
     monkeypatch.setattr(socket, "create_connection", boundary("network"))
     monkeypatch.setattr(socket.socket, "connect", boundary("network"))
     monkeypatch.setattr(langchain_openai, "ChatOpenAI", boundary("llm"))
@@ -363,6 +383,7 @@ def test_gate_accepts_complete_preconditions(audit, capsys):
     assert result["condicao"] == "COND-001"
     assert result["head_before"] == HUB and result["workspace_id"] == WORKSPACE
     assert result["git_commit"] == "a" * 40
+    assert audit.client.prompt_identifiers == ["fabiocsm/bug_to_user_story_v2"]
     assert audit.calls == [] and audit.client.writes == []
 
 
@@ -373,21 +394,102 @@ def test_gate_accepts_cost_exactly_at_limit(audit, capsys):
     assert code == 0 and result["estado"] == "gate_ok"
 
 
-def test_gate_accepts_declared_alternative_condition(audit, capsys):
+@pytest.mark.parametrize("marker", ["AVALIACAO_GATE", "AVALIACAO_AUDITORIA"])
+@pytest.mark.parametrize("owner", ["outro-owner", " fabiocsm", "fabiocsm ", ""])
+def test_prompt_owner_mismatch_stops_before_client_creation(
+        marker, owner, audit, capsys, monkeypatch):
+    dataset = seed_dataset(audit.client)
+    experiment = seed_experiment(audit.client, dataset)
+    audit_env(audit, dataset, experiment)
+    os.environ["USERNAME_LANGSMITH_HUB"] = owner
+    clients = []
+
+    def permissive_client(*args, **kwargs):
+        clients.append(audit.client)
+        return audit.client  # Accepts every owner, including a matching public revision.
+
+    monkeypatch.setattr(langsmith, "Client", permissive_client)
+    code, result, _ = run_block(marker, capsys)
+    assert code == 1
+    if marker == "AVALIACAO_GATE":
+        assert result["estado"] == "bloqueado" and result["causa"] == "configuracao"
+    else:
+        assert result["estado"] == "falha_auditoria" and result["etapa"] == "configuracao"
+    assert clients == []
+    assert audit.client.prompt_identifiers == []
+    assert audit.calls == [] and audit.client.writes == []
+
+
+def alternative_condition(audit):
     other = PROJECT + "-c2"
     declaration = {"condicao": "COND-002", "provider": "openai",
                    "llm_model": "gpt-4.1-2025-04-14", "eval_model": "gpt-4.1-2025-04-14",
                    "temperature": 0, "langsmith_project": other,
                    "dataset_name": other + "-eval", "workspace_id": WORKSPACE,
-                   "endpoint": "https://api.smith.langchain.com"}
+                   "endpoint": "https://api.smith.langchain.com",
+                   "rates_usd_per_million": RATES}
     with (audit.root / "docs" / "avaliacao-v2.md").open("a", encoding="utf-8") as doc:
         doc.write("\n```json condicao\n" + json.dumps(declaration) + "\n```\n")
     dataset = seed_dataset(audit.client)
     dataset.name = other + "-eval"
     gate_env(dataset)
     os.environ.update(AVALIACAO_CONDICAO="COND-002", LANGSMITH_PROJECT=other)
+    return other
+
+
+def test_gate_accepts_declared_alternative_condition(audit, capsys):
+    other = alternative_condition(audit)
+    audit.client.named_projects[other] = SimpleNamespace(
+        id=str(uuid.uuid4()), name=other, tenant_id=WORKSPACE)
     code, result, _ = run_block("AVALIACAO_GATE", capsys)
     assert code == 0 and result["condicao"] == "COND-002"
+
+
+def test_new_condition_bootstrap_unblocks_gate_without_llm(audit, capsys):
+    other = alternative_condition(audit)
+    code, result, _ = run_block("AVALIACAO_GATE", capsys)
+    assert code == 1 and result["causa"] == "configuracao"
+    assert audit.client.writes == []
+
+    code, result, _ = run_block("AVALIACAO_PROJETO", capsys)
+    assert code == 0 and result["estado"] == "pronto" and result["criado"] is True
+    assert result["projeto"] == other and result["workspace_id"] == WORKSPACE
+    assert audit.client.client_options[-1]["workspace_id"] == WORKSPACE
+    assert audit.client.writes == ["create_project"]
+
+    code, result, _ = run_block("AVALIACAO_GATE", capsys)
+    assert code == 0 and result["estado"] == "gate_ok"
+    assert audit.client.writes == ["create_project"] and audit.calls == []
+
+
+def test_project_bootstrap_is_idempotent(audit, capsys):
+    alternative_condition(audit)
+    for created in (True, False):
+        code, result, _ = run_block("AVALIACAO_PROJETO", capsys)
+        assert code == 0 and result["criado"] is created
+    assert audit.client.writes == ["create_project"] and audit.calls == []
+
+
+def test_project_bootstrap_rejects_existing_wrong_workspace(audit, capsys):
+    other = alternative_condition(audit)
+    project = SimpleNamespace(id=str(uuid.uuid4()), name=other, tenant_id=str(uuid.uuid4()))
+    audit.client.named_projects[other] = project
+    code, result, _ = run_block("AVALIACAO_PROJETO", capsys)
+    assert code == 1 and result["estado"] == "bloqueado" and result["causa"] == "workspace"
+    assert audit.client.named_projects[other] is project
+    assert audit.client.writes == [] and audit.calls == []
+
+
+def test_project_bootstrap_does_not_create_after_transport_error(audit, capsys, monkeypatch):
+    alternative_condition(audit)
+
+    def unavailable(**kwargs):
+        raise langsmith_utils.LangSmithConnectionError(" ".join(SECRETS))
+
+    monkeypatch.setattr(audit.client, "read_project", unavailable)
+    code, result, _ = run_block("AVALIACAO_PROJETO", capsys)
+    assert code == 1 and result["estado"] == "bloqueado"
+    assert audit.client.writes == [] and audit.calls == []
 
 
 def _change_file(relative):
@@ -490,7 +592,7 @@ def test_dataset_absent_is_created_once_by_provided_function(audit, capsys):
     code, result, out = run_block("AVALIACAO_DATASET", capsys)
     assert code == 0
     assert result["estado"] == "idêntico" and result["criado"] is True
-    assert out.count("Criando dataset de avaliação") == 1
+    assert "Criando dataset de avaliação" not in out
     assert audit.client.writes == ["create_dataset"] + ["create_example"] * 15
     assert result["example_count"] == 15 and result["matches_local"] is True
     assert result["distribution"] == {"simple": 5, "medium": 7, "complex": 3}
@@ -546,6 +648,25 @@ def test_dataset_partial_creation_is_divergent(audit, capsys):
     assert audit.client.writes.count("create_dataset") == 1
 
 
+def test_dataset_creation_failure_suppresses_raw_output(audit, capsys, monkeypatch):
+    create_example = audit.client.create_example
+
+    def fail_after_three(**kwargs):
+        if len(audit.client.examples[str(kwargs["dataset_id"])]) == 3:
+            print(f"x-api-key: {SECRETS[0]}", file=sys.stderr)
+            raise RuntimeError(f"headers: {SECRETS[0]} {SECRETS[1]}")
+        create_example(**kwargs)
+
+    monkeypatch.setattr(audit.client, "create_example", fail_after_three)
+    code, result, out = run_block("AVALIACAO_DATASET", capsys)
+    assert code == 1
+    assert result["estado"] == "divergente" and result["example_count"] == 3
+    assert result["matches_local"] is False
+    assert audit.client.writes.count("create_dataset") == 1
+    assert audit.client.writes.count("create_example") == 3
+    assert "headers:" not in out and "Erro ao criar dataset" not in out
+
+
 # --- C04/C05: AVALIACAO_AUDITORIA ----------------------------------------------
 
 def test_audit_accepts_complete_and_linked_experiment(audit, capsys):
@@ -562,6 +683,7 @@ def test_audit_accepts_complete_and_linked_experiment(audit, capsys):
     assert result["vinculo"]["estado"] == "estavel"
     assert result["vinculo"]["lc_hub_commit_hash"] == "confirmado"
     assert result["vinculo"]["head_depois"] == HUB
+    assert audit.client.prompt_identifiers == ["fabiocsm/bug_to_user_story_v2"]
     assert len(result["exemplos"]) == 15
     assert {row["prompt_commit"] for row in result["exemplos"]} == {HUB}
     counts = {name: item["exemplos"] for name, item in result["by_complexity"].items()}
@@ -575,7 +697,8 @@ def test_audit_accepts_complete_and_linked_experiment(audit, capsys):
     assert tokens["juizes"]["estimados"] == 1
     assert tokens["juizes"]["entrada"] > 14 * 3000 and tokens["juizes"]["saida"] > 14 * 300
     assert tokens["estimado"] is True
-    assert result["custo_estimado_usd"] > 0
+    assert result["rates_usd_per_million"] == RATES
+    assert result["custo_estimado_usd"] == pytest.approx(0.184402)
     assert audit.calls == [] and audit.client.writes == []
 
 
@@ -911,3 +1034,99 @@ def test_cycle_records_have_every_required_field():
         experiment = _bullet(text, "**Experimento**")
         assert re.search(r"selectedSessions=[0-9a-f-]{36}", experiment), cycle
         assert re.search(r"`[0-9a-f]{64}`", text.split("**Revisão publicada**", 1)[1]), cycle
+
+
+# --- R1-4: tariffs belong to the active experimental condition -----------------
+
+RATES = {"geracao": {"entrada": 2, "saida": 8},
+         "juizes": {"entrada": 2, "saida": 8}}
+
+
+def _rewrite_condition(audit, change):
+    path = audit.root / "docs" / "avaliacao-v2.md"
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"^```json condicao\n(.*?)^```$", text, flags=re.M | re.S)
+    condition = json.loads(match.group(1))
+    change(condition)
+    path.write_text(text[:match.start(1)] + json.dumps(condition) + "\n"
+                    + text[match.end(1):], encoding="utf-8")
+
+
+@pytest.mark.parametrize("marker", ["AVALIACAO_GATE", "AVALIACAO_AUDITORIA"])
+@pytest.mark.parametrize("bad", [None, {}, {"geracao": RATES["geracao"]},
+                                  {"geracao": {}, "juizes": RATES["juizes"]},
+                                  {"geracao": RATES["geracao"], "juizes": {"entrada": 2}},
+                                  {"geracao": RATES["geracao"],
+                                   "juizes": {"entrada": 2, "saida": True}},
+                                  True, "2", -1, math.nan, math.inf])
+def test_condition_invalid_rates_stop_before_client_creation(
+        marker, bad, audit, capsys, monkeypatch):
+    dataset = seed_dataset(audit.client)
+    experiment = seed_experiment(audit.client, dataset)
+    audit_env(audit, dataset, experiment)
+
+    def change(condition):
+        if bad is None:
+            condition.pop("rates_usd_per_million", None)
+        elif isinstance(bad, dict):
+            condition["rates_usd_per_million"] = bad
+        else:
+            condition["rates_usd_per_million"] = {
+                "geracao": {"entrada": bad, "saida": 8}, "juizes": RATES["juizes"]}
+
+    _rewrite_condition(audit, change)
+    clients = []
+    monkeypatch.setattr(langsmith, "Client", lambda **kwargs: clients.append(kwargs))
+    code, result, _ = run_block(marker, capsys)
+    assert code == 1
+    if marker == "AVALIACAO_GATE":
+        assert result["estado"] == "bloqueado" and result["causa"] == "condicao"
+    else:
+        assert result["estado"] == "falha_auditoria" and result["etapa"] == "condicao"
+    assert result["categoria"] == "ValueError"
+    assert clients == []
+    assert audit.client.writes == [] and audit.calls == []
+
+
+@pytest.mark.parametrize("marker", ["AVALIACAO_GATE", "AVALIACAO_AUDITORIA"])
+def test_condition_accepts_zero_rates(marker, audit, capsys):
+    dataset = seed_dataset(audit.client)
+    experiment = seed_experiment(audit.client, dataset)
+    audit_env(audit, dataset, experiment)
+    zero = {role: {direction: 0 for direction in ("entrada", "saida")}
+            for role in ("geracao", "juizes")}
+    _rewrite_condition(audit, lambda condition: condition.update(rates_usd_per_million=zero))
+    code, result, _ = run_block(marker, capsys)
+    assert code == 0, json.dumps(result)
+    assert result["rates_usd_per_million"] == zero
+    if marker == "AVALIACAO_AUDITORIA":
+        assert result["custo_estimado_usd"] == 0
+
+
+def test_alternative_condition_cost_uses_each_role_and_blocks_next_gate(audit, capsys):
+    dataset = seed_dataset(audit.client)
+    experiment = seed_experiment(audit.client, dataset)
+    audit_env(audit, dataset, experiment)
+    path = audit.root / "docs" / "avaliacao-v2.md"
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"^```json condicao\n(.*?)^```$", text, flags=re.M | re.S)
+    condition = json.loads(match.group(1))
+    rates = {"geracao": {"entrada": 10, "saida": 20},
+             "juizes": {"entrada": 100, "saida": 200}}
+    condition.update(condicao="COND-002", llm_model="offline-generator",
+                     eval_model="offline-judge", rates_usd_per_million=rates)
+    path.write_text(text + "\n```json condicao\n" + json.dumps(condition) + "\n```\n",
+                    encoding="utf-8")
+    os.environ.update(AVALIACAO_CONDICAO="COND-002", LLM_MODEL="offline-generator",
+                      EVAL_MODEL="offline-judge")
+    code, result, _ = run_block("AVALIACAO_GATE", capsys)
+    assert code == 0 and result["condicao"] == "COND-002", json.dumps(result)
+    code, result, _ = run_block("AVALIACAO_AUDITORIA", capsys)
+    assert code == 0 and result["estado"] == "aprovado"
+    assert result["rates_usd_per_million"] == rates
+    # 15k/3k generation + 45k/4.5k judging, each using its own USD/M rates.
+    assert result["custo_estimado_usd"] == pytest.approx(5.61)
+    os.environ["AVALIACAO_CUSTO_ACUMULADO_USD"] = str(result["custo_estimado_usd"])
+    code, result, _ = run_block("AVALIACAO_GATE", capsys)
+    assert code == 1 and result["causa"] == "custo"
+    assert audit.client.writes == [] and audit.calls == []
