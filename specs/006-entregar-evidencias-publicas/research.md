@@ -25,7 +25,11 @@ chamada LLM ou experimento foi executado nesta etapa.
   não há compartilhamento prévio. Registrar a URL pública retornada (o token faz parte dela e
   só dá leitura ao dataset compartilhado, não ao workspace). Nunca chamar `unshare_dataset`
   nem repetir `share_dataset`.
-- **Rationale**: FR-001/FR-004 e o README (“ao compartilhar de novo, o link muda”).
+- **Experimentos**: o link público de cada experimento é o que se alcança **a partir do link
+  compartilhado** do dataset (página pública de comparação/experimento sob `/public/<token>/`),
+  registrado na conferência anônima. URLs de workspace (`smith.langchain.com/o/…`), como as do
+  registro da 005, não são evidência pública (constituição V) e não aparecem como tal no README.
+- **Rationale**: FR-001/FR-004/FR-006 e o README (“ao compartilhar de novo, o link muda”).
   Compartilhar torna dados públicos: ação externa que exige confirmação.
 - **Alternatives considered**: somente screenshots (o README aceita, mas o link público é a
   forma principal e a spec exige links conferidos sem login); compartilhar antes do
@@ -38,7 +42,12 @@ chamada LLM ou experimento foi executado nesta etapa.
   mensagens, resposta, juízes e feedback. Screenshots legíveis desses três traces e do
   resumo das cinco médias são capturados **sempre** (FR-002). Se o detalhe do trace não for
   público pelo link do dataset, usar `Client.share_run` nos três runs raiz, com autorização
-  explícita, e registrar as URLs; o link do dataset não muda.
+  explícita, e registrar as URLs; o link do dataset não muda. Como os juízes rodam em traces
+  **separados** (projeto `evaluators`, ligados pelo `source_run_id` do feedback), o conjunto de
+  `share_run` inclui também os três runs do avaliador de `CIC-03` (#1
+  `b7973768-c22d-4614-b359-a49e6df21293`, #10 `6c19d03a-dbda-40ea-bf80-382f2cbb4010`, #14
+  `8b32f3ca-937d-4872-9fbd-a7cf63fadd63`); compartilhar só os runs `target` não mostraria os
+  julgamentos.
 - **Rationale**: FR-003 e o edge case “link não mostra detalhes”. `share_run` cria links
   independentes, sem invalidar o do dataset.
 - **Alternatives considered**: só `share_run` (não mostra dataset nem notas agregadas); só
@@ -86,16 +95,25 @@ chamada LLM ou experimento foi executado nesta etapa.
 
 ## D06 — Reprodução em ambiente limpo
 
-- **Decision**: depois do commit de entrega, clonar o repositório local em diretório
-  temporário, criar venv novo com o mesmo Python, `pip install -r requirements.txt`,
+- **Decision**: clonar o **commit de entrega** registrado (T016) em diretório temporário; se o
+  autor não autorizar commits locais, copiar a árvore de trabalho (excluindo `venv/`, `.env`,
+  `results/` e `screenshots/`) e registrar a origem usada. Então criar venv novo com o mesmo Python, `pip install -r requirements.txt`,
   `pip check`, copiar apenas o `.env` local (nunca versionado) e seguir `Como Executar`
   literalmente: `pull_prompts.py` (v1 com hash igual), `pytest`, `push_prompts.py` (reuso da
   revisão `36a96c05` por conflito/equivalência, código 0), blocos de dataset/gate,
-  `evaluate.py` e auditoria. O experimento gerado é registrado como **reprodução** (`REP-006`),
-  não substitui o final, e seu custo (~US$ 0,27) entra no acumulado. Repetir a partir do fork
-  público após o push autorizado, se o autor quiser confirmação externa.
-- **Rationale**: FR-007/FR-010/SC-004. O mesmo autor executa; o registro diz isso
-  honestamente (não é um segundo executor independente).
+  `evaluate.py` e auditoria. O `push_prompts.py` não cria revisão (conteúdo idêntico), mas
+  reaplica descrição/tags no repositório do Hub — escrita remota esperada, conferida pelo HEAD
+  inalterado. O experimento gerado é registrado como **reprodução** (`REP-006`), não substitui
+  o final, e seu custo (~US$ 0,27) entra no acumulado. Como o link público do dataset passará a
+  mostrar também `REP-006`, o README e o registro o identificam (ID, decisão, custo, “não é o
+  final”).
+- **Segundo executor (SC-004)**: `REP-006` é executada pelo próprio autor e comprova o roteiro,
+  mas **não** satisfaz sozinha o SC-004, que exige um segundo executor. O autor é solicitado a
+  indicar outra pessoa que siga `Como Executar` a partir do fork público com credenciais
+  próprias (`REP-006B`); sem essa execução, o SC-004 fica registrado como **pendente**, conforme
+  a própria spec permite (“explicitamente pendentes”), e a conclusão da 006 o declara.
+- **Rationale**: FR-007/FR-010/SC-004. A reinterpretação do SC-004 como “o próprio autor em
+  clone limpo” não é adotada: mudar o critério exigiria `/speckit-clarify`.
 - **Alternatives considered**: reprodução sem avaliação (não cobre o roteiro completo);
   novo `LANGSMITH_PROJECT` (criaria outro dataset e nova condição sem necessidade).
 

@@ -28,9 +28,11 @@ Falha bloqueia a entrega; edição da v2 reabre a 005 (FR-010).
 
 Em sessão sem login (navegador integrado, sem cookies do workspace; botão “Log in” visível):
 o link do dataset mostra 15 exemplos e os experimentos da v2, incluindo `CIC-03` com as cinco
-médias; os links do prompt e do fork abrem. Para cada alvo, registrar `visível`, `parcial` ou
+médias; registrar a URL **pública** do experimento `CIC-03` alcançada a partir desse link; os
+links do prompt e do fork abrem. Para cada alvo, registrar `visível`, `parcial` ou
 `exige_login`. `parcial`/`exige_login` exige screenshot complementar (E04) e, para traces,
-opcionalmente `share_run` nos três runs com autorização explícita.
+opcionalmente `share_run` com autorização explícita nos três runs `target` **e** nos três runs
+do avaliador (projeto `evaluators`, via `source_run_id`), pois os juízes ficam em traces separados.
 
 ## E04 — Screenshots
 
@@ -44,6 +46,8 @@ opcionalmente `share_run` nos três runs com autorização explícita.
 ## E05 — README
 
 - Seções do enunciado preservadas, sem edição de requisitos.
+- Nenhuma URL de workspace (`smith.langchain.com/o/…`) apresentada como evidência pública; links
+  de experimento são os públicos registrados em E03.
 - `Técnicas Aplicadas (Fase 2)`: cada técnica (Role Prompting, Few-shot Learning), por que foi
   escolhida e trechos reais da v2 final; regras introduzidas pelos ciclos com justificativa.
 - `Resultados Finais`: cinco médias e média geral de `CIC-03`, revisão `36a96c05`, tabela dos
@@ -52,15 +56,24 @@ opcionalmente `share_run` nos três runs com autorização explícita.
   comparação numérica da v1 declarada como não executada.
 - `Como Executar`: pré-requisitos, venv, dependências, variáveis (nomes, sem valores),
   provedor/modelos `COND-001`, comandos ordenados de cada fase (pull, testes, push, dataset,
-  gate, avaliação, auditoria) e interpretação de sucesso/falha.
+  gate, avaliação, auditoria) e interpretação de sucesso/falha; como obter cada entrada do gate
+  (`AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` do bloco de dataset, `AVALIACAO_HUB_COMMIT` e
+  hashes da saída do push, `AVALIACAO_TESTES` após os testes, `AVALIACAO_DASHBOARD` após inspeção
+  própria no Hub, `AVALIACAO_CUSTO_ACUMULADO_USD`) e quando definir `LANGSMITH_WORKSPACE_ID`
+  (chave com acesso a mais de um workspace). `.env.example` só muda com concordância do autor.
 
 ## E06 — Reprodução
 
-Clone limpo do commit de entrega, venv novo, `.env` local copiado (nunca versionado),
-comandos de `Como Executar` na ordem. Esperado: v1 com o mesmo hash; testes aprovados; push
+Clone limpo do commit de entrega (ou cópia da árvore de trabalho, se commits não forem
+autorizados, com a origem registrada), venv novo, `.env` local copiado (nunca versionado),
+comandos de `Como Executar` na ordem. O push reaplica descrição/tags no Hub sem nova revisão
+(escrita remota esperada; HEAD deve continuar `36a96c05`). Esperado: v1 com o mesmo hash; testes aprovados; push
 com código 0 sem nova revisão (conteúdo idêntico); dataset `idêntico`; gate `gate_ok`;
 avaliação e auditoria completas. O novo experimento é `REP-006`, não substitui `CIC-03`; seu
-custo é somado. Reprovação ou divergência na reprodução é registrada como tal, sem
+custo é somado e ele é identificado no README e no registro (aparece no link público do
+dataset). `REP-006` é do próprio autor; o SC-004 exige ainda `REP-006B` por um segundo
+executor, a partir do fork público e com credenciais próprias, ou fica explicitamente
+pendente. Reprovação ou divergência na reprodução é registrada como tal, sem
 selecionar resultados (D09 da 005); não altera a revisão final sem novo ciclo da 005.
 
 ## E07 — Integridade e sigilo
@@ -93,3 +106,6 @@ Nenhum experimento, dataset, commit do Hub, registro ou evidência anterior é a
 | Reprodução reprova ou fica incompleta | Registrar; não substituir `CIC-03`; decisão do autor |
 | v2 precisa mudar | Reabrir a 005 (novo ciclo completo) antes de concluir a 006 |
 | Push recusado ou não autorizado | Entrega fica `preparado`; nada é forçado |
+| Traces públicos sem julgamentos | `share_run` também nos runs do avaliador, ou screenshot dos traces do avaliador |
+| Nenhum segundo executor disponível | SC-004 registrado como pendente; a conclusão da 006 o declara |
+| Commits locais não autorizados | Reprodução a partir de cópia da árvore de trabalho, com origem registrada |

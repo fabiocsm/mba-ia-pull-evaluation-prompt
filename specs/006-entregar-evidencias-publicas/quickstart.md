@@ -40,7 +40,8 @@ devolve o mesmo token. Nunca repetir.
 ## W04 — Conferência anônima (E03)
 
 No navegador integrado, sem login: link do dataset (15 exemplos, experimentos, médias de
-`CIC-03`), prompt público, traces. Esperado: cada alvo `visível`, ou `parcial`/`exige_login`
+`CIC-03`), URL pública do experimento `CIC-03` alcançada por ele, prompt público, traces com
+os julgamentos (runs do avaliador). Esperado: cada alvo `visível`, ou `parcial`/`exige_login`
 com complemento em W05.
 
 ## W05 — Screenshots (E04)
@@ -56,12 +57,16 @@ enunciado intacto; nenhuma nota ilustrativa como resultado; limitações de `CIC
 ## W07 — Reprodução limpa (E06)
 
 ```bash
-git clone --branch dev . "$TMPDIR/rep-006" && cd "$TMPDIR/rep-006" && python3.11 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && pip check
+git clone . "$TMPDIR/rep-006" && git -C "$TMPDIR/rep-006" checkout "$COMMIT_ENTREGA" && cd "$TMPDIR/rep-006" && python3.11 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && pip check
 ```
 
-Copiar o `.env` local para o clone e seguir `Como Executar`. Esperado: todos os passos com o
-código documentado; experimento `REP-006` auditado e registrado com custo; divergências
-resolvidas ou pendentes explícitas.
+`COMMIT_ENTREGA` é o commit registrado em T016; sem commits autorizados, usar cópia da árvore
+de trabalho sem `venv/`, `.env`, `results/` e `screenshots/`. Copiar o `.env` local e seguir
+`Como Executar`. O push reaplica descrição/tags sem nova revisão (HEAD `36a96c05`). Esperado: todos os passos com o
+código documentado; experimento `REP-006` auditado, registrado com custo e identificado no
+README; divergências resolvidas ou pendentes explícitas. SC-004 exige ainda `REP-006B`: um
+segundo executor segue `Como Executar` a partir do fork com credenciais próprias; sem ele, o
+SC-004 fica pendente e declarado.
 
 ## W08 — Integridade final (E07)
 

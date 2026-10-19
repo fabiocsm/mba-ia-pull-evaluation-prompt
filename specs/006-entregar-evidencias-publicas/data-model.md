@@ -27,15 +27,17 @@ edição da v2 invalida a entrada e reabre a 005 (FR-010).
 | Campo | Regra |
 | --- | --- |
 | `id` | `EV-01`… |
-| `tipo` | `link_dataset` · `link_prompt` · `link_trace` · `screenshot` · `fork` |
+| `tipo` | `link_dataset` · `link_experimento` · `link_prompt` · `link_trace` · `screenshot` · `fork` |
 | `alvo` | O que comprova: dataset 15, experimento final, cinco médias, trace simples/médio/complexo, prompt, código |
 | `endereco` | URL pública ou caminho em `docs/evidencias/` (nunca `screenshots/`/`results/`) |
-| `relacao` | `experiment_id`, `hub_commit` e/ou `example_id` correspondentes |
+| `relacao` | `experiment_id`, `hub_commit` e/ou `example_id` correspondentes; para traces, também o run do avaliador (`source_run_id`) |
 | `conferencia_anonima` | Data, navegador sem login, resultado (`visível` · `parcial` · `exige_login`) |
 | `sigilo` | Inspeção: nenhuma chave, e-mail, cabeçalho ou configuração privada visível |
 
 Regras: `link_dataset` existe uma única vez (FR-004); `parcial` ou `exige_login` exige
-`screenshot` complementar ligado ao mesmo alvo (FR-003).
+`screenshot` complementar ligado ao mesmo alvo (FR-003); o alvo “experimento final” tem
+`link_experimento` público alcançado pelo link do dataset (FR-006); URLs de workspace
+(`smith.langchain.com/o/…`) nunca são `endereco` de evidência pública (constituição V).
 
 ## CompartilhamentoDataset
 
@@ -52,11 +54,13 @@ Transição única: `não_compartilhado → compartilhado`. Nenhuma volta, nenhu
 
 | Campo | Regra |
 | --- | --- |
-| `id` | `REP-006` (e `REP-006B` se repetida a partir do fork) |
-| `origem` | Commit clonado e diretório temporário; venv novo, Python e pins |
+| `id` | `REP-006` (autor, clone limpo) e `REP-006B` (segundo executor, a partir do fork) |
+| `executor` | `autor` ou `segundo_executor` (sem dados pessoais além do papel); só `segundo_executor` satisfaz o SC-004 |
+| `origem` | Commit de entrega clonado **ou** cópia da árvore de trabalho (se commits não autorizados), diretório temporário; venv novo, Python e pins |
 | `configuracao` | Variáveis presentes (nomes, sem valores), `COND-001` |
 | `passos` | Cada comando de `Como Executar` com código de saída e observação |
-| `experimento` | ID/URL do novo experimento, decisão da auditoria; marcado como reprodução, não final |
+| `experimento` | ID/URL do novo experimento, decisão da auditoria; marcado como reprodução, não final, e identificado no README por aparecer no link público do dataset |
+| `escritas_remotas` | Esperadas: novo experimento; reaplicação de descrição/tags pelo push sem nova revisão (HEAD inalterado) |
 | `custo` | Tokens e US$ do novo experimento; acumulado do projeto |
 | `divergencias` | Diferenças em relação ao documentado, resolvidas ou pendentes |
 

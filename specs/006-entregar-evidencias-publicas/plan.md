@@ -28,8 +28,10 @@ inventada), que deve aparecer nos resultados.
 Decisões centrais da [pesquisa](research.md): `share_dataset` uma vez, com autorização (D01);
 screenshots sempre, `share_run` só se o trace não for público (D02); PNG em
 `docs/evidencias/` (D03); README reorganizado sobre o enunciado intacto (D04); comparação v1/v2
-qualitativa, numérica não executada (D05); reprodução em clone limpo como `REP-006` (D06); push
-e `main` só com autorização (D07); testes offline da entrega (D08).
+qualitativa, numérica não executada (D05); reprodução em clone limpo como `REP-006` (D06), mais
+`REP-006B` por um segundo executor para o SC-004 ou pendência declarada; push e `main` só com
+autorização (D07); testes offline da entrega (D08). US2 depende das evidências de US1 (links e
+PNG citados no README); a independência da spec vale para a revisão do conteúdo.
 
 Fora do escopo: editar a v2 (reabre a 005), novo avaliador, métricas ou dados; serviços novos.
 
@@ -100,6 +102,7 @@ specs/006-entregar-evidencias-publicas/
 README.md                        # três seções obrigatórias sobre o enunciado preservado
 docs/entrega-publica.md          # criar: registro de compartilhamento, conferências, reprodução, integridade
 docs/evidencias/avaliacao-v2-*.png  # criar: dataset, cinco médias, três traces
+docs/historico-readme.md         # criar: subseções por spec retiradas do README, copiadas literalmente
 tests/test_delivery.py           # criar: testes offline da documentação de entrega
 docs/avaliacao-v2.md             # somente leitura (fonte dos números finais)
 prompts/bug_to_user_story_v2.yml # somente leitura (revisão 36a96c05)
@@ -143,10 +146,18 @@ Entidades em [data-model.md](data-model.md); contrato em
 | FR-009 | R12/R13 | D09, E07 | W08; SC-005 |
 | FR-010 | R10/R12 | D06, E06/E09 | W07; SC-004/SC-005 |
 
-Aceite da implementação: link público do dataset registrado e conferido sem login; cinco
-médias, dataset e três traces com evidência pública legível; README com as três seções e
-números iguais ao registro; reprodução registrada; integridade aprovada; fork `main`
-publicado e conferido sem login após autorização.
+Aceite da implementação: link público do dataset e do experimento final registrados e
+conferidos sem login; cinco médias, dataset e três traces (com julgamentos) com evidência
+pública legível; README com as três seções, números iguais ao registro e `REP-006`
+identificado; reprodução registrada; SC-004 por segundo executor (`REP-006B`) ou pendência
+declarada; integridade aprovada; fork `main` publicado e conferido sem login após autorização.
+
+### Correção da análise — 2026-10-19
+
+`/speckit-analyze` apontou 9 achados (2 HIGH, 4 MEDIUM, 3 LOW), todos corrigidos na pesquisa,
+contrato, modelo, guia, tarefas e neste plano, sem mudar requisitos; ver o
+[registro](tasks.md#correção-da-análise--2026-10-19). O SC-004 não foi reinterpretado: exige
+segundo executor ou fica pendente e declarado.
 
 ## Complexity Tracking
 
