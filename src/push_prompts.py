@@ -18,6 +18,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langsmith import Client
 from langsmith.utils import LangSmithConflictError, get_env_var, tracing_is_enabled
 import requests
+import yaml
 
 from utils import check_env_vars, load_yaml, validate_prompt_structure
 
@@ -119,6 +120,8 @@ def validate_prompt(prompt_data: dict) -> tuple[bool, list]:
         if (not isinstance(value, list) or not value
                 or not all(isinstance(item, str) and item.strip() for item in value)):
             errors.append(f'{field}: lista de strings não brancas obrigatória')
+    if errors:
+        return False, errors
     if any(PENDING.search(text) for text in _text_values(prompt_data)):
         errors.append('marcador de pendência na definição')
     if errors:
@@ -398,6 +401,8 @@ def main():
         original.decode('utf-8')
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             data = load_yaml(str(PROMPT_PATH))
+            if data != yaml.safe_load(original):
+                raise ValueError('conteúdo carregado divergente dos bytes originais')
         if PROMPT_PATH.read_bytes() != original:
             raise ValueError('arquivo alterado')
     except Exception:

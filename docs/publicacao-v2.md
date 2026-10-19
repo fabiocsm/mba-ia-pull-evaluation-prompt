@@ -246,3 +246,58 @@ e média >= 0.8, 3–5 iterações, dataset/experimentos compartilhados e evidê
 acadêmicas finais nas specs 005/006. Publicação aprovada não é aprovação acadêmica.
 
 Auditoria final em 2026-10-18T21:40:08.909385-03:00: 138 links locais, integridade e sigilo aprovados; três PNGs reais não ignoradas, 35/35 tarefas e diff sem erros. Hooks de extensão ausentes antes/depois. Arquivos preparados na árvore de trabalho; sem commit/push Git nesta feature.
+
+## Revisão do commit f0fbb3b — iteração 1/1
+
+Revisão posterior em 2026-10-18, solicitada com
+`review-loop --base main --max-iterations 1 --commit`. Foco: commit `f0fbb3b`,
+16 arquivos, +1530/−147 linhas; `734ff30` e `main..HEAD` como contexto.
+Três revisores aplicaram as lentes A–M. A suíte inicial passou em 703 testes.
+
+| ID | Gravidade / lente | Problema confirmado | Disposição / correção |
+| --- | --- | --- | --- |
+| R1-1 | Important / B | Loader pode ler B entre duas leituras de A e associar conteúdo B ao hash dos bytes A | accepted → fixed: comparar o objeto carregado com o parse seguro dos bytes originais antes de cliente/push |
+| R1-2 | Important / H | Alias YAML cíclico em campo inválido provoca RecursionError antes do retorno contratual | accepted → fixed: retornar erros estruturais antes da varredura recursiva |
+
+U1 agrupou os dois achados porque ambos editam o script e o mesmo módulo de
+testes; lane serial, sem codegen. Rastreabilidade: T036/T037, FR-005/FR-006,
+SC-002/SC-003/SC-004 e C01/C02/C08. O orquestrador confirmou os dois cenários
+localmente antes de delegar as correções, sem chamadas remotas.
+
+Resultado do fixer, preservado integralmente:
+
+```text
+STATUS: fixed
+FINDINGS: R1-1, R1-2
+FILES CHANGED:
+- src/push_prompts.py — vincula o objeto carregado aos bytes originais e rejeita schemas inválidos antes da travessia recursiva.
+- tests/test_prompts.py — acrescenta 29 regressões determinísticas para troca A→B→A e aliases cíclicos.
+FIX: Comparação com yaml.safe_load(original) dentro da proteção existente preserva load_yaml e rejeita conteúdo divergente antes de criar cliente. Guardas de schema retornam diagnósticos seguros antes de percorrer campos inválidos. Conferências finais de estabilidade preservadas.
+TESTS: Regressões observadas falhando primeiro: 29 falhas, sendo 28 RecursionError e uma publicação indevidamente aceita com main()==0. Após correção: `source venv/bin/activate && python -m pytest tests/test_prompts.py -k 'cyclic_aliases or restored_file_with_different_loaded_content or test_push_tracking_ or test_push_validation_' -q --tb=line` — 187 passaram, 279 deselecionados. Sintaxe AST e diff-check dos arquivos aprovados. Testes confirmam argumentos e arquivos temporários intactos, ausência de cliente/push nas rejeições e sentinela ausente dos diagnósticos. YAML real preservado: SHA-256 49ffb35893ae86769d22b555b9b0017e1910e08c49373e89a1931f58ec06c46d. Suíte integral reservada ao orquestrador.
+DEVIATIONS: none
+```
+
+Revisão do orquestrador: as cinco linhas de produção e as 61 linhas de testes
+pertencem a U1; documentação/tarefas registram esta revisão. Os testes usam o
+loader real para reproduzir A→B→A e aliases lista/map em cada campo e campo
+extra, pelas duas entradas. As rejeições ocorrem sem cliente ou push e mantêm
+os dados. Guardas finais do arquivo e todas as conferências remotas permanecem.
+Busca pelos usos de `load_yaml`, `_text_values`, `read_bytes` e dos hashes no
+script não encontrou sibling omitido. Sem regressões ou itens H; hardening
+dispensado. O delta de código/testes tem menos de 400 linhas.
+
+Gates locais: `python -m pytest tests -q` → **732 aprovados** (466 v2/publicação
+e 266 regressões); AST dos dois arquivos Python aprovado; `python -m pip check`
+sem dependências quebradas; hashes de v1/v2 e dos quatro protegidos preservados,
+dataset integral com 15 exemplos e distribuição 5/7/3. `git diff --check main
+<gate-tree>` aplicado à árvore final e snapshot pós-gates estável; identificador
+da árvore final registrado na saída do review-loop, sem autorreferência neste
+arquivo. Build_runner, formatador/analisador Dart e Flutter não se aplicam à
+stack Python; nenhum formatador ou linter adicional é exigido pelo projeto.
+
+Resultado: dois achados aceitos corrigidos, nenhum pendente ou que exija decisão,
+uma iteração. As tarefas originais e as três corretivas estão concluídas. Esta
+verificação é local: não executou nova publicação, avaliação ou consulta ao
+LangSmith; as tentativas PUB-004-01–04 e as capturas acima continuam evidências
+históricas. A v2 não mudou. A 005 deve revalidar o estado remoto antes de avaliar;
+experimentos, métricas e entrega final seguem pendentes nas specs 005/006.

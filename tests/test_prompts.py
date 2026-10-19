@@ -628,6 +628,36 @@ def test_push_validation_shape(publisher, candidate):
     assert valid is False and errors
 
 
+@pytest.mark.parametrize('field', TEXT_FIELDS + LIST_FIELDS + ('extra',))
+@pytest.mark.parametrize('alias', ['&cycle [*cycle]', '&cycle {SECRET_SENTINEL: *cycle}'])
+@pytest.mark.parametrize('entrypoint', ['validate', 'main'])
+def test_push_validation_cyclic_aliases(publisher, prompt, publication, tmp_path,
+                                      monkeypatch, capsys, field, alias, entrypoint):
+    import yaml
+    candidate = deepcopy(prompt)
+    candidate[field] = yaml.safe_load(alias)
+    original = yaml.safe_dump({NAME004: candidate}, allow_unicode=True)
+    if entrypoint == 'validate':
+        valid, errors = publisher.validate_prompt(candidate)
+        assert valid is False and isinstance(errors, list) and errors
+        assert all(isinstance(error, str) and error.strip() for error in errors)
+        assert (field if field != 'extra' else 'campos') in ' '.join(errors)
+        assert 'SECRET_SENTINEL' not in ' '.join(errors)
+        assert yaml.safe_dump({NAME004: candidate}, allow_unicode=True) == original
+    else:
+        path = tmp_path / 'v2.yml'
+        path.write_text(original, encoding='utf-8')
+        monkeypatch.setattr(publisher, 'PROMPT_PATH', path)
+        assert publisher.main() == 1
+        assert path.read_text(encoding='utf-8') == original
+    output = capsys.readouterr()
+    if entrypoint == 'main':
+        assert 'rejeitada' in output.out
+    assert not publication.calls and not publication.pushes
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+    assert 'Traceback' not in output.out + output.err
+
+
 @pytest.mark.parametrize('field,values,reason', [
     ('version', 'v1', 'version'), ('extra', 'value', 'campos'),
     ('techniques_applied', ['Few-shot Learning'], 'techniques'),
@@ -1006,6 +1036,37 @@ def test_push_tracking_main_summary(publisher, prompt, publication, tmp_path, mo
     assert summary['visual_inspection'] == 'pendente'
     assert summary['repo_snapshot']['observed_at'].endswith('+00:00')
     assert path.read_bytes() == original
+
+
+def test_push_tracking_rejects_restored_file_with_different_loaded_content(
+        publisher, prompt, publication, tmp_path, monkeypatch, capsys):
+    import yaml
+    path = tmp_path / 'v2.yml'
+    original = yaml.safe_dump({NAME004: prompt}, allow_unicode=True).encode()
+    changed = deepcopy(prompt)
+    changed['system_prompt'] += '\nPreserve os fatos relatados.'
+    replacement = yaml.safe_dump({NAME004: changed}, allow_unicode=True).encode()
+    path.write_bytes(original)
+    monkeypatch.setattr(publisher, 'PROMPT_PATH', path)
+    real_loader = publisher.load_yaml
+    loaded_paths = []
+
+    def restoring_loader(file_path):
+        loaded_paths.append(file_path)
+        path.write_bytes(replacement)
+        try:
+            return real_loader(file_path)
+        finally:
+            path.write_bytes(original)
+
+    monkeypatch.setattr(publisher, 'load_yaml', restoring_loader)
+    assert publisher.main() == 1
+    assert loaded_paths == [str(path)]
+    assert path.read_bytes() == original
+    assert not publication.calls and not publication.pushes
+    output = capsys.readouterr()
+    assert 'rejeitada' in output.out
+    assert 'conferida automaticamente' not in output.out
 
 
 def test_push_tracking_format_and_metadata_hash(publisher, prompt, publication):

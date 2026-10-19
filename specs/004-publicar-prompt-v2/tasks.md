@@ -13,7 +13,7 @@ description: "Tarefas da spec 004: publicação pública e rastreável da v2"
 [constituição v1.0.0](../../.specify/memory/constitution.md).
 As evidências da 001/003 são pré-requisitos; não repetir suas chamadas LLM ou o pull.
 
-**Estado**: 35/35 tarefas concluídas em 2026-10-18. Implementação, 437 testes locais e 266 regressões aprovados; escrita real, conferência anônima e inspeção visual comprovadas em [publicação da v2](../../docs/publicacao-v2.md). Tentativas/falhas preservadas. Métricas acadêmicas permanecem na 005.
+**Estado**: 35/35 tarefas originais concluídas em 2026-10-18. Implementação, 437 testes locais e 266 regressões aprovados; escrita real, conferência anônima e inspeção visual comprovadas em [publicação da v2](../../docs/publicacao-v2.md). Revisão posterior: T036–T038 concluídas, dois achados corrigidos e 732 testes aprovados, conforme registro ao final. Tentativas/falhas preservadas. Métricas acadêmicas permanecem na 005.
 
 **Tests**: incluídos para os testes independentes das três histórias e SC-002/
 SC-004 da spec, operacionalizados pela matriz obrigatória C09 do desenho.
@@ -414,3 +414,36 @@ commit ou push Git foi executado. O histórico remoto não foi removido.
 ### Auditoria final — 2026-10-18T21:40:08.909385-03:00
 
 Conferidos 138 links locais existentes nos Markdown alterados; 35/35 tarefas marcadas, 004 ativa e branch dev. V1/v2/quatro protegidos e dataset intactos. Varredura de valores secretos em arquivos versionáveis: nenhuma ocorrência. Três capturas convertidas do JPEG retornado pelo navegador para PNG real, sem alteração de conteúdo, fora do ignore. `git diff --check` aprovado. `.specify/extensions.yml` continua ausente: hooks pré/pós não registrados. Nenhum commit/push Git ou chamada LLM adicional. Aceite da 004 concluído; 005/006 continuam pendentes.
+
+## Revisão do commit f0fbb3b — review-loop, iteração 1/1
+
+Revisão solicitada com `--base main --max-iterations 1 --commit`, focada no
+commit da 004. Três revisores cobriram A–M; árvore inicial limpa
+`e42ecbaf2cdb23b06b00d7d164616ce8d5753ff8`. Regressão inicial: 703 testes
+aprovados, dependências consistentes. Checklist de requisitos: 16/16, sem
+pendências. Sem hooks de extensão. Os registros anteriores permanecem históricos.
+
+| Achado | Gravidade | Requisito/contrato | Reprodução local confirmada |
+| --- | --- | --- | --- |
+| R1-1 — associação dos bytes ao conteúdo | Important (B) | FR-006, SC-003, C01 | Loader lê B entre duas leituras de A; CLI retorna 0 e associa o hash de A à definição B |
+| R1-2 — aliases YAML cíclicos | Important (H) | FR-005, SC-002/SC-004, C02/C08 | Lista autorreferente em tags causa RecursionError em vez de rejeição controlada |
+
+Unidade U1, lane serial: ambos afetam `src/push_prompts.py` e
+`tests/test_prompts.py`; sem codegen, alterações no prompt ou arquivos protegidos.
+Ordem: regressões falhando → correções mínimas → revisão do delta → gates → commit.
+
+- [X] T036 [US3] Criar em `tests/test_prompts.py` regressão determinística da troca A→B→A; corrigir `src/push_prompts.py` para vincular o objeto carregado aos bytes originais antes de qualquer cliente/push, preservando `load_yaml` e a conferência final do arquivo (R1-1; FR-006; C01).
+- [X] T037 [US2] Criar em `tests/test_prompts.py` regressões de aliases cíclicos em campos inválidos, para validação direta e `main()`; corrigir a ordem das guardas de `src/push_prompts.py` para retornar reprovação segura sem cliente/push ou traceback (R1-2; FR-005; C02/C08).
+- [X] T038 Revisar o delta de T036/T037, executar pytest integral, sintaxe, pip check, integridade e `git diff --check main <gate-tree>`; registrar evidência em `docs/publicacao-v2.md` e neste `specs/004-publicar-prompt-v2/tasks.md`, conferir snapshot estável e preparar o commit solicitado pela revisão. Nenhuma nova publicação ou avaliação é necessária para as correções locais do script; YAML permanece intacto.
+
+T036/T037: 29 regressões observadas falhando antes da correção (28 ciclos e a
+troca A→B→A aceita indevidamente). Depois: 187 testes selecionados aprovados,
+279 deselecionados; suíte integral com **732 aprovados** (466 v2/publicação +
+266 preparação/pull). Cinco linhas acrescentadas ao script, 61 aos testes.
+T038: delta revisado pelo orquestrador, sem regressão, sibling omitido ou
+hardening necessário; nenhum achado aceito pendente ou decisão normativa.
+Sintaxe, dependências, integridade e diff verificados; snapshots/gates no
+[relatório completo](../../docs/publicacao-v2.md#revisão-do-commit-f0fbb3b--iteração-11).
+Hooks pré/pós ausentes. Prompts, credenciais, providers e quatro protegidos
+preservados; sem nova operação no LangSmith. O commit das correções é autorizado
+por `--commit`; push Git e avaliações acadêmicas continuam fora desta revisão.
