@@ -14,7 +14,7 @@ description: "Tarefas da spec 005: avaliação íntegra e otimização guiada po
 Aceite da 004 e revisão `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`
 em [publicação da v2](../../docs/publicacao-v2.md) são pré-requisitos.
 
-**Estado**: 0/35 tarefas concluídas. Nenhum dataset, experimento ou métrica existe.
+**Estado**: 35/35 tarefas concluídas em 2026-10-19 (T024–T028 e T032 registradas como não aplicáveis, com justificativa). `CIC-01` real completo e aprovado; ver [registro de execução](#registro-de-execução).
 Duas análises SDD realizadas. Achados C1, I1, I2, U1, D1, I3, P1, U2, A1, I4 e U3 da
 primeira (ver [correção da análise](#correção-da-análise--2026-10-18)) e G1, U1, U2, I1,
 I2, U3, U4, I3 e A1 da segunda (ver [segunda correção](#segunda-correção-da-análise--2026-10-18))
@@ -105,11 +105,11 @@ respostas e feedbacks (V03–V07), sem depender de ciclos posteriores ou da 006.
 - [X] T010 [US1] Escrever o bloco `AVALIACAO_DATASET` em `docs/avaliacao-v2.md` conforme C02: localizar por nome exato; se ausente, importar `evaluate` de `src/` e chamar `create_evaluation_dataset(client, dataset_name, "datasets/bug_to_user_story.jsonl")` uma vez; comparar multiconjunto canônico `json.dumps({"inputs":…, "outputs":…}, sort_keys=True, ensure_ascii=False)` remoto × local com multiplicidade; exigir 15; emitir `dataset_id`, `example_map` (`example_id → índice local, complexidade`) e estado `idêntico`/`divergente`, com as linhas `AVALIACAO_DATASET_ID=…` e `AVALIACAO_DATASET=…` para exportação; em divergência instruir D03 sem apagar nada.
 - [X] T011 [US1] Escrever o bloco `AVALIACAO_AUDITORIA` em `docs/avaliacao-v2.md` conforme C04/C05: ler `AVALIACAO_LOG`, extrair URL e `selectedSessions`; ler o projeto do experimento e conferir `reference_dataset_id` contra `AVALIACAO_DATASET_ID`; reler esse dataset somente por leitura e reconstruir o `example_map` pela comparação canônica de C02; listar runs raiz e runs do template; listar feedback dos 15 runs; validar regras de D06; conferir HEAD e hashes da v2 e dos quatro protegidos depois; calcular por dificuldade (via `example_map` reconstruído) as médias `by_complexity` e as três menores notas por métrica base com comentário (`lowest`); somar tokens dos runs LLM da geração e das árvores dos runs do avaliador (via `source_run_id` do feedback ou projeto do avaliador), marcando como `estimado` o que não tiver contagem, e estimar custo a US$ 2/M entrada e US$ 8/M saída; emitir JSON com tabela por exemplo e estado. Sem URL no log, listar somente para registro projetos com `reference_dataset_id` do dataset auditado, prefixo `fabiocsm-bug_to_user_story_v2` e início posterior ao comando, sem avaliá-los, e emitir `falha_execução`.
 - [X] T012 [US1] Executar `pytest tests/test_evaluation_audit.py -v` até T006–T008 passarem, depois `pytest -q` para regressão (base 732); registrar contagens e a falha pertinente observada antes dos blocos em `specs/005-avaliar-iterar-v2/tasks.md`.
-- [ ] T013 [US1] Executar V04: bloco `AVALIACAO_DATASET` real (criação única + auditoria); registrar `dataset_id`, contagem, igualdade e distribuição 5/7/3 em `docs/avaliacao-v2.md` e exportar `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` emitidos. Divergência → registrar, declarar nova condição `COND-00N` com novo `LANGSMITH_PROJECT` na seção de condições de `docs/avaliacao-v2.md` (D03), exportar `AVALIACAO_CONDICAO=COND-00N` antes de qualquer LLM e repetir T013.
-- [ ] T014 [US1] Executar V03: bloco `AVALIACAO_GATE` real para `CIC-01`, depois de T013, com `AVALIACAO_CONDICAO` (padrão `COND-001`), `AVALIACAO_DATASET_ID` e `AVALIACAO_DATASET` de T013, `AVALIACAO_HUB_COMMIT=4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`, `AVALIACAO_V2_FILE_SHA256=49ffb35893ae86769d22b555b9b0017e1910e08c49373e89a1931f58ec06c46d`, `AVALIACAO_V2_DEFINITION_SHA256=ab661782f912303d01a38d45d8a0f89074b84a1a5756fd6d6df7aa7f0489b89c`, `AVALIACAO_TESTES=aprovado` (T012), `AVALIACAO_DASHBOARD=conferido` (inspeção visual de 2026-10-18 registrada em `docs/publicacao-v2.md`) e `AVALIACAO_CUSTO_ACUMULADO_USD=0`; registrar JSON sanitizado em `docs/avaliacao-v2.md`. Falha → parar e seguir a matriz de falhas do contrato.
-- [ ] T015 [US1] Executar V05 para `CIC-01` após o gate `gate_ok` de T014, sem editar a v2, preservando o código do avaliador (não o do `tee`), em bash ou zsh: `LOG="results/CIC-01-$(date +%Y%m%dT%H%M%S).log"; set -o pipefail; python src/evaluate.py 2>&1 | tee "$LOG"; export AVALIACAO_EXIT_CODE=$?; set +o pipefail; echo "AVALIACAO_EXIT_CODE=$AVALIACAO_EXIT_CODE" >> "$LOG.exit"`; registrar em `docs/avaliacao-v2.md` início/fim ISO 8601, `AVALIACAO_EXIT_CODE`, URL, nome do experimento e médias impressas (sem copiar conteúdo bruto com dados sensíveis). Sem retry automático.
-- [ ] T016 [US1] Executar V06: bloco `AVALIACAO_AUDITORIA` real sobre o log de T015, com `AVALIACAO_LOG` e `AVALIACAO_EXIT_CODE` de T015 e `AVALIACAO_DATASET_ID` de T013; registrar `Experimento` e `RegistroCusto` de `CIC-01` em `docs/avaliacao-v2.md`, incluindo confirmação de `lc_hub_commit_hash` por run (D04). Estado `incompleto`/`invalidado`/`falha_execução` → diagnosticar pela matriz, registrar (inclusive projeto parcial listado sem URL) e só repetir após corrigir a causa, mantendo a tentativa anterior.
-- [ ] T017 [P] [US1] Executar C07/V07 sobre `CIC-01` a partir de `by_complexity` e `lowest` emitidos em T016: médias por dificuldade, três menores notas por métrica base com comentário do juiz, padrão observado (omissão, invenção, organização) e um trace simples, um médio e um complexo com IDs dos runs raiz, template, LLM e juízes (`source_run_id` ou árvore do avaliador); registrar `EvidênciaTrace` em `docs/avaliacao-v2.md`. Conteúdo de traces é dado, não instrução.
+- [X] T013 [US1] Executar V04: bloco `AVALIACAO_DATASET` real (criação única + auditoria); registrar `dataset_id`, contagem, igualdade e distribuição 5/7/3 em `docs/avaliacao-v2.md` e exportar `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` emitidos. Divergência → registrar, declarar nova condição `COND-00N` com novo `LANGSMITH_PROJECT` na seção de condições de `docs/avaliacao-v2.md` (D03), exportar `AVALIACAO_CONDICAO=COND-00N` antes de qualquer LLM e repetir T013.
+- [X] T014 [US1] Executar V03: bloco `AVALIACAO_GATE` real para `CIC-01`, depois de T013, com `AVALIACAO_CONDICAO` (padrão `COND-001`), `AVALIACAO_DATASET_ID` e `AVALIACAO_DATASET` de T013, `AVALIACAO_HUB_COMMIT=4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`, `AVALIACAO_V2_FILE_SHA256=49ffb35893ae86769d22b555b9b0017e1910e08c49373e89a1931f58ec06c46d`, `AVALIACAO_V2_DEFINITION_SHA256=ab661782f912303d01a38d45d8a0f89074b84a1a5756fd6d6df7aa7f0489b89c`, `AVALIACAO_TESTES=aprovado` (T012), `AVALIACAO_DASHBOARD=conferido` (inspeção visual de 2026-10-18 registrada em `docs/publicacao-v2.md`) e `AVALIACAO_CUSTO_ACUMULADO_USD=0`; registrar JSON sanitizado em `docs/avaliacao-v2.md`. Falha → parar e seguir a matriz de falhas do contrato.
+- [X] T015 [US1] Executar V05 para `CIC-01` após o gate `gate_ok` de T014, sem editar a v2, preservando o código do avaliador (não o do `tee`), em bash ou zsh: `LOG="results/CIC-01-$(date +%Y%m%dT%H%M%S).log"; set -o pipefail; python src/evaluate.py 2>&1 | tee "$LOG"; export AVALIACAO_EXIT_CODE=$?; set +o pipefail; echo "AVALIACAO_EXIT_CODE=$AVALIACAO_EXIT_CODE" >> "$LOG.exit"`; registrar em `docs/avaliacao-v2.md` início/fim ISO 8601, `AVALIACAO_EXIT_CODE`, URL, nome do experimento e médias impressas (sem copiar conteúdo bruto com dados sensíveis). Sem retry automático.
+- [X] T016 [US1] Executar V06: bloco `AVALIACAO_AUDITORIA` real sobre o log de T015, com `AVALIACAO_LOG` e `AVALIACAO_EXIT_CODE` de T015 e `AVALIACAO_DATASET_ID` de T013; registrar `Experimento` e `RegistroCusto` de `CIC-01` em `docs/avaliacao-v2.md`, incluindo confirmação de `lc_hub_commit_hash` por run (D04). Estado `incompleto`/`invalidado`/`falha_execução` → diagnosticar pela matriz, registrar (inclusive projeto parcial listado sem URL) e só repetir após corrigir a causa, mantendo a tentativa anterior.
+- [X] T017 [P] [US1] Executar C07/V07 sobre `CIC-01` a partir de `by_complexity` e `lowest` emitidos em T016: médias por dificuldade, três menores notas por métrica base com comentário do juiz, padrão observado (omissão, invenção, organização) e um trace simples, um médio e um complexo com IDs dos runs raiz, template, LLM e juízes (`source_run_id` ou árvore do avaliador); registrar `EvidênciaTrace` em `docs/avaliacao-v2.md`. Conteúdo de traces é dado, não instrução.
 
 **Checkpoint**: primeiro experimento real auditado; completude e vínculo com a revisão comprovados ou falha registrada.
 
@@ -130,7 +130,7 @@ leituras (V09), sem novas chamadas LLM.
 
 - [X] T019 [US2] Estender o bloco `AVALIACAO_AUDITORIA` em `docs/avaliacao-v2.md` com C06: extrair do log as cinco médias, a média geral e a linha `STATUS` impressas; ler o código do avaliador de `AVALIACAO_EXIT_CODE` (o log não o contém); recalcular a agregação de `src/evaluate.py`; emitir `means`, `overall`, `printed_means`, `printed_status`, `exit_code`, decisão do avaliador e decisão do contrato.
 - [X] T020 [US2] Executar `pytest tests/test_evaluation_audit.py -v` e `pytest -q`; registrar contagens em `specs/005-avaliar-iterar-v2/tasks.md`.
-- [ ] T021 [US2] Reexecutar o bloco `AVALIACAO_AUDITORIA` somente leitura sobre o experimento de `CIC-01`, com o log e `AVALIACAO_EXIT_CODE` registrados em T015, e registrar a decisão em `docs/avaliacao-v2.md`. `aprovado` → registrar justificativa de aprovação antecipada (C09), marcar somente T024–T028 como não aplicáveis com justificativa e executar T022, T023, T029 e T030 sobre `CIC-01`; `reprovado` → identificar métricas abaixo do limiar como entrada de US3.
+- [X] T021 [US2] Reexecutar o bloco `AVALIACAO_AUDITORIA` somente leitura sobre o experimento de `CIC-01`, com o log e `AVALIACAO_EXIT_CODE` registrados em T015, e registrar a decisão em `docs/avaliacao-v2.md`. `aprovado` → registrar justificativa de aprovação antecipada (C09), marcar somente T024–T028 como não aplicáveis com justificativa e executar T022, T023, T029 e T030 sobre `CIC-01`; `reprovado` → identificar métricas abaixo do limiar como entrada de US3.
 
 **Checkpoint**: decisão integral registrada para o primeiro experimento.
 
@@ -145,18 +145,18 @@ cada um com revisão publicada e experimento acessíveis e condição declarada 
 
 ### Tests for User Story 3
 
-- [ ] T022 [US3] Em `tests/test_evaluation_audit.py`: teste documental (condição e custo já cobertos por T006/T009) que exige em cada seção `### CIC-0N` de `docs/avaliacao-v2.md` os campos de FR-005 (data, provedor, modelos, dataset, identificação local da v2, revisão publicada, ID e URL do experimento, cinco médias, média geral, completude, decisão) mais problema, hipótese, `RevisãoCandidata` com inspeção no dashboard e custo acumulado; seções marcadas como não aplicáveis exigem apenas justificativa.
+- [X] T022 [US3] Em `tests/test_evaluation_audit.py`: teste documental (condição e custo já cobertos por T006/T009) que exige em cada seção `### CIC-0N` de `docs/avaliacao-v2.md` os campos de FR-005 (data, provedor, modelos, dataset, identificação local da v2, revisão publicada, ID e URL do experimento, cinco médias, média geral, completude, decisão) mais problema, hipótese, `RevisãoCandidata` com inspeção no dashboard e custo acumulado; seções marcadas como não aplicáveis exigem apenas justificativa.
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Ajustar o formato de registro de ciclo em `docs/avaliacao-v2.md` até o teste de T022 passar também para o registro existente de `CIC-01`; executar `pytest tests/test_evaluation_audit.py -v` e `pytest -q`; registrar contagens.
-- [ ] T024 [US3] `CIC-02` — preparação: registrar em `docs/avaliacao-v2.md` problema e hipótese ligados às métricas/comentários de `CIC-01` (D10: F1 → omissões; Precision → invenção/excesso; Clarity → organização); editar somente `prompts/bug_to_user_story_v2.yml` mantendo Few-shot próprio e Role Prompting, sem casos ou referências do dataset e sem instruções ao juiz; ajustar `tests/test_prompts.py` só se um contrato local mudar, com justificativa e sem enfraquecer os seis obrigatórios; executar `pytest tests/test_prompts.py -v` e `pytest -q`; executar `python src/push_prompts.py` (código 0, revisão conferida); conferir a nova revisão no dashboard do LangSmith sem login (badge Public, `fabiocsm/bug_to_user_story_v2`, revisão, tags/técnicas, System com persona/regras/exemplos e User `{bug_report}`), como na C07.5 da 004; registrar `RevisãoCandidata` (hashes, commit do Hub, data, inspeção) e fazer o commit local autorizado do ciclo (v2, testes e registro), sem push Git.
-- [ ] T025 [US3] `CIC-02` — avaliação: bloco `AVALIACAO_DATASET` (somente auditoria, `idêntico`) → bloco `AVALIACAO_GATE` de `docs/avaliacao-v2.md` com `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` recém-emitidos, a nova revisão, seus hashes, `AVALIACAO_TESTES=aprovado`, `AVALIACAO_DASHBOARD=conferido` e o custo acumulado → comando de T015 com `CIC-02` no nome do log e `AVALIACAO_EXIT_CODE` preservado → bloco `AVALIACAO_AUDITORIA` (C04–C06) → análise C07 sem traces obrigatórios; registrar `Experimento`, custo, decisão e conclusão de `CIC-02` em `docs/avaliacao-v2.md`.
-- [ ] T026 [US3] `CIC-03` em `prompts/bug_to_user_story_v2.yml` e `docs/avaliacao-v2.md`: se `CIC-02` não aprovado e gate de custo aberto, repetir T024–T025 com hipótese baseada em `CIC-02`; senão registrar não aplicável com justificativa.
-- [ ] T027 [US3] `CIC-04` em `prompts/bug_to_user_story_v2.yml` e `docs/avaliacao-v2.md`: mesma regra de T026, com base em `CIC-03`.
-- [ ] T028 [US3] `CIC-05` em `prompts/bug_to_user_story_v2.yml` e `docs/avaliacao-v2.md`: mesma regra de T026, com base em `CIC-04`.
-- [ ] T029 [US3] Registrar a decisão de parada em `docs/avaliacao-v2.md` conforme C09: aprovação (ciclo, justificativa, sem ciclos para completar contagem); reprovação após `CIC-05` (diagnóstico, plano `CIC-06+`, 005 aberta, sem declarar sucesso); gate de custo (estado `bloqueado`, causa `custo`, e pedido de decisão ao autor). Repetições por falha de infraestrutura listadas com as demais execuções.
-- [ ] T030 [P] [US3] Montar em `docs/avaliacao-v2.md` a tabela comparativa de todos os ciclos e tentativas (condição, revisão, experimento, cinco médias, média geral, completude, decisão, custo) e o resumo das mudanças; marcar nova condição, se houver, antes de comparar; nenhuma linha removida.
+- [X] T023 [US3] Ajustar o formato de registro de ciclo em `docs/avaliacao-v2.md` até o teste de T022 passar também para o registro existente de `CIC-01`; executar `pytest tests/test_evaluation_audit.py -v` e `pytest -q`; registrar contagens.
+- [X] T024 [US3] `CIC-02` — preparação: registrar em `docs/avaliacao-v2.md` problema e hipótese ligados às métricas/comentários de `CIC-01` (D10: F1 → omissões; Precision → invenção/excesso; Clarity → organização); editar somente `prompts/bug_to_user_story_v2.yml` mantendo Few-shot próprio e Role Prompting, sem casos ou referências do dataset e sem instruções ao juiz; ajustar `tests/test_prompts.py` só se um contrato local mudar, com justificativa e sem enfraquecer os seis obrigatórios; executar `pytest tests/test_prompts.py -v` e `pytest -q`; executar `python src/push_prompts.py` (código 0, revisão conferida); conferir a nova revisão no dashboard do LangSmith sem login (badge Public, `fabiocsm/bug_to_user_story_v2`, revisão, tags/técnicas, System com persona/regras/exemplos e User `{bug_report}`), como na C07.5 da 004; registrar `RevisãoCandidata` (hashes, commit do Hub, data, inspeção) e fazer o commit local autorizado do ciclo (v2, testes e registro), sem push Git.
+- [X] T025 [US3] `CIC-02` — avaliação: bloco `AVALIACAO_DATASET` (somente auditoria, `idêntico`) → bloco `AVALIACAO_GATE` de `docs/avaliacao-v2.md` com `AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` recém-emitidos, a nova revisão, seus hashes, `AVALIACAO_TESTES=aprovado`, `AVALIACAO_DASHBOARD=conferido` e o custo acumulado → comando de T015 com `CIC-02` no nome do log e `AVALIACAO_EXIT_CODE` preservado → bloco `AVALIACAO_AUDITORIA` (C04–C06) → análise C07 sem traces obrigatórios; registrar `Experimento`, custo, decisão e conclusão de `CIC-02` em `docs/avaliacao-v2.md`.
+- [X] T026 [US3] `CIC-03` em `prompts/bug_to_user_story_v2.yml` e `docs/avaliacao-v2.md`: se `CIC-02` não aprovado e gate de custo aberto, repetir T024–T025 com hipótese baseada em `CIC-02`; senão registrar não aplicável com justificativa.
+- [X] T027 [US3] `CIC-04` em `prompts/bug_to_user_story_v2.yml` e `docs/avaliacao-v2.md`: mesma regra de T026, com base em `CIC-03`.
+- [X] T028 [US3] `CIC-05` em `prompts/bug_to_user_story_v2.yml` e `docs/avaliacao-v2.md`: mesma regra de T026, com base em `CIC-04`.
+- [X] T029 [US3] Registrar a decisão de parada em `docs/avaliacao-v2.md` conforme C09: aprovação (ciclo, justificativa, sem ciclos para completar contagem); reprovação após `CIC-05` (diagnóstico, plano `CIC-06+`, 005 aberta, sem declarar sucesso); gate de custo (estado `bloqueado`, causa `custo`, e pedido de decisão ao autor). Repetições por falha de infraestrutura listadas com as demais execuções.
+- [X] T030 [P] [US3] Montar em `docs/avaliacao-v2.md` a tabela comparativa de todos os ciclos e tentativas (condição, revisão, experimento, cinco médias, média geral, completude, decisão, custo) e o resumo das mudanças; marcar nova condição, se houver, antes de comparar; nenhuma linha removida.
 
 **Checkpoint**: histórico completo e comparável; revisão aprovada ou pendência explícita.
 
@@ -166,11 +166,11 @@ cada um com revisão publicada e experimento acessíveis e condição declarada 
 
 **Purpose**: correspondência final, traces finais, integridade e entrega à 006.
 
-- [ ] T031 Verificar SC-005 em `docs/avaliacao-v2.md`: hashes do YAML local, HEAD do Hub e `hub_commit` do experimento aprovado iguais, e inspeção no dashboard da revisão final registrada (constituição III); qualquer edição da v2 posterior à aprovação reabre um ciclo completo (T024–T025) e marca o anterior como `substituído`.
-- [ ] T032 Se o experimento final não for `CIC-01`, repetir V07 sobre ele (um simples, um médio, um complexo) e registrar `EvidênciaTrace` em `docs/avaliacao-v2.md` (SC-004).
-- [ ] T033 [P] Atualizar `README.md` com link para `docs/avaliacao-v2.md` e os comandos de gate/dataset/avaliação/auditoria, preservando o enunciado; seções `Resultados Finais` e evidências públicas ficam para a 006.
-- [ ] T034 Executar V11: hashes dos protegidos e da v1, `git status`, `git diff --check`, busca de segredos nos arquivos alterados (`docs/avaliacao-v2.md`, `tests/test_evaluation_audit.py`, `prompts/bug_to_user_story_v2.yml`, `README.md`), `pytest -q`; confirmar que `results/` não é a única evidência; registrar em `specs/005-avaliar-iterar-v2/tasks.md`.
-- [ ] T035 Atualizar estado em `specs/005-avaliar-iterar-v2/plan.md`, `specs/README.md` e `plan/plano-implementacao.md`; registrar no fim de `docs/avaliacao-v2.md` a entrega à 006 (dataset ID, experimento final ID/URL, revisão, médias, traces), diferenciando o que foi verificado no LangSmith do que permanece pendente.
+- [X] T031 Verificar SC-005 em `docs/avaliacao-v2.md`: hashes do YAML local, HEAD do Hub e `hub_commit` do experimento aprovado iguais, e inspeção no dashboard da revisão final registrada (constituição III); qualquer edição da v2 posterior à aprovação reabre um ciclo completo (T024–T025) e marca o anterior como `substituído`.
+- [X] T032 Se o experimento final não for `CIC-01`, repetir V07 sobre ele (um simples, um médio, um complexo) e registrar `EvidênciaTrace` em `docs/avaliacao-v2.md` (SC-004).
+- [X] T033 [P] Atualizar `README.md` com link para `docs/avaliacao-v2.md` e os comandos de gate/dataset/avaliação/auditoria, preservando o enunciado; seções `Resultados Finais` e evidências públicas ficam para a 006.
+- [X] T034 Executar V11: hashes dos protegidos e da v1, `git status`, `git diff --check`, busca de segredos nos arquivos alterados (`docs/avaliacao-v2.md`, `tests/test_evaluation_audit.py`, `prompts/bug_to_user_story_v2.yml`, `README.md`), `pytest -q`; confirmar que `results/` não é a única evidência; registrar em `specs/005-avaliar-iterar-v2/tasks.md`.
+- [X] T035 Atualizar estado em `specs/005-avaliar-iterar-v2/plan.md`, `specs/README.md` e `plan/plano-implementacao.md`; registrar no fim de `docs/avaliacao-v2.md` a entrega à 006 (dataset ID, experimento final ID/URL, revisão, médias, traces), diferenciando o que foi verificado no LangSmith do que permanece pendente.
 
 ---
 
@@ -385,3 +385,55 @@ seguir a ordem dataset → gate.
 - **T019**: C06 acrescentado ao bloco `AVALIACAO_AUDITORIA`.
 - **T020**: `pytest tests/test_evaluation_audit.py -v` → **84 passed**; `pytest -q` →
   **816 passed**, zero skip/xfail.
+
+### US1/US2 real — 2026-10-18/19
+
+- **T013 (V04)**: 2026-10-18T23:56:18-03:00, bloco `AVALIACAO_DATASET` código 0. Dataset
+  ausente criado uma vez pela função fornecida: `8c78638d-37a5-4175-9984-8db0e3473228`,
+  15 exemplos, `matches_local=true`, 5/7/3, `idêntico`. Sem divergência; `COND-001` mantida.
+- **T014 (V03)**: 2026-10-18T23:56:29-03:00, bloco `AVALIACAO_GATE` código 0, `gate_ok`,
+  HEAD antes `4278de75…9595`, workspace e dataset conferidos, custo acumulado 0.
+- **T015 (V05)**: `python src/evaluate.py` de 02:56:38 a 02:57:54 UTC (2026-10-19), com
+  `pipefail`; `AVALIACAO_EXIT_CODE=0`; `STATUS: APROVADO`; experimento
+  `fabiocsm-bug_to_user_story_v2-31a99eea` (`86196746-1c83-42cc-868b-6b57f977f19b`).
+  Log local `results/CIC-01-20261018T235638.log` (ignorado). Sem retry.
+- **T016 (V06)**: 2026-10-18T23:58:27-03:00, bloco `AVALIACAO_AUDITORIA` código 0: 15 runs,
+  75 notas válidas, HEAD/hashes estáveis, `lc_hub_commit_hash` confirmado nos 15 runs,
+  médias recalculadas iguais às impressas. Tokens 70.664 entrada / 10.131 saída, nenhum
+  estimado; US$ 0,222376.
+- **T017 (V07)**: `by_complexity`, três menores por métrica com comentários e três traces
+  (#1 simple, #12 medium, #14 complex) com IDs de raiz, template, LLM, run do avaliador e
+  três LLMs de juiz registrados em `docs/avaliacao-v2.md`.
+- **T021 (V09)**: 2026-10-19T00:00:28-03:00, reexecução somente leitura idêntica; decisão
+  `aprovado`, sem divergência → aprovação antecipada (C09).
+
+### US3 e Polish — 2026-10-19
+
+- **T022**: teste documental `test_cycle_records_have_every_required_field`; antes do ajuste,
+  **falhou** em `CIC-01` por campos ausentes.
+- **T023**: registro de `CIC-01` reformatado com os 14 campos; o teste passou a ler o bullet
+  inteiro (incluindo linhas quebradas). `pytest tests/test_evaluation_audit.py -v` →
+  **85 passed**; `pytest -q` → **817 passed**.
+- **T024–T028**: **não aplicáveis** — `CIC-01` aprovado; C09/FR-009 proíbem ciclos só para
+  completar a contagem e C08/FR-007 exigem problema observado. Seções `CIC-02`…`CIC-05`
+  registram a justificativa. Nenhuma edição da v2, push ou experimento adicional.
+- **T029**: decisão de parada registrada (aprovação antecipada, 1 ciclo executado, gate de
+  custo não acionado, limitações e risco de oscilação).
+- **T030**: tabela comparativa com `CIC-01` e `CIC-02–05` não aplicáveis; condição única.
+- **T031**: SC-005 conferido: YAML local, HEAD e `lc_hub_commit_hash` do experimento são a
+  mesma revisão; inspeção sem login repetida em 2026-10-19 no navegador integrado (Log in,
+  Public, 1 commit `4278de75`, cinco tags, persona, exemplos, `{bug_report}`).
+- **T032**: não aplicável — o experimento final é `CIC-01`, cujos três traces já constam.
+- **T033**: README com a subseção “Avaliação e iterações — spec 005” (ordem dos blocos,
+  comando com `pipefail`, testes offline) e estado da 005 em `Resultados Finais`, sem
+  publicar evidências; enunciado preservado.
+- **T034 (V11)**: hashes dos quatro protegidos, v1 e v2 inalterados; `git diff --check`
+  aprovado; nenhum valor de credencial do `.env` nem padrão de chave nos cinco arquivos
+  alterados; `pytest -q` 817 e `pytest tests/test_prompts.py -q` 466 aprovados; fatos
+  sanitizados em `docs/avaliacao-v2.md`, `results/` não é a única evidência.
+- **T035**: estado atualizado em `plan.md`, `specs/README.md` e `plan/plano-implementacao.md`;
+  entrega à 006 registrada em `docs/avaliacao-v2.md`. Verificado no LangSmith: dataset,
+  experimento, notas, vínculo e traces (workspace do autor). Pendente (006): acesso público
+  ao dataset/experimentos, screenshots, seções finais do README e push Git.
+
+`.specify/extensions.yml` ausente: nenhum hook antes ou depois da implementação.

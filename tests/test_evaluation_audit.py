@@ -860,3 +860,49 @@ def test_decision_missing_status_line_is_incomplete(audit, capsys):
     assert result["printed_status"] is None
     assert result["estado"] == result["decisao"] == "incompleto"
     assert "status_ausente" in result["completude"]["problemas"]
+
+
+# --- FR-005 / SC-003: registro documental de cada ciclo -------------------------
+
+CYCLE_FIELDS = ["**Data**", "**Condição**", "**Dataset**", "**v2 local**",
+                "**Revisão publicada**", "**Inspeção no dashboard**", "**Experimento**",
+                "**Médias**", "**Média geral**", "**Completude**", "**Decisão**",
+                "**Custo acumulado**", "**Problema**", "**Hipótese**"]
+
+
+def _cycle_sections():
+    document = DOC.read_text(encoding="utf-8")
+    cycles = document.split("\n## Ciclos\n", 1)[1].split("\n## ", 1)[0]
+    parts = re.split(r"^### (CIC-0\d)\n", cycles, flags=re.MULTILINE)[1:]
+    return document, dict(zip(parts[::2], parts[1::2]))
+
+
+def _bullet(text, label):
+    """Whole Markdown bullet starting with label, including wrapped lines."""
+    match = re.search(rf"^- {re.escape(label)}.*?(?=^- \*\*|^\s*$)", text + "\n\n",
+                      flags=re.MULTILINE | re.DOTALL)
+    assert match, label
+    return match.group(0)
+
+
+def test_cycle_records_have_every_required_field():
+    document, sections = _cycle_sections()
+    assert list(sections) == ["CIC-01", "CIC-02", "CIC-03", "CIC-04", "CIC-05"]
+    stop = document.split("\n## Decisão de parada\n", 1)[1].split("\n## ", 1)[0]
+    assert sections["CIC-01"].strip() != "Pendente."
+    for cycle, body in sections.items():
+        text = body.strip()
+        if text == "Pendente.":
+            assert stop.strip() == "Pendente.", f"{cycle} pendente após a decisão de parada"
+            continue
+        if text.startswith("**Não aplicável**"):
+            assert "**Justificativa**" in text, cycle
+            continue
+        missing = [field for field in CYCLE_FIELDS if field not in text]
+        assert not missing, (cycle, missing)
+        means = _bullet(text, "**Médias**")
+        for metric in ("Helpfulness", "Correctness", "F1-Score", "Clarity", "Precision"):
+            assert metric in means, (cycle, metric)
+        experiment = _bullet(text, "**Experimento**")
+        assert re.search(r"selectedSessions=[0-9a-f-]{36}", experiment), cycle
+        assert re.search(r"`[0-9a-f]{64}`", text.split("**Revisão publicada**", 1)[1]), cycle

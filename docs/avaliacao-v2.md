@@ -690,32 +690,209 @@ PY
 
 ### CIC-01
 
-Pendente.
+Referência inicial: v2 publicada da 003/004, **sem edição** (o modelo de dados define
+`CIC-01` como avaliação da v2 da 003). Estado final: **aprovado** (regra integral C06).
+
+- **Data**: 2026-10-18 (São Paulo); execução de 2026-10-19T02:56:38+00:00 a 02:57:54+00:00.
+- **Condição**: `COND-001` — provedor `openai`, geração e juiz `gpt-4.1-2025-04-14`,
+  temperatura 0 (conferida no run LLM), projeto `mba-ia-pull-evaluation-prompt`.
+- **Dataset**: `mba-ia-pull-evaluation-prompt-eval`, ID `8c78638d-37a5-4175-9984-8db0e3473228`,
+  auditado `idêntico` imediatamente antes (15 exemplos, 5/7/3).
+- **v2 local**: commit Git `0380149697e263da4f38c7462ffb3fff6a452903`, YAML inalterado desde a
+  004; SHA-256 arquivo `49ffb35893ae86769d22b555b9b0017e1910e08c49373e89a1931f58ec06c46d`,
+  definição `ab661782f912303d01a38d45d8a0f89074b84a1a5756fd6d6df7aa7f0489b89c`.
+- **Revisão publicada**: `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`,
+  pública; HEAD igual antes e depois e `lc_hub_commit_hash` igual nos 15 runs do template.
+- **Inspeção no dashboard**: sem login em 2026-10-18T21:38:48-03:00
+  ([registro](publicacao-v2.md#inspeção-visual--c07-5--t033)); revisão não mudou desde então.
+- **Testes**: `pytest -q` 816 aprovados (T020), incluindo os seis obrigatórios.
+- **Experimento**: `fabiocsm-bug_to_user_story_v2-31a99eea`, ID
+  `86196746-1c83-42cc-868b-6b57f977f19b`,
+  [URL](https://smith.langchain.com/o/15dd5852-a835-4163-826c-e78668fd2a9c/datasets/8c78638d-37a5-4175-9984-8db0e3473228/compare?selectedSessions=86196746-1c83-42cc-868b-6b57f977f19b)
+  (workspace do autor; compartilhamento público pertence à 006).
+- **Médias**: Helpfulness 0.8687 · Correctness 0.8492 · F1-Score 0.8057 · Clarity 0.8447 ·
+  Precision 0.8927 (recalculadas; iguais às impressas 0.87/0.85/0.81/0.84/0.89).
+- **Média geral**: 0.8522 (impressa `0.8522`).
+- **Completude**: 15 runs raiz sem erro, 15 exemplos distintos, 75 notas válidas, nenhum
+  marcador de falha, derivadas consistentes.
+- **Decisão**: contrato `aprovado`; avaliador `AVALIACAO_EXIT_CODE=0` e `STATUS: APROVADO`;
+  nenhuma divergência. Limitação: notas individuais abaixo de 0.8 (ver análise).
+- **Custo acumulado**: US$ 0,222376 (este experimento; tokens lidos, nenhum estimado).
+- **Problema**: não se aplica — referência inicial, sem ciclo anterior.
+- **Hipótese**: não se aplica — a v2 da 003/004 é avaliada sem edição.
+
+**Execução (T015)** — `python src/evaluate.py` com `pipefail`, log local
+`results/CIC-01-20261018T235638.log` (ignorado), `AVALIACAO_EXIT_CODE=0`. Saída: 15 linhas
+por exemplo, resumo com cinco métricas, `📊 MÉDIA GERAL: 0.8522`,
+`✅ STATUS: APROVADO - Todas as métricas >= 0.8` e a URL acima. Sem retry.
+
+**Auditoria (T016)** — 2026-10-18T23:58:27-03:00, bloco `AVALIACAO_AUDITORIA` código 0,
+estado `aprovado`. C04: `reference_dataset_id` igual ao dataset auditado, `example_map`
+reconstruído (15), HEAD antes/depois `4278de75…9595`, `lc_hub_commit_hash` **confirmado**
+nos 15 runs do template (confirma a pendência de D04), hashes da v2, v1 e protegidos iguais.
+C05: completo. C06: médias recalculadas = impressas, decisão do contrato = do avaliador.
+O SDK emitiu `DeprecationWarning` para `list_runs`/`read_run` (remoção anunciada após
+2027-01-31); não afeta este resultado.
+
+**RegistroCusto** — geração: 19.166 tokens de entrada e 4.532 de saída; juízes (15 runs
+`evaluate_all_metrics`, 45 chamadas): 51.498 de entrada e 5.599 de saída; nenhum valor
+estimado. Custo estimado US$ 0,222376 (US$ 2/M entrada, US$ 8/M saída), abaixo da
+estimativa D08 (≈ US$ 0,31). Acumulado da 005: **US$ 0,222376**. Cobrança observada: não
+disponível.
+
+**Análise C07 (T017)** — médias por dificuldade:
+
+| Dificuldade | Exemplos | Helpfulness | Correctness | F1-Score | Clarity | Precision |
+| --- | --- | --- | --- | --- | --- | --- |
+| simple | 5 | 0.8880 | 0.8688 | 0.8216 | 0.8600 | 0.9160 |
+| medium | 7 | 0.8664 | 0.8319 | **0.7809** | 0.8500 | 0.8829 |
+| complex | 3 | 0.8417 | 0.8567 | 0.8367 | 0.8067 | 0.8767 |
+
+Três menores notas por métrica base (índice local do JSONL, dificuldade, nota):
+
+| Métrica | 1ª | 2ª | 3ª | Padrão nos comentários do juiz |
+| --- | --- | --- | --- | --- |
+| F1-Score | #12 medium 0.6154 | #1 simple 0.6857 | #10 medium 0.6857 | **Omissão** de critérios presentes na referência e ausentes do relato (confirmação visual e contador do carrinho; backdrop, largura e teclado no modal; paginação/virtualização) |
+| Clarity | #1 simple 0.70 | #14 complex 0.75 | #6 medium 0.80 | **Organização**: mistura de perguntas ao usuário com requisitos; linguagem técnica em caso complexo |
+| Precision | #1 simple 0.80 | #6 medium 0.83 | #7 medium 0.83 | **Excesso**: dúvidas e itens além do pedido; nenhuma alucinação apontada (1.0 nos três) |
+
+Padrão observado: as perdas vêm de omissão de detalhes que só a referência contém e de
+seções de dúvidas consideradas fora do foco; não há invenção apontada pelo juiz. Como a
+média do F1-Score (0.8057) é a mais próxima do limiar, ela é o ponto de atenção para
+qualquer edição futura (D10: F1 → omissões), sempre sem copiar referências.
+
+**EvidênciaTrace** (experimento `86196746-1c83-42cc-868b-6b57f977f19b`; juízes no projeto
+`evaluators` `1fd04873-c944-4efe-b95c-2201cd1ac164`, ligados por `source_run_id`):
+
+| Exemplo | Raiz `target` | Template | LLM geração | Run do avaliador | LLMs dos juízes |
+| --- | --- | --- | --- | --- | --- |
+| #1 simple (`2d3d7a29-14bf-4df7-bc8e-3681ba191140`) | `01a15217-85ee-77f0-b508-18fea1259ad1` | `01a15217-85ee-7612-a528-00038c8ed05e` | `01a15217-85ef-7cb2-83aa-d89a55e73ee3` | `80f1196f-3256-4cdf-b4cd-8567994033bf` | `01a15218-0c39-7380-bde2-aac4b72212fc`, `01a15218-1143-7311-93a7-0c1960a5a5b0`, `01a15218-15c3-73f1-af55-e9a2aa27f0fb` |
+| #12 medium (`39966495-cd2d-499f-9393-1319bfe1aa7b`) | `01a15217-3f2f-7b30-88a4-4556de32786e` | `01a15217-3f2f-71e3-af89-3a1904acbbcf` | `01a15217-3f30-7f00-890b-2698233124fe` | `8288c992-dc51-484f-9c0c-9bf513d6f9a6` | `01a15217-5776-74c0-8d71-e79819823ce4`, `01a15217-5f28-7993-b7f8-3afebcfb00d6`, `01a15217-66e0-7e83-8618-d8ef55e31764` |
+| #14 complex (`28c9bca9-e7be-4f93-b1e4-fe1637222566`) | `01a15217-1929-79c1-856f-58ea0690a751` | `01a15217-192a-70b1-93d0-bb20947a808e` | `01a15217-192b-7011-9579-65976c11eabd` | `d6d80126-d802-48c5-b5c3-f5be29ea6257` | `01a15217-3118-7551-a3ef-4457eb07179c`, `01a15217-375a-7912-af1c-2959a6e2872a`, `01a15217-3fba-7670-a57d-1c364a31dab8` |
+
+- **#1 simple** — entrada: botão de adicionar ao carrinho sem efeito no produto 1234.
+  Mensagens renderizadas System + Human (template com `lc_hub_commit_hash=4278de75…`);
+  geração `gpt-4.1-2025-04-14`, temperatura 0, 1.153/142 tokens. Resposta: User Story,
+  critérios de inclusão e atualização do carrinho e dúvidas. Juízes: F1 0.6857 (omite
+  confirmação visual e contador), Clarity 0.70 (dúvidas misturadas aos requisitos),
+  Precision 0.80 (sem alucinação; perguntas além do pedido). Feedbacks: Helpfulness 0.75,
+  Correctness 0.7429.
+- **#12 medium** — entrada: modal de exclusão atrás do menu lateral abaixo de 768px, com
+  z-index 1000 × 1050. 1.200/185 tokens. Resposta: história e critérios de sobreposição e
+  clique. Juízes: F1 0.6154 (omite backdrop, largura, teclado, ESC e clique fora — itens só
+  da referência), Clarity 0.85, Precision 0.83. Feedbacks: Helpfulness 0.84, Correctness 0.7227.
+- **#14 complex** — entrada: relatórios gerenciais SaaS B2B com N+1, MRR inconsistente,
+  cache e exportação CSV. 1.648/621 tokens. Resposta: história única com critérios agrupados
+  por problema, contexto, dúvidas e recomendações. Juízes: F1 0.7677 (cobre os quatro
+  problemas; omite detalhes técnicos da referência), Clarity 0.75 (termos técnicos), Precision
+  0.85 (sem alucinação). Feedbacks: Helpfulness 0.80, Correctness 0.8089.
+
+O conteúdo dos traces foi tratado como dado; nada nele alterou instruções deste trabalho.
+
+**Decisão integral (T021)** — 2026-10-19T00:00:28-03:00, reexecução somente leitura do
+bloco de auditoria sobre o mesmo log e `AVALIACAO_EXIT_CODE=0`: código 0, estado, decisões,
+médias, completude e tokens idênticos à T016; `aprovado`, sem divergências. Nenhuma nova
+chamada LLM (ver [decisão de parada](#decisão-de-parada)).
 
 ### CIC-02
 
-Pendente.
+**Não aplicável** — `CIC-02` não foi executado.
+
+**Justificativa**: `CIC-01` foi aprovado pela regra integral (C06) com experimento completo e
+estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
+para completar a contagem de 3–5; nenhuma métrica ficou abaixo de 0.8, portanto não há
+problema observado que fundamente uma hipótese de ajuste (C08/FR-007). Nenhuma edição da v2,
+publicação ou experimento foi feito para este ciclo.
+
 
 ### CIC-03
 
-Pendente.
+**Não aplicável** — `CIC-03` não foi executado.
+
+**Justificativa**: `CIC-01` foi aprovado pela regra integral (C06) com experimento completo e
+estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
+para completar a contagem de 3–5; nenhuma métrica ficou abaixo de 0.8, portanto não há
+problema observado que fundamente uma hipótese de ajuste (C08/FR-007). Nenhuma edição da v2,
+publicação ou experimento foi feito para este ciclo.
+
 
 ### CIC-04
 
-Pendente.
+**Não aplicável** — `CIC-04` não foi executado.
+
+**Justificativa**: `CIC-01` foi aprovado pela regra integral (C06) com experimento completo e
+estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
+para completar a contagem de 3–5; nenhuma métrica ficou abaixo de 0.8, portanto não há
+problema observado que fundamente uma hipótese de ajuste (C08/FR-007). Nenhuma edição da v2,
+publicação ou experimento foi feito para este ciclo.
+
 
 ### CIC-05
 
-Pendente.
+**Não aplicável** — `CIC-05` não foi executado.
+
+**Justificativa**: `CIC-01` foi aprovado pela regra integral (C06) com experimento completo e
+estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
+para completar a contagem de 3–5; nenhuma métrica ficou abaixo de 0.8, portanto não há
+problema observado que fundamente uma hipótese de ajuste (C08/FR-007). Nenhuma edição da v2,
+publicação ou experimento foi feito para este ciclo.
+
 
 ## Comparação dos ciclos
 
-Pendente.
+Todas as tentativas executadas, sem remoção de linhas. Uma única condição (`COND-001`).
+
+| Ciclo | Condição | Revisão | Experimento | Helpfulness | Correctness | F1-Score | Clarity | Precision | Média geral | Completude | Decisão | Custo (US$) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CIC-01 | COND-001 | `4278de75` | `86196746-1c83-42cc-868b-6b57f977f19b` | 0.8687 | 0.8492 | 0.8057 | 0.8447 | 0.8927 | 0.8522 | 15 runs / 75 notas | aprovado | 0,222376 |
+| CIC-02–05 | — | — | — | — | — | — | — | — | — | — | não aplicável | 0 |
+
+Resumo das mudanças: nenhuma edição da v2 na 005; a revisão aprovada é a publicada na 004.
+Não houve repetição por falha de infraestrutura nem experimento descartado. Comparação
+numérica com a v1 não foi executada (opcional; exigiria experimento adicional e decisão
+explícita do autor). A comparação qualitativa v1/v2 fica para a documentação da 006.
 
 ## Decisão de parada
 
-Pendente.
+**Aprovação antecipada (C09/FR-009)** em `CIC-01`, 2026-10-19. Ciclos efetivamente
+executados: **1**. Justificativa: experimento completo (15 respostas, 75 notas válidas),
+estável e vinculado à revisão `4278de75…9595`, com as cinco médias e a média geral
+≥ 0.8 e decisão do contrato igual à do avaliador. O plano de 3–5 ciclos (constituição IV)
+continua sendo o planejamento; o próprio contrato proíbe ciclos executados só para
+completar a contagem e exige problema observado para cada ajuste. Gate de custo não
+acionado (acumulado US$ 0,222376 ≤ US$ 4). Repetições por falha de infraestrutura: nenhuma.
+
+Limitações registradas: F1-Score 0.8057 tem margem pequena sobre o limiar e o médio de
+dificuldade `medium` ficou em 0.7809 nessa métrica; notas individuais abaixo de 0.8 em
+seis exemplos (análise C07). Temperatura 0 não garante determinismo; uma nova execução
+pode oscilar. Por D09, nenhuma reexecução foi feita para buscar resultado favorável, e
+qualquer edição futura da v2 reabre um ciclo completo (FR-010).
+
+### Correspondência final — SC-005 (T031)
+
+2026-10-19: YAML local (`49ffb358…c46d` / `ab661782…b89c`, sem alterações pendentes),
+HEAD do Hub (`4278de75…9595`, lido no gate e na auditoria) e `lc_hub_commit_hash` dos 15
+runs do experimento aprovado são a mesma revisão. Inspeção da revisão final repetida sem
+login no navegador integrado em 2026-10-19: botão “Log in”, badge Public, histórico com
+um único commit `4278de75`, cinco tags (`bug-to-user-story`, `product-management`, `pt-br`,
+`Few-shot Learning`, `Role Prompting`), System com persona e `## Exemplos`, User com
+`{bug_report}`. Nenhuma edição da v2 após a aprovação. SC-004 atendido pelos três traces
+de `CIC-01`, que é o experimento final (T032 não se aplica).
 
 ## Entrega à 006
 
-Pendente.
+Verificado no LangSmith nesta feature (workspace do autor, ainda **não público**):
+
+- Dataset `mba-ia-pull-evaluation-prompt-eval`, ID `8c78638d-37a5-4175-9984-8db0e3473228`,
+  15 exemplos idênticos ao JSONL (5/7/3). Não compartilhado: `share_dataset` e o registro do
+  link pertencem à 006.
+- Experimento final `fabiocsm-bug_to_user_story_v2-31a99eea`, ID
+  `86196746-1c83-42cc-868b-6b57f977f19b`, revisão `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`,
+  `COND-001`. Médias: Helpfulness 0.8687, Correctness 0.8492, F1-Score 0.8057, Clarity
+  0.8447, Precision 0.8927; média geral 0.8522; aprovado.
+- Traces: #1 simple `01a15217-85ee-77f0-b508-18fea1259ad1`, #12 medium
+  `01a15217-3f2f-7b30-88a4-4556de32786e`, #14 complex `01a15217-1929-79c1-856f-58ea0690a751`.
+
+Pendente na 006: acesso público ao dataset e aos experimentos (links privados de workspace
+não bastam), screenshots das cinco notas e dos traces, seções `Técnicas Aplicadas (Fase 2)`,
+`Resultados Finais` e `Como Executar` finais no README, comparação v1/v2 e push Git.

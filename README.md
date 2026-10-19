@@ -569,6 +569,28 @@ no reenvio idêntico. Nesse conflito, o script confere uma revisão existente po
 leitura, com todos os gates, registra `returned_url: null` e não alega nova escrita.
 Outras falhas continuam retornando 1; não há repetição automática de push.
 
+### Avaliação e iterações — spec 005
+
+O [registro da avaliação](docs/avaliacao-v2.md) contém três blocos executáveis e o
+histórico dos ciclos. Em **todo** ciclo, da raiz com o venv ativo e nesta ordem: bloco
+`AVALIACAO_DATASET` (cria o dataset uma vez pela função fornecida e audita os 15 exemplos),
+bloco `AVALIACAO_GATE` (integridade, revisão publicada, condição, workspace, dataset,
+testes, inspeção e custo, sem chamadas LLM), a avaliação e o bloco `AVALIACAO_AUDITORIA`
+(15 runs, 75 notas válidas, vínculo com a revisão e decisão integral). As variáveis
+`AVALIACAO_*` de entrada estão descritas antes de cada bloco. A avaliação preserva o
+código do avaliador:
+
+```bash
+mkdir -p results && export AVALIACAO_INICIO="$(date -u +%Y-%m-%dT%H:%M:%S+00:00)"; LOG="results/${AVALIACAO_CICLO}-$(date +%Y%m%dT%H%M%S).log"; set -o pipefail; python src/evaluate.py 2>&1 | tee "$LOG"; export AVALIACAO_EXIT_CODE=$?; set +o pipefail; export AVALIACAO_LOG="$LOG"
+```
+
+```bash
+python -m pytest tests/test_evaluation_audit.py -v
+```
+
+Os testes acima exercitam os blocos offline, com dublês e LLM/rede bloqueados; não são
+evidência de notas. As notas vêm somente de `python src/evaluate.py`.
+
 ## Técnicas Aplicadas (Fase 2)
 
 ### Diagnóstico da v1 e regras da v2 — spec 003
@@ -638,7 +660,7 @@ estruturais não comprovam a resposta futura de um modelo.
 | Saída | Pedido genérico de User Story | Português, Markdown, história e critérios verificáveis |
 | Exemplos | Ausentes | Três pares completos de entrada/saída |
 | Bordas | Não orientadas | Seis grupos com fundamentação e perguntas |
-| Evidência numérica | Sem baseline real | Avaliação real pendente na 005 |
+| Evidência numérica | Sem baseline real | `CIC-01` aprovado na 005 ([registro](docs/avaliacao-v2.md)) |
 
 ## Resultados Finais
 
@@ -653,8 +675,13 @@ A spec 004 está **concluída**: 35/35 tarefas, publicação pública real e rev
 contra o YAML intacto. [Prompt público](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/4278de75?tab=0),
 [histórico e três capturas reais](docs/publicacao-v2.md). O script final retornou 0;
 437 testes de prompt/publicação e 266 regressões passaram. As tentativas com
-falhas e os ajustes de compatibilidade estão preservados no registro. Experimentos,
-cinco métricas, média >= 0.8 e ciclos reais: **pendentes na 005**. Link público do
+falhas e os ajustes de compatibilidade estão preservados no registro.
+
+A spec 005 avaliou essa revisão sem edição: experimento `CIC-01` completo (15 respostas,
+75 notas válidas), vinculado à revisão e **aprovado** pela regra integral — Helpfulness
+0.8687, Correctness 0.8492, F1-Score 0.8057, Clarity 0.8447, Precision 0.8927, média
+geral 0.8522 — com aprovação antecipada justificada e custo estimado de US$ 0,22. Detalhes,
+análise e traces no [registro da avaliação](docs/avaliacao-v2.md). Link público do
 dataset/experimentos, screenshots das cinco notas e tracing detalhado de três
-exemplos: **pendentes na 006**. O link público acima comprova o prompt; ainda não há notas acadêmicas ou
-dataset/experimentos públicos da v2 para apresentar. As ilustrações do enunciado não representam resultados desta entrega.
+exemplos: **pendentes na 006**. O link público acima comprova o prompt; o dataset e o
+experimento ainda estão apenas no workspace do autor, sem acesso público. As ilustrações do enunciado não representam resultados desta entrega.
