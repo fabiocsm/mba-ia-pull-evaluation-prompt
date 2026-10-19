@@ -6,8 +6,8 @@
 [plano mestre](../../plan/plano-implementacao.md), com a entrega da
 [005](../../docs/avaliacao-v2.md#entrega-à-006) aprovada.
 
-**Estado**: planejamento e desenho concluídos em 2026-10-19; tarefas e implementação
-pendentes. O setup retornou `BRANCH=006-entregar-evidencias-publicas` como identificador da
+**Estado**: planejamento e desenho concluídos em 2026-10-19; [25 tarefas](tasks.md) geradas;
+implementação pendente. O setup retornou `BRANCH=006-entregar-evidencias-publicas` como identificador da
 feature; a branch Git continua `dev`. O ponteiro local `.specify/feature.json` (ignorado
 pelo Git) seleciona a 006 por pedido do autor. Nenhuma branch criada ou trocada.
 
