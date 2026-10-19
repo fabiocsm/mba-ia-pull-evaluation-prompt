@@ -135,7 +135,7 @@ def _extract_templates(prompt):
     _require(prompt.metadata.get("lc_hub_owner") == owner, "lc_hub_owner")
     _require(prompt.metadata.get("lc_hub_repo") == repo, "lc_hub_repo")
     revision = prompt.metadata.get("lc_hub_commit_hash")
-    _require(type(revision) is str and bool(re.fullmatch(r"[0-9a-fA-F]+", revision)),
+    _require(type(revision) is str and bool(re.fullmatch(r"[0-9a-f]{64}", revision)),
              "lc_hub_commit_hash")
     return texts, revision
 
@@ -210,10 +210,11 @@ def _persist(mapping):
 
 
 def _report_failure(error, stage, revision):
-    if stage == "persistência":
-        category, action = "escrita", "Confira permissões, espaço e integridade da gravação."
-    elif isinstance(error, RepresentationError):
+    # Divergência na releitura também ocorre na persistência, mas é de representação.
+    if isinstance(error, RepresentationError):
         category, action = "representação", "Confira o contrato; não adapte a semente."
+    elif stage == "persistência":
+        category, action = "escrita", "Confira permissões, espaço e integridade da gravação."
     elif isinstance(error, ls_utils.LangSmithAuthError):
         category, action = "acesso", "Confira credencial, endpoint e workspace."
     elif isinstance(error, ls_utils.LangSmithNotFoundError):

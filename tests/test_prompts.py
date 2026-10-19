@@ -81,11 +81,14 @@ def rules(prompt):
     return prompt["system_prompt"].split("## Exemplos", 1)[0]
 
 
+PERSONA = re.compile(
+    r"\bvocê é (?:um|uma)\b[^.\n]{0,40}?\b(?:product manager|product owner|pm|analista de produto)\b",
+    re.IGNORECASE,
+)
+
+
 def assert_role(prompt):
-    assert re.search(
-        r"você é (?:um|uma) (?:product manager|analista de produto)\b",
-        rules(prompt), re.IGNORECASE,
-    ), "Persona de produto ausente das regras"
+    assert PERSONA.search(rules(prompt)), "Persona de produto ausente das regras"
 
 
 def assert_format(prompt):
@@ -130,7 +133,7 @@ def assert_techniques(prompt):
     names = [v.strip().casefold() for v in values]
     assert len(set(names)) == len(names), "Técnicas duplicadas"
     assert len(names) >= 2, "Pelo menos duas técnicas distintas"
-    assert set(names) == {"few-shot learning", "role prompting"}, "Técnicas exigidas: Few-shot Learning e Role Prompting"
+    assert "few-shot learning" in names, "Técnicas exigidas: Few-shot Learning entre pelo menos duas"
     assert_role(prompt)
     assert_examples(prompt)
 
@@ -341,13 +344,32 @@ def test_examples_reject_incomplete_pairs(prompt, defect, expected):
     (['Few-shot Learning', ' few-SHOT learning '], 'duplicadas'),
     (['Few-shot Learning', 'Role Prompting', ' ROLE PROMPTING '], 'duplicadas'),
     (['Role Prompting', 'ReAct'], 'Técnicas exigidas'),
-    (['Few-shot Learning', 'ReAct'], 'Técnicas exigidas'),
 ])
 def test_techniques_reject_invalid_metadata(prompt, values, expected):
     candidate = deepcopy(prompt)
     candidate['techniques_applied'] = values
     with pytest.raises(AssertionError, match=expected):
         assert_techniques(candidate)
+
+
+@pytest.mark.parametrize('values', [
+    ['Few-shot Learning', 'Role Prompting', 'Chain of Thought'],
+    ['Role Prompting', 'Few-shot Learning'],
+])
+def test_techniques_accept_at_least_two_with_few_shot(prompt, values):
+    # README: "pelo menos 2 técnicas"; Few-shot Learning é a única obrigatória.
+    candidate = deepcopy(prompt)
+    candidate['techniques_applied'] = values
+    assert_techniques(candidate)
+
+
+@pytest.mark.parametrize('persona', [
+    'Você é uma PM sênior', 'Você é um Product Owner', 'Você é uma analista de produto',
+])
+def test_role_accepts_product_persona_variants(prompt, persona):
+    candidate = deepcopy(prompt)
+    candidate['system_prompt'] = candidate['system_prompt'].replace('Você é um Product Manager', persona, 1)
+    assert_role(candidate)
 
 
 @pytest.mark.parametrize('defect,expected', [('role', 'Persona'), ('examples', 'Seção Exemplos')])
@@ -663,6 +685,7 @@ def test_push_validation_cyclic_aliases(publisher, prompt, publication, tmp_path
     ('techniques_applied', ['Few-shot Learning'], 'techniques'),
     ('techniques_applied', ['Few-shot Learning', ' few-SHOT learning '], 'techniques'),
     ('techniques_applied', ['Role Prompting', 'ReAct'], 'techniques'),
+    ('techniques_applied', ['Few-shot Learning', 'Role Prompting', 'role prompting'], 'techniques'),
     ('user_prompt', 'Relato: {bug_report}', 'user_prompt'),
     ('user_prompt', '{bug_report}{bug_report}', 'user_prompt'),
 ])
@@ -671,6 +694,18 @@ def test_push_validation_contract(publisher, prompt, field, values, reason):
     candidate[field] = values
     valid, errors = publisher.validate_prompt(candidate)
     assert valid is False and reason in ' '.join(errors)
+
+
+@pytest.mark.parametrize('field,values', [
+    ('techniques_applied', ['Few-shot Learning', 'Role Prompting', 'Chain of Thought']),
+    ('system_prompt', 'Você é uma PM sênior'),
+])
+def test_push_validation_accepts_contract_variants(publisher, prompt, field, values):
+    candidate = deepcopy(prompt)
+    if field == 'system_prompt':
+        values = candidate['system_prompt'].replace('Você é um Product Manager', values, 1)
+    candidate[field] = values
+    assert publisher.validate_prompt(candidate) == (True, [])
 
 
 @pytest.mark.parametrize('field', TEXT_FIELDS + LIST_FIELDS + ('TODO',))
@@ -946,6 +981,22 @@ def test_push_publication_effective_tracing(publisher, prompt, publication, monk
     monkeypatch.setattr(publisher, 'tracing_is_enabled', lambda: False)
     assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
     assert not publication.pushes
+
+
+@pytest.mark.parametrize('endpoint,host,accepted', [
+    ('https://eu.api.smith.langchain.com', 'eu.smith.langchain.com', True),
+    ('https://eu.api.smith.langchain.com', 'smith.langchain.com', False),
+    ('https://api.smith.langchain.com', 'eu.smith.langchain.com', False),
+])
+def test_push_publication_regional_endpoint(publisher, prompt, publication, endpoint, host, accepted):
+    # O host da URL devolvida segue o mesmo mapeamento API → UI do SDK.
+    publication.env['LANGSMITH_ENDPOINT'] = endpoint
+    publication.url = (f'https://{host}/prompts/bug_to_user_story_v2/aaaaaaaa?organizationId='
+                       + publication.env['LANGSMITH_WORKSPACE_ID'])
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is accepted
+    assert len(publication.pushes) == 1
+    if accepted:
+        assert all(url.startswith(endpoint + '/') for url in publication.requests)
 
 
 def test_push_publication_google(publisher, prompt, publication):

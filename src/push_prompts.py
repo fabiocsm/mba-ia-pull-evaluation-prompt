@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from langchain_core.load import dumps
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import Client
-from langsmith.utils import LangSmithConflictError, get_env_var, tracing_is_enabled
+from langsmith.utils import LangSmithConflictError, get_env_var, get_host_url, tracing_is_enabled
 import requests
 import yaml
 
@@ -29,6 +29,8 @@ TEXT_FIELDS = ('description', 'system_prompt', 'user_prompt', 'version')
 LIST_FIELDS = ('tags', 'techniques_applied')
 PENDING = re.compile(r'\b(?:TODO|FIXME|TBD)\b|\[\s*(?i:TODO|FIXME|TBD)\s*\]')
 REPORTS = ('A legenda permanece visível.', '', '{"status":"erro"}; {literal}')
+PERSONA = re.compile(r'\bvocê é (?:um|uma)\b[^.\n]{0,40}?\b(?:product manager|product owner|pm|'
+                     r'analista de produto)\b', re.I)
 
 
 def _text_values(value):
@@ -65,7 +67,7 @@ def _template(data):
 def _content_errors(system):
     errors = []
     instructions = system.split('## Exemplos', 1)[0]
-    if not re.search(r'você é (?:um|uma) (?:product manager|analista de produto)\b', instructions, re.I):
+    if not PERSONA.search(instructions):
         errors.append('system_prompt: persona ausente das regras')
     text = instructions.casefold()
     if (not all(term in text for term in ('português', 'markdown', 'como', 'eu quero',
@@ -131,8 +133,8 @@ def validate_prompt(prompt_data: dict) -> tuple[bool, list]:
     if prompt_data['user_prompt'] != '{bug_report}':
         errors.append('user_prompt deve ser exatamente {bug_report}')
     names = [name.strip().casefold() for name in prompt_data['techniques_applied']]
-    if len(names) != len(set(names)) or set(names) != {'few-shot learning', 'role prompting'}:
-        errors.append('techniques_applied: Few-shot Learning e Role Prompting distintas obrigatórias')
+    if len(names) != len(set(names)) or len(names) < 2 or 'few-shot learning' not in names:
+        errors.append('techniques_applied: pelo menos duas distintas, incluindo Few-shot Learning')
     try:
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             result = validate_prompt_structure(prompt_data)
@@ -206,7 +208,8 @@ def _revision_prefix(url, endpoint, handle, workspace):
     if not isinstance(url, str) or not url:
         raise ValueError('URL ausente')
     parts = urlsplit(url)
-    host = urlsplit(endpoint).hostname.removeprefix('api.')
+    # Mesmo host que o SDK usa para montar a URL devolvida pelo push (inclui EU/AWS/APAC).
+    host = urlsplit(get_host_url(None, endpoint)).hostname
     if (parts.scheme != 'https' or parts.hostname != host or parts.port not in (None, 443)
             or parts.username or parts.password or parts.fragment):
         raise ValueError('URL incompatível')
@@ -289,7 +292,8 @@ def _publication_result(prompt_name: str, prompt_data: dict, local_file_sha256=N
         return None
     stage, publication = 'configuração', 'não iniciada'
     client = None
-    attempt = dict(local_definition_sha256=_definition_hash(prompt_data),
+    definition_sha256 = _definition_hash(prompt_data)
+    attempt = dict(local_definition_sha256=definition_sha256,
                    observed_at=datetime.now(timezone.utc).isoformat(), visual_inspection='pendente')
     if local_file_sha256 is not None:
         attempt['local_file_sha256'] = local_file_sha256
@@ -312,7 +316,7 @@ def _publication_result(prompt_name: str, prompt_data: dict, local_file_sha256=N
         template = _template(prompt_data)
         template.metadata = dict(version=prompt_data['version'],
             techniques_applied=prompt_data['techniques_applied'].copy(),
-            local_definition_sha256=_definition_hash(prompt_data))
+            local_definition_sha256=definition_sha256)
         stage, publication = 'push', 'não confirmada; remoto pode ter mudado'
         options = dict(include_model=False, skip_cache=True, dangerously_pull_public_prompt=True)
         revision_source = 'push_return'
@@ -357,7 +361,7 @@ def _publication_result(prompt_name: str, prompt_data: dict, local_file_sha256=N
         if revision_source == 'existing_after_conflict':
             publication = 'revisão existente conferida; push em conflito'
         summary = dict(observed_at=datetime.now(timezone.utc).isoformat(), destination=destination,
-            endpoint=endpoint, workspace_id=workspace, local_definition_sha256=_definition_hash(prompt_data),
+            endpoint=endpoint, workspace_id=workspace, local_definition_sha256=definition_sha256,
             commit_hash=commit, returned_url=returned_url, public_urls=urls, repo_snapshot=snapshot,
             publication=publication, revision_source=revision_source, content='conferido', metadata='conferido', public_access='conferido',
             visual_inspection='pendente')
@@ -418,7 +422,8 @@ def main():
     if not valid:
         print('Validação rejeitada: ' + '; '.join(errors))
         return 1
-    summary = _publication_result(NAME, data[NAME], hashlib.sha256(original).hexdigest())
+    file_sha256 = hashlib.sha256(original).hexdigest()
+    summary = _publication_result(NAME, data[NAME], file_sha256)
     if summary is None:
         return 1
     try:
@@ -430,7 +435,6 @@ def main():
         summary.update(local_stability='divergente', stage='estabilidade final do arquivo')
         print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
         return 1
-    summary['local_file_sha256'] = hashlib.sha256(original).hexdigest()
     _report(summary)
     return 0
 

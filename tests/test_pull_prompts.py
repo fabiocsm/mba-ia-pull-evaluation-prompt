@@ -164,7 +164,8 @@ REPRESENTATION_CASES = [
     "kwargs", "inner-parser", "inner-partial", "inner-optional", "inner-types",
     "inner-metadata", "inner-tags", "inner-name", "inner-validate", "jinja", "mustache",
     "inner-variables", "variables", "empty-system", "empty-user", "metadata-null",
-    "owner", "repo", "revision", "revision-invalid", "template-tags",
+    "owner", "repo", "revision", "revision-invalid", "revision-short", "revision-upper",
+    "template-tags",
 ]
 
 
@@ -220,6 +221,9 @@ def test_v04_incompatible_representation(pull, previous, monkeypatch, capsys, ca
         p.messages[0 if case == "empty-system" else 1].prompt.template = " \n"
     elif case == "metadata-null":
         p.metadata = None
+    elif case in ("revision-short", "revision-upper"):
+        # Hash do Hub é SHA-256 completo em minúsculas; prefixos não identificam a revisão.
+        p.metadata["lc_hub_commit_hash"] = "a" * 8 if case == "revision-short" else "A" * 64
     elif case in ("owner", "repo", "revision", "revision-invalid"):
         key = {"owner": "lc_hub_owner", "repo": "lc_hub_repo",
                "revision": "lc_hub_commit_hash", "revision-invalid": "lc_hub_commit_hash"}[case]
@@ -370,6 +374,9 @@ def test_v08_v11_io_failures(pull, previous, monkeypatch, capsys, point):
     elif point == "replace":
         monkeypatch.setattr(m.os, "replace", fail)
     text = assert_failed(pull, previous, capsys, "persistência", residue=point == "cleanup")
+    # Releitura divergente é falha de representação, não de escrita em disco.
+    expected = "representação" if point in ("different-data", "different-type") else "escrita"
+    assert f"Falha [{expected}]" in text
     if point == "cleanup":
         assert "resíduo temporário" in text and "não é referência válida" in text
         assert len(list(m.DESTINATION.parent.glob(".pull-v1-*.tmp"))) == 1
