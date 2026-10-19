@@ -355,45 +355,30 @@ Rode uma vez e guarde o endereço: ao compartilhar de novo, o link muda.
 
 ## Como Executar
 
-### Preparação — spec 001
-
-Consulte o [registro de prontidão](docs/preparacao.md),
-o [manifesto de integridade](docs/integridade-inicial.json) e o
-[inventário de dependências instalado](docs/dependencias-preparacao.txt).
-A [matriz atual por pré-requisito e operação](docs/preparacao.md#matriz-atual)
-registra V01–V16, datas e evidências: os pré-requisitos da 001 passaram; a prova
-de escrita pública V15 está comprovada no [registro da 004](docs/publicacao-v2.md). A recuperação da 002 foi concluída;
-seu [registro de execução](docs/recuperacao-v1.md) comprova o acesso à origem.
-A otimização e os testes da 003 foram concluídos localmente; a publicação/conferência da 004 foi concluída; as operações das
-specs 005–006 continuam pendentes.
-A instalação, a integridade e a autenticação LangSmith passaram. A API key local
-confirmou o workspace com handle `fabiocsm`; os dois papéis de modelo responderam
-com temperatura zero e seus traces foram conferidos. Não há resultados de avaliação
-acadêmica obtidos nesta etapa. O pull tem comprovação própria na 002;
-publicação e conferência estão comprovadas na 004; experimentos e evidências
-finais pertencem às specs 005–006 e dependem de seus pré-requisitos.
-
-Pré-requisitos: Git, Python 3.10+ (validado com CPython 3.11.14), LangSmith CLI,
-acesso ao workspace/handle `fabiocsm` e chaves locais LangSmith/OpenAI. Execute da raiz.
-Selecione um Python compatível; neste ambiente, `uv python find 3.11` localiza o
-interpretador já instalado. Crie e ative o ambiente antes de instalar:
+Execute da raiz do repositório. Pré-requisitos: Git, Python 3.10+ (validado em
+CPython 3.11.14), conta LangSmith com handle `fabiocsm`, acesso ao workspace da entrega
+e chave OpenAI. Preserve a v2 final e os quatro arquivos fornecidos como prontos.
 
 ```bash
-python3 -m venv venv  # Use o Python 3.11 selecionado, quando disponível.
+python3 -m venv venv
 source venv/bin/activate
-python -m pip install -r requirements.txt
-python -m pip check
-python -c 'import langsmith, langchain_core, langchain_openai, langchain_google_genai, dotenv, yaml, pydantic, pytest; print("imports OK")'
+pip install -r requirements.txt
+pip check
 ```
 
-No PowerShell, use `venv\Scripts\Activate.ps1`. Não copie o template sobre o `.env`
-existente. Preserve as credenciais; configure-as somente nesse arquivo local ignorado,
-sem incluí-las no Git ou no terminal. Valores não secretos escolhidos:
+No Windows, ative com `venv\Scripts\Activate.ps1`. Use um Python compatível para criar
+o venv; nesta máquina `uv python find 3.11` localiza o interpretador usado. Instalação
+ou `pip check` com saída diferente de zero bloqueia os passos seguintes.
+
+Se ainda não existir `.env`, copie `.env.example` para `.env`. Nunca sobrescreva um
+`.env` existente. Preencha localmente `LANGSMITH_API_KEY` e `OPENAI_API_KEY`; não as
+imprima nem versione. Confira também `LANGSMITH_ENDPOINT`, `LANGSMITH_PROJECT`,
+`USERNAME_LANGSMITH_HUB`, `LANGSMITH_TRACING`, `LLM_PROVIDER`, `LLM_MODEL` e `EVAL_MODEL`.
+A condição real `COND-001` usou:
 
 ```dotenv
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 LANGSMITH_PROJECT=mba-ia-pull-evaluation-prompt
-LANGSMITH_WORKSPACE_ID=15dd5852-a835-4163-826c-e78668fd2a9c
 USERNAME_LANGSMITH_HUB=fabiocsm
 LANGSMITH_TRACING=true
 LLM_PROVIDER=openai
@@ -401,16 +386,18 @@ LLM_MODEL=gpt-4.1-2025-04-14
 EVAL_MODEL=gpt-4.1-2025-04-14
 ```
 
-Os modelos foram selecionados após consulta à documentação oficial e devem ser
-comprovados em chamadas reais com `temperature=0`. Ambos os papéis passaram nessa
-verificação mínima; isso não mede a qualidade das User Stories ou dos juízes.
-O [modelo](https://developers.openai.com/api/docs/models/gpt-4.1) tem
-[desligamento anunciado para 2027-01-14](https://developers.openai.com/api/docs/deprecations):
-reconsulte as fontes antes de repetir. Uma troca exige nova condição experimental.
-O suporte a `LLM_PROVIDER=google` permanece disponível; exige seleção documentada de
-modelos e `GOOGLE_API_KEY` quando usado.
+Defina `LANGSMITH_WORKSPACE_ID` se a chave acessar mais de um workspace. O ID da
+condição está em [Condições experimentais](docs/avaliacao-v2.md#condições-experimentais);
+use esse workspace para reproduzir `COND-001`. Variáveis exportadas prevalecem sobre
+`.env`; confira aliases de tracing pelo SDK, conforme o [roteiro de preparação](docs/preparacao.md#roteiro-executavel).
+A alternativa Gemini permanece disponível com `LLM_PROVIDER=google`, `GOOGLE_API_KEY`
+e modelos compatíveis com `temperature=0`. Uma troca de provedor/modelo/workspace exige
+outra condição experimental documentada, com suas tarifas; não reutilize `COND-001`.
+Consulte a documentação oficial de [OpenAI](https://developers.openai.com/api/docs/models/gpt-4.1)
+ou [Gemini](https://ai.google.dev/gemini-api/docs/models) antes de selecionar modelos.
+Os experimentos desta entrega usaram temperatura zero nos dois papéis.
 
-Confira a presença sem revelar valores. Variáveis exportadas têm precedência sobre `.env`:
+Confira a configuração sem revelar valores (o SDK também confere o tracing efetivo):
 
 ```bash
 python - <<'PY'
@@ -432,265 +419,238 @@ assert os.getenv('LLM_MODEL') == os.getenv('EVAL_MODEL') == 'gpt-4.1-2025-04-14'
 PY
 ```
 
-O gate também verifica o tracing efetivo do SDK: aliases `LANGSMITH_TRACING_V2`
-ou `LANGCHAIN_TRACING_V2` podem prevalecer sobre `LANGSMITH_TRACING`. Resolva
-qualquer configuração conflitante antes das consultas ou chamadas mínimas.
-
-Copie e execute o [roteiro de contexto e traces](docs/preparacao.md#roteiro-executavel).
-Ele consulta a ajuda do CLI, carrega dotenv sem sobrescrever variáveis exportadas,
-seleciona o workspace, confere o handle autenticado e consulta o projeto pelo SDK.
-Por padrão, valida os quatro run IDs existentes com **zero novas chamadas LLM**,
-conferindo tenant/projeto, modelo, temperatura, término, uso e metadados da condição.
-As saídas são filtradas; erros de acesso não são tratados como projeto ausente.
-
-O ID de workspace acima é o desta entrega. Se a variável não for definida, o roteiro
-só seleciona automaticamente quando há um único workspace acessível. Em outro
-contexto, escolha explicitamente o workspace que possui o handle esperado.
-
-Para uma nova reprodução integral, siga os checks locais do
-[guia de validação](specs/001-preparar-experimentos/quickstart.md), em outro venv limpo,
-e execute o mesmo bloco documentado com `PREPARACAO_NOVAS_CHAMADAS=1` no processo.
-Essa opção executa a dupla mínima real pelos utilitários, com captura de run IDs,
-modelos e uso, espera de tracing e até quatro consultas para confirmar os traces.
-Ela consome API; registre novas tentativas, tokens e custo no relatório. Projeto
-confirmadamente ausente pode surgir após as chamadas; autenticação inválida bloqueia
-o avanço. O modo de leitura dos quatro traces não substitui essa nova reprodução.
-
-Estados do registro: `pronto` exige evidência; `impedido` exige causa e próxima ação;
-`pendente` identifica prova ainda não realizada. Leitura de recurso público não
-comprova posse do handle nem permissão de push. Para reproduzir em outro ambiente,
-outro executor deve seguir o guia com um venv limpo separado, sem apagar `venv/`,
-repetir os gates e contabilizar as duas novas chamadas. A reprodução automatizada foi concluída em um venv separado na mesma máquina;
-seus resultados, a ocorrência na conferência de traces e os limites dessa prova
-estão no registro. Quatro chamadas mínimas consumiram 100 tokens, com custo
-estimado de US$ 0,000248; cobrança observada não disponível.
-
-### Recuperação do prompt original — spec 002
-
-Com o ambiente virtual ativo e a configuração acima conferida, execute da raiz:
+Recupere a origem e valide a v2:
 
 ```bash
-source venv/bin/activate
-pytest tests/test_pull_prompts.py -v
 python src/pull_prompts.py
-```
-
-O script usa `Client.pull_prompt` na origem obrigatória
-`leonanluppi/bug_to_user_story_v1`, com `dangerously_pull_public_prompt=True`,
-`include_model=False` e `skip_cache=True`. A configuração exportada prevalece
-sobre `.env`, inclusive valores vazios; configure as variáveis sem espaços em branco.
-O pull confere configuração de provedor e modelos, sem executar inferência.
-
-O código de saída **0** confirma a persistência e imprime origem, revisão e destino
-`prompts/bug_to_user_story_v1.yml`. O código **1** informa categoria, etapa e ação
-para falhas de configuração, acesso, disponibilidade, representação ou escrita.
-Falhas anteriores à substituição atômica conservam a cópia anterior byte a byte;
-sem cópia anterior, não criam uma referência parcial no destino. Eventual resíduo
-temporário é diagnosticado separadamente e deve ser removido antes de repetir.
-
-O [registro da recuperação](docs/recuperacao-v1.md) guarda revisão, SHA-256,
-versões, comandos, cenários de falha e a comparação real de 2/2 mensagens idênticas.
-O [guia V12](specs/002-recuperar-prompt-v1/quickstart.md#recuperação-real-e-comparação--v12)
-permite repetir a comparação fixando a revisão salva, sem recuperar outra latest.
-Metadados do repositório são um snapshot observado separadamente; datas/tags do
-arquivo ilustrativo foram substituídas apenas pelos valores efetivamente retornados.
-
-A 002 passou em 236 testes offline e na comparação real da revisão recuperada.
-Os seis testes obrigatórios da v2 em `tests/test_prompts.py` foram implementados
-na 003, com resultados locais abaixo. A publicação foi comprovada posteriormente
-na 004; notas e experimentos acadêmicos continuam pendentes.
-
-### Otimização e validação offline — spec 003
-
-Use o venv preparado acima, Python 3.10+ e os pins de `requirements.txt`. Para
-validar a [v2 local](prompts/bug_to_user_story_v2.yml), execute da raiz:
-
-```bash
-source venv/bin/activate
-python -m pip check
-pytest tests/test_prompts.py --collect-only -q
-pytest tests/test_prompts.py -v -rA
-pytest tests/test_preparation_checks.py tests/test_pull_prompts.py -q
-```
-
-Em 2026-10-18: coleta de **188 testes**, **188 aprovados** na suíte v2, incluindo
-os seis métodos obrigatórios de `TestPrompts`, e **266 aprovados** nas regressões
-de preparação/pull. A execução conjunta `pytest tests -q` confirmou **454 aprovados**.
-Nenhum skip/xfail. Os seis carregam o YAML real e compartilham
-suas asserções com defeitos em cópias isoladas; YAML ausente/inválido, persona só
-nos exemplos, pares incompletos, técnicas duplicadas e variáveis extras reprovam.
-A suíte bloqueia rede e criação de cliente/modelos, isola o ambiente e desabilita
-dotenv; os testes não precisam das chaves locais. O YAML é comparado byte a byte
-antes/depois. A política delimitada de pendências aceita `TODOS`, `todos` e `todo`
-em prosa e rejeita marcadores reais, sem mudar `src/utils.py` nem ocultar seus
-outros erros. Detalhes e comandos incrementais estão no
-[registro da 003](specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
-
-Saída zero comprova o contrato estrutural e a sensibilidade dos testes. A revisão
-semântica está abaixo; comportamento de LLM e notas reais continuam por verificar.
-A publicação e a conferência posteriores na 004 estão documentadas a seguir.
-A 005 executará `python src/evaluate.py` com a revisão publicada após seu preflight. Cada alteração futura exige testar, publicar novamente e
-avaliar. As 3–5 iterações e a exigência de cada métrica e média >= 0.8 permanecem.
-
-
-### Publicação e conferência — spec 004
-
-Após os testes da v2, execute da raiz no venv ativo:
-
-```bash
-python -m pytest tests/test_prompts.py -v
+pytest tests/test_prompts.py -v
+pytest -q
 python src/push_prompts.py
 ```
 
-O script lê `USERNAME_LANGSMITH_HUB` e confirma o handle/workspace autenticado
-antes de escrever. Reutiliza dotenv sem sobrescrever variáveis exportadas e exige
-as variáveis de prontidão acima, provider/chave correspondente e tracing efetivo.
-Publica somente System/Human, sem modelo, com descrição intacta, união das tags e
-nomes das técnicas; metadata do template contém versão, técnicas e hash canônico.
+Pull com código 0 salva a v1 recuperada; falha preserva a cópia anterior. Testes com
+código 0 aprovam a estrutura local; não medem a qualidade do LLM. Push com código 0
+confirma revisão pública, round-trip e hashes; ele pode reutilizar a revisão idêntica,
+reaplicando descrição/tags. Código 1 exige investigar a etapa indicada antes de repetir.
+A v2 final deve continuar no HEAD `36a96c05…696f`. Confira a revisão no Hub por conta
+própria antes do gate; toda edição futura exige testes → push → nova avaliação.
 
-Status 1 significa validação rejeitada, publicação não confirmada ou conferência
-pendente/divergente, com etapa segura. Timeout pode ocorrer após escrita; investigar
-por leitura antes de tentar publicar outra vez. Status 0 exige revisão completa
-resolvida do retorno, round-trip idêntico, repo público, HEAD correspondente,
-leitura HTTP sem autenticação e bytes locais estáveis. A inspeção visual posterior
-e seu registro continuam obrigatórios para aceitar a 004. Acompanhe as tentativas
-e provas em [publicação da v2](docs/publicacao-v2.md).
-
-Qualquer edição local, inclusive só metadados ou formatação, exige testes → push →
-conferência antes do próximo experimento. Commits equivalentes podem ser
-reutilizados; registros anteriores conservam valor histórico. A 005 deve conferir
-hashes/HEAD/metadados antes e depois e manter a revisão estável durante a execução:
-o avaliador fornecido usa HEAD e não implementa esse gate automaticamente.
-A publicação real e a inspeção pública passaram: revisão `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`,
-CLI final com status 0 e 437 testes de prompt/publicação + 266 regressões aprovados.
-[Abra a revisão pública](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/4278de75?tab=0).
-O serviço pode acrescentar a tag técnica `ChatPromptTemplate` e devolver conflito
-no reenvio idêntico. Nesse conflito, o script confere uma revisão existente por
-leitura, com todos os gates, registra `returned_url: null` e não alega nova escrita.
-Outras falhas continuam retornando 1; não há repetição automática de push.
-
-### Avaliação e iterações — spec 005
-
-O [registro da avaliação](docs/avaliacao-v2.md) contém três blocos principais, o
-bootstrap opcional `AVALIACAO_PROJETO` para inicializar um projeto isolado antes do
-dataset, e o histórico dos ciclos. Em **todo** ciclo, da raiz com o venv ativo e nesta ordem: bloco
-`AVALIACAO_DATASET` (cria o dataset uma vez pela função fornecida e audita os 15 exemplos),
-bloco `AVALIACAO_GATE` (integridade, revisão publicada, condição, workspace, dataset,
-testes, inspeção e custo, sem chamadas LLM), a avaliação e o bloco `AVALIACAO_AUDITORIA`
-(15 runs, 75 notas válidas, vínculo com a revisão e decisão integral). As variáveis
-`AVALIACAO_*` de entrada estão descritas antes de cada bloco. A avaliação preserva o
-código do avaliador:
+Os blocos executáveis do [registro da avaliação](docs/avaliacao-v2.md#roteiro-executável)
+auditam o dataset, a revisão e os resultados sem editar o avaliador. Para executá-los
+literalmente, defina esta função na sessão Bash ou Zsh ativa:
 
 ```bash
-mkdir -p results && export AVALIACAO_INICIO="$(date -u +%Y-%m-%dT%H:%M:%S+00:00)"; LOG="results/${AVALIACAO_CICLO}-$(date +%Y%m%dT%H%M%S).log"; set -o pipefail; python src/evaluate.py 2>&1 | tee "$LOG"; export AVALIACAO_EXIT_CODE=$?; set +o pipefail; export AVALIACAO_LOG="$LOG"
+executar_bloco() {
+  python - "$1" <<'PY'
+from pathlib import Path
+import re
+import subprocess
+import sys
+text = Path('docs/avaliacao-v2.md').read_text(encoding='utf-8')
+blocks = [block for block in re.findall(r'^```bash\n(.*?)^```$', text, re.M | re.S)
+          if '# ' + sys.argv[1] + ' —' in block]
+assert len(blocks) == 1, 'Bloco ausente ou ambíguo'
+raise SystemExit(subprocess.run(['bash', '-c', blocks[0]]).returncode)
+PY
+}
+export AVALIACAO_CICLO=REP-006
+export AVALIACAO_CONDICAO=COND-001
+executar_bloco AVALIACAO_DATASET
 ```
+
+O bloco deve retornar código 0, `idêntico`, 15 casos e distribuição 5/7/3. Exporte
+`AVALIACAO_DATASET_ID` e `AVALIACAO_DATASET` com as duas linhas impressas pelo bloco.
+Se houver divergência, preserve o dataset e siga D03 do registro; não apague ou edite
+exemplos. Em outro projeto ainda inexistente, execute o bootstrap opcional documentado
+antes do bloco do dataset, declarando a condição correspondente.
+
+Antes do gate, exporte as entradas abaixo com valores efetivamente conferidos. Para
+esta revisão, os hashes esperados estão no [registro de entrega](docs/entrega-publica.md#resultadoaprovado).
+
+| Entrada do gate | Como obter |
+| --- | --- |
+| `AVALIACAO_HUB_COMMIT` | `commit_hash` completo confirmado pela saída do push |
+| `AVALIACAO_V2_FILE_SHA256` | `local_file_sha256` da saída do push |
+| `AVALIACAO_V2_DEFINITION_SHA256` | `local_definition_sha256` da saída do push |
+| `AVALIACAO_DATASET_ID` / `AVALIACAO_DATASET` | Saída do bloco do dataset do mesmo ciclo |
+| `AVALIACAO_TESTES` | Definir `aprovado` somente após os testes passarem |
+| `AVALIACAO_DASHBOARD` | Definir `conferido` somente após inspecionar a revisão pública |
+| `AVALIACAO_CUSTO_ACUMULADO_USD` | Somar custos já registrados; antes da primeira reprodução: `0.755018` |
 
 ```bash
-python -m pytest tests/test_evaluation_audit.py -v
+executar_bloco AVALIACAO_GATE
 ```
 
-Os testes acima exercitam os blocos offline, com dublês e LLM/rede bloqueados; não são
-evidência de notas. As notas vêm somente de `python src/evaluate.py`.
+Código 0 e `gate_ok` autorizam a avaliação dessa condição. Código 1 e `bloqueado`
+exigem resolver a causa. O gate bloqueia custo acumulado acima de US$ 4; a estimativa
+do desafio é US$ 1–5 e não garante a cobrança. Uma reprodução de 15 casos gera cerca de
+60 chamadas LLM e custou aproximadamente US$ 0,27 nos ciclos anteriores.
+Mantenha o HEAD do Hub estável até a auditoria.
+
+```bash
+mkdir -p results
+export AVALIACAO_INICIO="$(date -u +%Y-%m-%dT%H:%M:%S+00:00)"
+export AVALIACAO_LOG="results/${AVALIACAO_CICLO}-$(date +%Y%m%dT%H%M%S).log"
+set -o pipefail
+python src/evaluate.py 2>&1 | tee "$AVALIACAO_LOG"
+export AVALIACAO_EXIT_CODE=$?
+set +o pipefail
+executar_bloco AVALIACAO_AUDITORIA
+```
+
+Guarde `AVALIACAO_INICIO`, `AVALIACAO_LOG` e `AVALIACAO_EXIT_CODE` na mesma sessão;
+a auditoria usa essas entradas e os hashes/ID exportados antes. Se a avaliação falhar,
+ainda execute a auditoria para registrar incompletude; não selecione só notas favoráveis.
+Sucesso exige 15 runs, 75 notas válidas, revisão estável, cada média e a média geral
+≥ 0.8, decisão `aprovado` e nenhuma divergência entre auditoria e saída do avaliador.
+Uma nota individual abaixo de 0.8 pode coexistir com aprovação agregada e deve ser analisada.
+Registre o novo ID, tokens, custo e limitações como reprodução, sem substituir CIC-03.
+
+O dataset desta entrega **já foi compartilhado**: reutilize o link em Resultados Finais;
+não repita o exemplo de compartilhamento do enunciado. `results/` e `screenshots/` são
+cópias locais ignoradas; as evidências entregues estão em `docs/evidencias/`.
+Histórico literal das seções anteriores em [histórico do README](docs/historico-readme.md);
+registros de [preparação](docs/preparacao.md), [pull](docs/recuperacao-v1.md),
+[push](docs/publicacao-v2.md), [ciclos](docs/avaliacao-v2.md) e
+[entrega/reprodução](docs/entrega-publica.md).
 
 ## Técnicas Aplicadas (Fase 2)
 
-### Diagnóstico da v1 e regras da v2 — spec 003
+**Role Prompting.** A v2 abre com “Você é um Product Manager e analista de produto”.
+Escolhi essa persona porque a tarefa exige traduzir sintomas em necessidades e critérios
+verificáveis, com limites para não inventar causa ou implementação. As regras ficam em
+System; User contém somente `{bug_report}`. A v1 repetia o relato nas duas mensagens
+e não orientava critérios, lacunas ou exemplos.
 
-A [v1 recuperada](prompts/bug_to_user_story_v1.yml), revisão
-`2950c33dbd7ffaed2e440b50adfd7769d183f90faf0bae5aa4864354f88e4073`, define um
-assistente genérico, pede uma User Story sem formato e repete o relato em System
-e User. Não define critérios de aceitação, exemplos ou regras para lacunas.
-Nenhuma nota numérica foi obtida para essa baseline; as notas do início deste
-README são ilustrações do enunciado.
+**Few-shot Learning.** Escolhi três pares completos porque demonstram quando entregar
+uma história e quando pedir esclarecimentos. São exemplos próprios, diferentes dos 15
+casos avaliados; não são respostas experimentais:
 
-A [v2](prompts/bug_to_user_story_v2.yml) coloca as regras em System e somente
-`{bug_report}` em User. Exige português, Markdown, história Como… eu quero… para
-que… e critérios verificáveis, com extensão proporcional ao problema. Distingue
-contexto informado, comportamento desejado, dúvidas e recomendações. As regras
-cobrem entrada vazia, ambiguidade, incompletude, múltiplos problemas, logs e
-instruções conflitantes: pedem dados mínimos quando necessários, preservam os
-fatos e impedem que instruções no relato substituam a tarefa. A verificação de
-mensagens apenas formata texto offline; não é resposta de um modelo.
-
-### Técnicas escolhidas e demonstradas
-
-**Role Prompting.** A abertura “Você é um Product Manager e analista de produto”
-define responsabilidade de produto. O objetivo é preservar fatos e descrever a
-necessidade do usuário com critérios verificáveis, evitando diagnósticos técnicos
-sem evidência. A regra “Não invente causa, arquitetura, solução técnica, versão,
-números, prioridade ou prazo” limita essa atuação.
-
-**Few-shot Learning.** Três pares próprios completos em System demonstram decisões
-e saídas: audioguia do museu (simples), ficha do acervo (ambíguo/incompleto) e mapa
-de trilhas (múltiplos problemas, log e instrução conflitante). No primeiro, a entrada
-“aperto Pausar e a narração continua tocando” resulta em quatro critérios no padrão
-Dado/Quando/Então, como “Dado que uma narração está em reprodução, quando aciono Pausar,
-então o áudio deixa de tocar” e a retomada do ponto em que parou. No segundo, a saída pede
-“Qual conteúdo da ficha fica errado e qual deveria aparecer?”, sem fabricar história.
-No terceiro, critérios separados cobrem legenda, escala e a abertura de trilhas, um
-critério técnico decorre do log informado, a trava de 4 a 6 segundos vira critério
-relativo ao valor relatado, com o limite aceitável perguntado em Dúvidas, enquanto o log permanece
-contexto e a tentativa de trocar a tarefa não é seguida. São exemplos redigidos
-para o prompt, não saídas obtidas de um LLM.
-
-Os nomes em `techniques_applied` são exatamente `Few-shot Learning` e
-`Role Prompting`. Títulos organizam a resposta; não se declara outra técnica
-apenas por essa organização.
-
-### Revisão semântica das regras e dos exemplos
-
-| Grupo | Cobertura revisada na v2 |
-| --- | --- |
-| Vazio | Regra pede ação, comportamento observado e esperado; não cria história |
-| Ambíguo | Exemplo 2 não decide qual conteúdo da ficha está errado |
-| Incompleto | Exemplo 2 solicita conteúdo esperado e passos de retorno |
-| Múltiplos problemas | Exemplo 3 cobre legenda e escala em critérios agrupados |
-| Logs | Exemplo 3 conserva o JSON como contexto, sem inferir causa |
-| Instruções conflitantes | Exemplo 3 mantém a tarefa apesar do pedido para responder APROVADO |
-
-A revisão das três entradas/saídas e das regras encontrou zero fatos inventados:
-benefícios e critérios descrevem o comportamento desejado; o papel de visitante
-está explícito na entrada do audioguia e os demais papéis são genéricos. Não se afirmam
-causas, números ou soluções ausentes. As dúvidas permanecem perguntas; recomendações
-são opcionais, identificadas nas regras e não foram necessárias nessas demonstrações.
-Os exemplos foram redigidos para domínios próprios e comparados às 15 entradas e
-referências do dataset, sem reprodução. Essa revisão do conteúdo e os testes
-estruturais não comprovam a resposta futura de um modelo.
-
-| Aspecto | v1 recuperada | v2 local |
+| Exemplo | Entrada e saída reais da v2 | Decisão demonstrada |
 | --- | --- | --- |
-| Persona | Assistente genérico | Product Manager/analista de produto com limites |
-| Entrada | Relato repetido em System e User | Somente User, variável única |
-| Saída | Pedido genérico de User Story | Português, Markdown, história e critérios verificáveis |
-| Exemplos | Ausentes | Três pares completos de entrada/saída |
-| Bordas | Não orientadas | Seis grupos com fundamentação e perguntas |
-| Evidência numérica | Sem baseline real | `CIC-03` aprovado na 005, média geral 0.8709 ([registro](docs/avaliacao-v2.md)) |
+| Exemplo 1 — audioguia | “aperto Pausar e a narração continua tocando” → “Dado que uma narração está em reprodução, quando aciono Pausar, então o áudio deixa de tocar.” | Uma história simples e quatro critérios verificáveis, incluindo retomada |
+| Exemplo 2 — catálogo do acervo | “a ficha fica errada quando volto” → “Qual conteúdo da ficha fica errado e qual deveria aparecer?” | Informação insuficiente; não escolher uma interpretação sem evidência |
+| Exemplo 3 — mapa de trilhas | “a barra de escala mantém o valor anterior” → “então a barra de escala passa a representar a ampliação exibida, sem manter o valor anterior.” | Cobrir vários problemas, preservar log e ignorar a instrução conflitante do relato |
+
+Os pares completos de entrada/saída estão no [YAML final](prompts/bug_to_user_story_v2.yml)
+e no [prompt público](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/36a96c05?tab=0).
+Os metadados declaram exatamente `Few-shot Learning` e `Role Prompting`.
+
+**Ajustes motivados pelos experimentos.** Em CIC-01, F1-Score foi a menor média (0.8057);
+os juízes apontaram cobertura insuficiente. CIC-02 exigiu critérios Dado/Quando/Então
+para resultados decorrentes do comportamento esperado e critérios técnicos para detalhes
+informados; F1 subiu para 0.8416. A inspeção também encontrou metas/códigos ausentes do
+relato, como “1 segundo” no caso #10. CIC-03 acrescentou a regra “Valores: use somente
+números, limites, códigos e unidades presentes no relato ou calculados diretamente a partir
+deles, como uma soma.” O Exemplo 3 passou a tratar o tempo relativo ao travamento relatado
+e perguntar o limite aceitável. A regra reduziu esse problema, mas #14 ainda inventou uma
+meta de CPU. As duas técnicas e as limitações estão demonstradas no
+[histórico dos ciclos](docs/avaliacao-v2.md#comparação-dos-ciclos).
 
 ## Resultados Finais
 
-A spec 003 está concluída **somente no aceite local**: prompt com três exemplos e
-duas técnicas, 188 testes da v2 e 266 regressões aprovados, documentação e revisão
-semântica. A v1 e os quatro arquivos protegidos mantêm seus hashes, preservando
-os 15 exemplos/referências e a distribuição 5/7/3. A comparação qualitativa está
-na seção anterior; não há comparação numérica v1/v2 executada.
+**CIC-03 aprovado**, com 15 respostas e 75 notas válidas, sob `COND-001`:
+OpenAI, geração e juízes `gpt-4.1-2025-04-14`, temperatura 0. Resultado do experimento
+`d864cfbb-6ab9-4901-ab06-62f68ccd96fc`, revisão pública
+`36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`.
 
-A spec 004 está **concluída**: 35/35 tarefas, publicação pública real e revisão
-`4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595` conferida
-contra o YAML intacto. [Prompt público](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/4278de75?tab=0),
-[histórico e três capturas reais](docs/publicacao-v2.md). O script final retornou 0;
-437 testes de prompt/publicação e 266 regressões passaram. As tentativas com
-falhas e os ajustes de compatibilidade estão preservados no registro.
+| Métrica | Média agregada |
+| --- | --- |
+| Helpfulness | 0.8773 |
+| Correctness | 0.8754 |
+| F1-Score | 0.8474 |
+| Clarity | 0.8513 |
+| Precision | 0.9033 |
+| Média geral | 0.8709 |
 
-A spec 005 executou três ciclos reais sob a mesma condição. `CIC-01` avaliou essa revisão
-(aprovada com F1-Score 0.8057). Por decisão do autor, `CIC-02` passou a exigir critérios
-Dado/Quando/Então que cobrem os resultados decorrentes do comportamento esperado e critérios
-técnicos para detalhes informados (F1-Score 0.8416), e `CIC-03` acrescentou a regra de
-valores — nenhuma meta, código ou exemplo numérico ausente do relato — publicada como revisão
-`36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`. O experimento final é
-completo (15 respostas, 75 notas válidas), vinculado à revisão e **aprovado** pela regra
-integral — Helpfulness 0.8773, Correctness 0.8754, F1-Score 0.8474, Clarity 0.8513,
-Precision 0.9033, média geral 0.8709 — com custo estimado acumulado de US$ 0,76. Detalhes,
-análise, traces e limitações no [registro da avaliação](docs/avaliacao-v2.md). Link público do
-dataset/experimentos, screenshots das cinco notas e tracing detalhado de três
-exemplos: **pendentes na 006**. O link público acima comprova o prompt; o dataset e o
-experimento ainda estão apenas no workspace do autor, sem acesso público. As ilustrações do enunciado não representam resultados desta entrega.
+Todas as médias e a média geral atingiram 0.8. As médias são arredondadas a quatro casas
+antes do cálculo geral, conforme o avaliador fornecido. As notas ilustrativas do enunciado
+não representam resultados desta entrega. A comparação numérica da v1 não foi executada.
+
+[Dataset público — 15 exemplos e todos os experimentos](https://smith.langchain.com/public/72eee98c-a991-4c8e-b825-b2b9b898df14/d) ·
+[Experimento final CIC-03](https://smith.langchain.com/public/72eee98c-a991-4c8e-b825-b2b9b898df14/d/compare?selectedSessions=d864cfbb-6ab9-4901-ab06-62f68ccd96fc) ·
+[Prompt final público](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/36a96c05?tab=0).
+Conferidos sem login em 2026-10-19; URL original guardada sem novo compartilhamento.
+
+### Iterações reais
+
+| Ciclo | Condição | Revisão | Experimento | Helpfulness | Correctness | F1-Score | Clarity | Precision | Média geral | Completude | Decisão | Custo (US$) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CIC-01 | COND-001 | `4278de75` | `86196746-1c83-42cc-868b-6b57f977f19b` | 0.8687 | 0.8492 | 0.8057 | 0.8447 | 0.8927 | 0.8522 | 15 runs / 75 notas | aprovado → substituído | 0,222376 |
+| CIC-02 | COND-001 | `25b881d1` | `c7d175e1-0f37-4afe-9b2a-88e061b01666` | 0.8837 | 0.8738 | 0.8416 | 0.8613 | 0.9060 | 0.8733 | 15 runs / 75 notas | aprovado → substituído | 0,262344 |
+| CIC-03 | COND-001 | `36a96c05` | `d864cfbb-6ab9-4901-ab06-62f68ccd96fc` | 0.8773 | 0.8754 | 0.8474 | 0.8513 | 0.9033 | 0.8709 | 15 runs / 75 notas | **aprovado (final)** | 0,270298 |
+
+F1-Score cresceu 0.0417 entre CIC-01 e CIC-03. Os três ciclos consumiram **US$ 0,755018
+estimados**, sem apagar execuções anteriores; a cobrança efetiva não foi consultada.
+
+### Comparação qualitativa v1/v2
+
+| Aspecto | v1 recuperada | v2 final e motivo |
+| --- | --- | --- |
+| Persona | Assistente genérico | Product Manager/analista de produto para formular necessidades do usuário |
+| Mensagens | Relato repetido em System e User | Regras/exemplos em System e relato em User, variável única |
+| Saída | Pedido genérico de User Story | Português, Markdown e critérios Dado/Quando/Então para permitir verificação |
+| Exemplos | Ausentes | Três pares completos para demonstrar decisões em casos simples, ambíguos e múltiplos |
+| Lacunas | Sem orientação | Pedir esclarecimentos, preservar fatos e evitar causas/metas inventadas |
+| Evidência | Nenhum experimento numérico da v1 | Três experimentos reais da v2; não permite atribuir ganho numérico sobre a v1 |
+
+### Limitações e inspeção dos traces
+
+A aprovação é agregada: há notas individuais abaixo de 0.8, como F1-Score 0.6857 no
+caso #10 e Clarity/Precision 0.70 no #1. No #14, a resposta ainda inventou “CPU do banco
+não ultrapassa 80%”, embora o relato só informe 95% no pico; o juiz deu Precision 0.93
+e não detectou essa invenção. No #8, a dúvida oferece códigos “403, 404 ou outra?”,
+limítrofe perante a regra de valores. Esses limites são mantidos apesar da aprovação.
+O uso de LLM como juiz e o conteúdo mais prescritivo das referências também limitam a
+interpretação das notas; veja a [análise completa](docs/avaliacao-v2.md#decisão-de-parada).
+
+| Caso original no JSONL | Geração, mensagens e resposta | Juízes e comentários |
+| --- | --- | --- |
+| #1 simples — carrinho | [Trace público](https://smith.langchain.com/public/0f791884-477a-4a1b-ba28-fe172098051e/r) | [Avaliação](https://smith.langchain.com/public/324bbbae-32ff-4493-a879-34bca11068a5/r) |
+| #10 médio — notificações | [Trace público](https://smith.langchain.com/public/a8211760-0517-47a8-8909-85f0fdc4bbbb/r) | [Avaliação](https://smith.langchain.com/public/4d521f2b-a4ca-4199-bb09-11baed8ba8c5/r) |
+| #14 complexo — relatórios | [Trace público](https://smith.langchain.com/public/c21a85d7-e3a0-4e0e-b770-5f030b785160/r) | [Avaliação](https://smith.langchain.com/public/af97f925-10c2-42c1-932b-97373b323e24/r) |
+
+A ordem das linhas do dashboard difere da ordem original; identifique os casos pelos
+IDs no [registro de evidências](docs/entrega-publica.md#evidênciapública).
+Os três runs dos juízes têm os mesmos inputs, outputs e referências dos respectivos runs
+de geração; seus IDs estão registrados, ligados ao feedback por `source_run_id`.
+
+### Capturas reais do LangSmith
+
+A tabela do dashboard usa duas casas decimais e foi rolada horizontalmente para mostrar
+todas as métricas. A primeira linha é CIC-03 (`9c836e20`). As duas imagens seguintes
+mostram Clarity/Correctness/Precision e F1-Score/Helpfulness, respectivamente.
+
+![Cinco médias — parte 1](docs/evidencias/avaliacao-v2-medias.png)
+
+![Cinco médias — parte 2](docs/evidencias/avaliacao-v2-medias-f1-helpfulness.png)
+
+<details>
+<summary>Dataset e três traces com feedbacks e julgamentos</summary>
+
+![Dataset com 15 exemplos](docs/evidencias/avaliacao-v2-dataset.png)
+
+![Trace simples — entrada, resposta e feedbacks](docs/evidencias/avaliacao-v2-trace-simples.png)
+
+![Julgamento simples](docs/evidencias/avaliacao-v2-juizes-simples-f1.png)
+
+![Trace médio — entrada e feedbacks](docs/evidencias/avaliacao-v2-trace-medio.png)
+
+![Resposta média](docs/evidencias/avaliacao-v2-trace-medio-resposta.png)
+
+![Julgamento médio](docs/evidencias/avaliacao-v2-juizes-medio.png)
+
+![Trace complexo — entrada e feedbacks](docs/evidencias/avaliacao-v2-trace-complexo.png)
+
+![Resposta complexa](docs/evidencias/avaliacao-v2-trace-complexo-resposta.png)
+
+![Limitação real — CPU 80%](docs/evidencias/avaliacao-v2-trace-complexo-cpu.png)
+
+![Julgamento complexo](docs/evidencias/avaliacao-v2-juizes-complexo.png)
+
+</details>
+
+As capturas, mensagens e links complementares estão no
+[registro da entrega](docs/entrega-publica.md). A reprodução em clone limpo está pendente;
+a verificação por segundo executor (SC-004) também permanece pendente. Publicação do
+conteúdo final em `main` aguarda autorização específica do autor.
