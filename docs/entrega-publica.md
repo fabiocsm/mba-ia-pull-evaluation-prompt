@@ -1,8 +1,8 @@
 # Entrega pública — spec 006
 
 Registro iniciado em 2026-10-19. Fonte dos resultados: [avaliação da 005](avaliacao-v2.md#entrega-à-006).
-O dataset, os três experimentos e seis traces estão públicos e foram conferidos sem login.
-Nenhuma nota nova foi produzida nesta etapa.
+O dataset, os três ciclos, a reprodução e seis traces estão públicos e foram conferidos sem login.
+As novas notas de REP-006 estão registradas separadamente do experimento final CIC-03.
 
 ## Escopo e limites
 
@@ -10,8 +10,9 @@ Preservar o prompt final, os quatro arquivos protegidos, a v1, o dataset e todo 
 Compartilhar o dataset uma única vez, depois da autorização explícita do autor no chat;
 reutilizar qualquer link existente. Compartilhar runs somente se necessário e autorizado.
 Push e atualização de main dependem de autorização própria. Commits locais autorizados pelo autor no chat em 2026-10-19: “Sim, autorizar commits locais”.
-Compartilhamento único autorizado: “Sim, compartilhar uma única vez”. Push e main seguem pendentes.
-Screenshots serão capturas reais, inspecionadas e versionadas em `docs/evidencias/`.
+Compartilhamento único autorizado: “Sim, compartilhar uma única vez”. Publicação de dev e PR
+autorizada posteriormente e concluída; merge/conferência de main pendentes.
+As capturas reais estão inspecionadas e versionadas em `docs/evidencias/`.
 
 ## Rastreabilidade
 
@@ -213,7 +214,8 @@ incluindo âncoras; zero erros. Nova leitura do Hub após reprodução confirmou
 
 Fork: [fabiocsm/mba-ia-pull-evaluation-prompt](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt),
 público, fork de `devfullcycle/mba-ia-pull-evaluation-prompt`, branch padrão `main`.
-`origin/main` local aponta para `a94ce44`; consulta ao GitHub confirma o fork, sem fetch ou push.
+Na inspeção inicial, `origin/main` local apontava para `a94ce44`; a consulta confirmou o fork
+sem escrita. Publicação posterior de dev e PR registrada abaixo.
 
 Estado: **publicado em dev**, com [PR #1](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/pull/1) aberto de `dev` para `main`.
 A conferência final de `main` (T022) aguarda o merge do PR. A autorização do autor em
