@@ -9,7 +9,8 @@ experimentos reais no LangSmith.
 - Leia o [README.md](README.md), que contém o contrato de avaliação, e a
   [constituição](.specify/memory/constitution.md) antes de planejar ou implementar mudanças.
 - Preserve os requisitos originais ao atualizar a documentação do processo.
-- Trabalhe com SDD usando as skills locais em `.agents/skills/`: especificação,
+- Trabalhe com SDD usando as skills locais do Spec Kit (`.agents/skills/` no Codex,
+  `.claude/skills/` no Claude Code, ambas com o mesmo fluxo): especificação,
   esclarecimentos quando necessários, plano, tarefas, análise e implementação.
   Consulte os artefatos existentes da feature antes de executar suas tarefas.
 - Mantenha rastreabilidade entre requisitos, tarefas, alterações e evidências.

@@ -47,7 +47,13 @@ ENV/
 # Project specific
 screenshots/
 results/
-.claude/
+# Claude Code: versiona as skills do Spec Kit; mantém o estado local ignorado
+.claude/*
+!.claude/skills/
+.claude/settings.local.json
+
+# Cache local de catálogos do Specify CLI
+.specify/integrations/.cache/
 
 # Preparação local e arquivos temporários
 .venv/
