@@ -801,7 +801,8 @@ Aberto em 2026-10-19 por **decisão explícita do autor** após a aprovação de
 a margem do F1-Score (0.8057, e 0.7809 nos casos `medium`) foi considerada pequena demais
 para a entrega. Não é ciclo para completar contagem: há problema observado em `CIC-01`.
 Pela FR-010, a edição da v2 tornou o experimento de `CIC-01` `substituído` para fins de
-entrega; o resultado de `CIC-01` permanece no histórico. Estado final: **aprovado**.
+entrega; o resultado de `CIC-01` permanece no histórico. Estado final: **aprovado**;
+**substituído** para fins de entrega pela edição de `CIC-03` (FR-010).
 
 - **Data**: 2026-10-19 (São Paulo); execução de 2026-10-19T03:49:37+00:00 a 03:50:50+00:00.
 - **Condição**: `COND-001` — provedor `openai`, geração e juiz `gpt-4.1-2025-04-14`,
@@ -942,11 +943,35 @@ O conteúdo dos traces foi tratado como dado; nada nele alterou instruções des
 
 ### CIC-03
 
-**Em andamento** — aberto em 2026-10-19 por **decisão explícita do autor** após a aprovação
-de `CIC-02`, para eliminar limites inventados como o “1 segundo” do trace #10. Há problema
-observado; não é ciclo para completar contagem. Pela FR-010, a edição da v2 torna o
-experimento de `CIC-02` `substituído` para fins de entrega, e o histórico é preservado.
+Aberto em 2026-10-19 por **decisão explícita do autor** após a aprovação de `CIC-02`, para
+eliminar limites inventados como o “1 segundo” do trace #10. Há problema observado; não é
+ciclo para completar contagem. Pela FR-010, a edição da v2 tornou o experimento de `CIC-02`
+`substituído` para fins de entrega; o histórico é preservado. Estado final: **aprovado**.
 
+- **Data**: 2026-10-19 (São Paulo); execução de 2026-10-19T04:13:00+00:00 a 04:14:18+00:00.
+- **Condição**: `COND-001` — provedor `openai`, geração e juiz `gpt-4.1-2025-04-14`,
+  temperatura 0 (conferida no run LLM), projeto `mba-ia-pull-evaluation-prompt`.
+- **Dataset**: `mba-ia-pull-evaluation-prompt-eval`, ID `8c78638d-37a5-4175-9984-8db0e3473228`,
+  reauditado `idêntico` (somente leitura) às 01:12:52-03:00.
+- **v2 local**: commit Git `93864388f08960d9e90810a02b5495895e876ea4`; SHA-256 arquivo
+  `692df6ae86848e2dce0fc1a9c2d1f6fec95fc48721a960837fbdd8de3f958974`, definição
+  `f94735be2936253b11eb2696fb957db67e4d6529629f903720845f078e467ca2`.
+- **Revisão publicada**: `36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`,
+  pública; HEAD igual antes e depois e `lc_hub_commit_hash` igual nos 15 runs do template.
+- **Inspeção no dashboard**: sem login em 2026-10-19T01:13-03:00 (ver RevisãoCandidata abaixo).
+- **Testes**: `pytest tests/test_prompts.py -q` 466 e `pytest -q` 817 aprovados.
+- **Experimento**: `fabiocsm-bug_to_user_story_v2-9c836e20`, ID
+  `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`,
+  [URL](https://smith.langchain.com/o/15dd5852-a835-4163-826c-e78668fd2a9c/datasets/8c78638d-37a5-4175-9984-8db0e3473228/compare?selectedSessions=d864cfbb-6ab9-4901-ab06-62f68ccd96fc)
+  (workspace do autor; compartilhamento público pertence à 006).
+- **Médias**: Helpfulness 0.8773 · Correctness 0.8754 · F1-Score 0.8474 · Clarity 0.8513 ·
+  Precision 0.9033 (recalculadas; iguais às impressas 0.88/0.88/0.85/0.85/0.90).
+- **Média geral**: 0.8709 (impressa `0.8709`).
+- **Completude**: 15 runs raiz sem erro, 15 exemplos distintos, 75 notas válidas, nenhum
+  marcador de falha, derivadas consistentes.
+- **Decisão**: contrato `aprovado`; avaliador `AVALIACAO_EXIT_CODE=0` e `STATUS: APROVADO`;
+  nenhuma divergência. Limitação: notas individuais abaixo de 0.8 e um valor inventado (#14).
+- **Custo acumulado**: US$ 0,755018 (0,222376 + 0,262344 + 0,270298 deste).
 - **Problema**: varredura das 30 respostas de `CIC-01`/`CIC-02` por números ausentes do
   relato encontrou duas invenções reais, contrárias à regra “Não invente … números” da v2:
   #10 (nos dois ciclos) define “a tela não congela por mais de 1 segundo”, quando o relato só
@@ -988,26 +1013,101 @@ metadata e acesso anônimo conferidos; inspeção sem login no navegador integra
 `25b881d1` e `4278de75`), cinco tags, System com persona, regra de valores e `## Exemplos`,
 User com `{bug_report}`.
 
+**Dataset e gate** — bloco `AVALIACAO_DATASET` 01:12:52-03:00 código 0 (`criado=false`,
+`idêntico`, 15, 5/7/3); bloco `AVALIACAO_GATE` 01:12:53-03:00 código 0, `gate_ok`, HEAD
+antes `36a96c05…696f`, commit Git `9386438…`, custo acumulado informado 0.484720.
+
+**Execução** — `python src/evaluate.py` com `pipefail`, log local
+`results/CIC-03-20261019T011300.log` (ignorado), `AVALIACAO_EXIT_CODE=0`,
+`📊 MÉDIA GERAL: 0.8709`, `✅ STATUS: APROVADO - Todas as métricas >= 0.8`. Sem retry.
+
+**Auditoria** — 2026-10-19T01:14:43-03:00, bloco `AVALIACAO_AUDITORIA` código 0, estado
+`aprovado`: C04 estável (`reference_dataset_id` correto, `example_map` reconstruído, HEAD
+antes/depois `36a96c05…696f`, `lc_hub_commit_hash` confirmado nos 15 runs, hashes da v2,
+v1 e protegidos iguais); C05 completo; C06 médias recalculadas = impressas e decisão do
+contrato = do avaliador.
+
+**RegistroCusto** — geração 27.671 entrada / 6.628 saída; juízes 57.786 / 5.795; nenhum
+estimado; US$ 0,270298. Acumulado **US$ 0,755018** (gate de US$ 4 não acionado).
+
+**Análise C07** — médias por dificuldade:
+
+| Dificuldade | Exemplos | Helpfulness | Correctness | F1-Score | Clarity | Precision |
+| --- | --- | --- | --- | --- | --- | --- |
+| simple | 5 | 0.8540 | 0.8594 | 0.8569 | 0.8460 | 0.8620 |
+| medium | 7 | 0.8786 | 0.8724 | 0.8234 | 0.8357 | 0.9214 |
+| complex | 3 | 0.9133 | 0.9088 | 0.8877 | 0.8967 | 0.9300 |
+
+| Métrica | 1ª | 2ª | 3ª | Padrão nos comentários do juiz |
+| --- | --- | --- | --- | --- |
+| F1-Score | #10 medium 0.6857 | #7 medium 0.70 | #5 simple 0.7467 | **Omissão** de soluções só da referência (paginação) e critérios considerados extras (#7, #5) |
+| Clarity | #1 simple 0.70 | #5 simple 0.80 | #6 medium 0.80 | **Extensão** em bug simples; perguntas ao usuário |
+| Precision | #1 simple 0.70 | #5 simple 0.80 | #7 medium 0.80 | **Excesso** em bug simples (foco 0.5 em #1); sem alucinação apontada |
+
+**Varredura de valores (critério de sucesso do ciclo)** — mesma regra aplicada às 15
+respostas: números ausentes do relato e trechos com “ex:”/“por exemplo”.
+
+| Caso | `CIC-02` | `CIC-03` |
+| --- | --- | --- |
+| #10 medium | “não congela por mais de 1 segundo” (inventado) | “não congela nem trava por 5 a 10 segundos” (valor relatado) e dúvida sobre o tempo máximo aceitável — **corrigido** |
+| #8 medium | critério “status HTTP apropriado (ex: 403 ou 401)” (inventado) | sem código nos critérios; dúvida “erro 403, 404 ou outra?” — opções numa pergunta, **limítrofe** |
+| #14 complex | — | “CPU do banco não ultrapassa 80%” (inventado; o relato informa 95% no pico) — **nova invenção** |
+| #9, #13, #14 (“50 mil”), #15 | soma `R$ 1.500` e valores citados do relato | idem — **não são invenção** |
+
+Conclusão sobre a hipótese: **parcialmente confirmada**. Invenções em critérios caíram de
+duas para uma, e o caso-alvo #10 passou a seguir a regra; a regra não eliminou a tendência
+(nova meta de CPU em #14). As médias permaneceram aprovadas: F1 0.8416 → 0.8474 (o risco
+previsto de queda não ocorreu), Clarity 0.8613 → 0.8513, Precision 0.9060 → 0.9033, média
+geral 0.8733 → 0.8709 — variações pequenas, compatíveis com oscilação de uma única execução
+por revisão (D09).
+
+**EvidênciaTrace** (experimento `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`; juízes no projeto
+`evaluators` `1fd04873-c944-4efe-b95c-2201cd1ac164`, ligados por `source_run_id`):
+
+| Exemplo | Raiz `target` | Template | LLM geração | Run do avaliador | LLMs dos juízes |
+| --- | --- | --- | --- | --- | --- |
+| #1 simple (`2d3d7a29-14bf-4df7-bc8e-3681ba191140`) | `01a1525d-899e-7711-835f-249803cf7318` | `01a1525d-899f-74a0-817b-a2458e1537da` | `01a1525d-89a0-79f0-b50e-ad08e6c38a4f` | `b7973768-c22d-4614-b359-a49e6df21293` | `01a1525d-fd04-7c00-b901-9330996d9a69`, `01a1525e-027f-7a60-b7fb-22a287c156cf`, `01a1525e-0707-7332-ad67-3642a44872d6` |
+| #10 medium (`307a4c8c-710f-4287-b880-07a10752cec2`) | `01a1525d-3ff5-7ae0-8915-df303b9a69b8` | `01a1525d-3ff6-7052-b5c1-ba61bd974532` | `01a1525d-3ff7-7663-9d15-4a3fdfb54a0a` | `6c19d03a-dbda-40ea-bf80-382f2cbb4010` | `01a1525d-6d14-75e3-a705-f3efa115d0c1`, `01a1525d-72cd-7923-aa51-bc5ce4990e8d`, `01a1525d-775a-7763-9604-91a5427eb210` |
+| #14 complex (`28c9bca9-e7be-4f93-b1e4-fe1637222566`) | `01a1525d-0432-7f50-99c6-c059ec587aa2` | `01a1525d-0432-7fe1-a617-86e62b300206` | `01a1525d-0433-73c0-a0cd-ff6944476675` | `8b32f3ca-937d-4872-9fbd-a7cf63fadd63` | `01a1525d-20c3-72f3-88ee-099f473c07db`, `01a1525d-2a7c-7211-b12a-d3a49d5b25a7`, `01a1525d-2fd5-7e83-bb21-531ebfab3298` |
+
+- **#1 simple** — entrada: botão de adicionar ao carrinho sem efeito no produto 1234.
+  System + Human renderizados pelo template `36a96c05`; geração `gpt-4.1-2025-04-14`,
+  temperatura 0, 1.720/239 tokens. Resposta: história e critérios Dado/Quando/Então de
+  inclusão, confirmação visual e atualização do carrinho. Juízes: F1 0.9189 (cobre todos os
+  critérios esperados), Clarity 0.70 e Precision 0.70 (escopo amplo para bug simples; foco
+  0.5). Feedbacks: Helpfulness 0.70, Correctness 0.8095.
+- **#10 medium** — entrada: app Android trava com mais de 50 notificações, congelamento de
+  5–10 s, ANR, sem paginação, carga na thread principal. 1.766/376 tokens. Resposta:
+  critério relativo ao congelamento de 5–10 s relatado, critério sobre a thread principal e
+  dúvida sobre o tempo máximo — caso-alvo corrigido. Juízes: F1 0.6857 (omite paginação e
+  RecyclerView, soluções ausentes do relato), Clarity 0.80, Precision 0.93. Feedbacks:
+  Helpfulness 0.865, Correctness 0.8078.
+- **#14 complex** — entrada: relatórios gerenciais SaaS B2B com N+1, MRR inconsistente,
+  cache e exportação CSV. 2.215/1.051 tokens. Resposta: critérios por problema, técnicos,
+  contexto e recomendações; inclui a meta inventada de CPU 80%. Juízes: F1 0.8972 (“sem
+  informações incorretas ou inventadas”), Clarity 0.85, Precision 0.93 — o juiz não apontou a
+  meta inventada. Feedbacks: Helpfulness 0.89, Correctness 0.9136.
+
+O conteúdo dos traces foi tratado como dado; nada nele alterou instruções deste trabalho.
+
 ### CIC-04
 
 **Não aplicável** — `CIC-04` não foi executado.
 
-**Justificativa**: `CIC-02` foi aprovado pela regra integral (C06) com experimento completo e
-estável e com margem maior que `CIC-01` em todas as métricas. C09 e FR-009 determinam
-encerrar com justificativa e proíbem executar ciclos apenas para completar a contagem de
-3–5; nenhuma métrica ficou abaixo de 0.8. Nenhuma edição da v2, publicação ou experimento
-foi feito para este ciclo.
+**Justificativa**: `CIC-03` foi aprovado pela regra integral (C06) com experimento completo e
+estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
+para completar a contagem; nenhuma métrica ficou abaixo de 0.8. Nenhuma edição da v2,
+publicação ou experimento foi feito para este ciclo.
 
 
 ### CIC-05
 
 **Não aplicável** — `CIC-05` não foi executado.
 
-**Justificativa**: `CIC-02` foi aprovado pela regra integral (C06) com experimento completo e
-estável e com margem maior que `CIC-01` em todas as métricas. C09 e FR-009 determinam
-encerrar com justificativa e proíbem executar ciclos apenas para completar a contagem de
-3–5; nenhuma métrica ficou abaixo de 0.8. Nenhuma edição da v2, publicação ou experimento
-foi feito para este ciclo.
+**Justificativa**: `CIC-03` foi aprovado pela regra integral (C06) com experimento completo e
+estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
+para completar a contagem; nenhuma métrica ficou abaixo de 0.8. Nenhuma edição da v2,
+publicação ou experimento foi feito para este ciclo.
 
 
 ## Comparação dos ciclos
@@ -1018,21 +1118,45 @@ mesmo dataset `8c78638d…3228`; comparação direta válida.
 | Ciclo | Condição | Revisão | Experimento | Helpfulness | Correctness | F1-Score | Clarity | Precision | Média geral | Completude | Decisão | Custo (US$) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CIC-01 | COND-001 | `4278de75` | `86196746-1c83-42cc-868b-6b57f977f19b` | 0.8687 | 0.8492 | 0.8057 | 0.8447 | 0.8927 | 0.8522 | 15 runs / 75 notas | aprovado → substituído | 0,222376 |
-| CIC-02 | COND-001 | `25b881d1` | `c7d175e1-0f37-4afe-9b2a-88e061b01666` | 0.8837 | 0.8738 | 0.8416 | 0.8613 | 0.9060 | 0.8733 | 15 runs / 75 notas | **aprovado (final)** | 0,262344 |
-| CIC-03–05 | — | — | — | — | — | — | — | — | — | — | não aplicável | 0 |
+| CIC-02 | COND-001 | `25b881d1` | `c7d175e1-0f37-4afe-9b2a-88e061b01666` | 0.8837 | 0.8738 | 0.8416 | 0.8613 | 0.9060 | 0.8733 | 15 runs / 75 notas | aprovado → substituído | 0,262344 |
+| CIC-03 | COND-001 | `36a96c05` | `d864cfbb-6ab9-4901-ab06-62f68ccd96fc` | 0.8773 | 0.8754 | 0.8474 | 0.8513 | 0.9033 | 0.8709 | 15 runs / 75 notas | **aprovado (final)** | 0,270298 |
+| CIC-04–05 | — | — | — | — | — | — | — | — | — | — | não aplicável | 0 |
 
-Variação CIC-01 → CIC-02: Helpfulness +0.0150, Correctness +0.0246, F1-Score +0.0359,
-Clarity +0.0166, Precision +0.0133, média geral +0.0211. Custo total US$ 0,484720.
+Variação CIC-01 → CIC-03: Helpfulness +0.0086, Correctness +0.0262, F1-Score +0.0417,
+Clarity +0.0066, Precision +0.0106, média geral +0.0187. Invenções de valores em critérios
+(varredura): `CIC-01` 1 (#10), `CIC-02` 2 (#8, #10), `CIC-03` 1 (#14). Custo total US$ 0,755018.
 
-Resumo das mudanças: `CIC-02` alterou somente a v2 — critérios Dado/Quando/Então cobrindo
-resultados decorrentes do comportamento esperado, critérios técnicos para detalhes
-informados, 3 a 5 critérios em bug simples e dúvidas restritas a lacunas bloqueantes.
+Resumo das mudanças: `CIC-02` — critérios Dado/Quando/Então cobrindo resultados decorrentes,
+critérios técnicos para detalhes informados, 3 a 5 critérios em bug simples e dúvidas só
+bloqueantes. `CIC-03` — regra de valores (somente valores do relato ou calculados deles,
+nenhuma meta/código/“ex.:” criado, limite ausente perguntado) e demonstração no Exemplo 3.
 Não houve repetição por falha de infraestrutura nem experimento descartado. Comparação
 numérica com a v1 não foi executada (opcional; exigiria experimento adicional e decisão
 explícita do autor). A comparação qualitativa v1/v2 fica para a documentação da 006.
 ## Decisão de parada
 
-**Reaberta** em 2026-10-19 pela abertura de `CIC-03` por decisão do autor. O registro abaixo é histórico e não é mais a decisão vigente.
+**Aprovação em `CIC-03`** (C09/FR-009), 2026-10-19. Ciclos efetivamente executados: **3**,
+dentro do plano de 3–5. `CIC-02` e `CIC-03` foram abertos por decisão do autor, cada um com
+problema e hipótese registrados antes da edição. `CIC-03` foi aprovado com experimento
+completo, estável e vinculado à revisão `36a96c05…696f`, cinco médias e média geral ≥ 0.8
+(menor média 0.8474) e decisão do contrato igual à do avaliador. Ciclos 04–05 não foram
+executados: C09 proíbe ciclos só para completar a contagem. Gate de custo não acionado
+(acumulado US$ 0,755018 ≤ US$ 4). Repetições por falha de infraestrutura: nenhuma.
+
+Limitações registradas: notas individuais abaixo de 0.8 em cinco exemplos (menor F1 #10
+0.6857; Clarity/Precision de #1 0.70); uma meta inventada em critério (#14, CPU 80%) e
+opções de código numa dúvida (#8), apesar da regra de valores; o juiz não penaliza essas
+invenções. Temperatura 0 não garante determinismo e cada revisão foi avaliada uma única vez
+(D09). Qualquer edição futura da v2 reabre um ciclo completo (FR-010).
+
+### Correspondência final — SC-005 (T031)
+
+2026-10-19: YAML local (`692df6ae…8974` / `f94735be…7ca2`, commit `9386438…`, sem
+alterações pendentes), HEAD do Hub (`36a96c05…696f`, lido no gate e na auditoria) e
+`lc_hub_commit_hash` dos 15 runs do experimento aprovado `d864cfbb…96fc` são a mesma
+revisão. Inspeção sem login da revisão final registrada em `CIC-03`. Nenhuma edição da v2
+após a aprovação. SC-004 atendido pelos três traces de `CIC-03` (T032), além dos de
+`CIC-01` e `CIC-02`.
 
 ### Registro histórico — aprovação em CIC-02 (substituída)
 
@@ -1091,17 +1215,18 @@ Verificado no LangSmith nesta feature (workspace do autor, ainda **não público
 - Dataset `mba-ia-pull-evaluation-prompt-eval`, ID `8c78638d-37a5-4175-9984-8db0e3473228`,
   15 exemplos idênticos ao JSONL (5/7/3). Não compartilhado: `share_dataset` e o registro do
   link pertencem à 006.
-- Experimento final `fabiocsm-bug_to_user_story_v2-ed9590ea`, ID
-  `c7d175e1-0f37-4afe-9b2a-88e061b01666`, revisão
-  `25b881d11f98916a66c9f0a8e00b07c4065d9895a935efabf776a9f5f2605e15`, `COND-001`.
-  Médias: Helpfulness 0.8837, Correctness 0.8738, F1-Score 0.8416, Clarity 0.8613,
-  Precision 0.9060; média geral 0.8733; aprovado.
-- Traces do experimento final: #1 simple `01a15248-21c5-75f1-a718-41d276c84faf`, #10 medium
-  `01a15247-db4f-7923-97f7-544b4f0e64c5`, #15 complex `01a15247-80b8-72c2-ad6d-7fad37ecd87a`.
-- Histórico: `CIC-01` (`86196746-1c83-42cc-868b-6b57f977f19b`, revisão `4278de75`) aprovado e
-  substituído; serve à comparação entre revisões.
+- Experimento final `fabiocsm-bug_to_user_story_v2-9c836e20`, ID
+  `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`, revisão
+  `36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`, `COND-001`.
+  Médias: Helpfulness 0.8773, Correctness 0.8754, F1-Score 0.8474, Clarity 0.8513,
+  Precision 0.9033; média geral 0.8709; aprovado.
+- Traces do experimento final: #1 simple `01a1525d-899e-7711-835f-249803cf7318`, #10 medium
+  `01a1525d-3ff5-7ae0-8915-df303b9a69b8`, #14 complex `01a1525d-0432-7f50-99c6-c059ec587aa2`.
+- Histórico: `CIC-01` (`86196746-1c83-42cc-868b-6b57f977f19b`, `4278de75`) e `CIC-02`
+  (`c7d175e1-0f37-4afe-9b2a-88e061b01666`, `25b881d1`), aprovados e substituídos; servem à
+  comparação entre revisões.
 
 Pendente na 006: acesso público ao dataset e aos experimentos (links privados de workspace
 não bastam), screenshots das cinco notas e dos traces, seções `Técnicas Aplicadas (Fase 2)`,
-`Resultados Finais` e `Como Executar` finais no README (incluindo a regra Dado/Quando/Então
-da v2), comparação v1/v2 e push Git.
+`Resultados Finais` e `Como Executar` finais no README (incluindo as regras de critérios e de
+valores da v2), comparação v1/v2 e push Git.

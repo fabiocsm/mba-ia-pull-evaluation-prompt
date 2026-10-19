@@ -626,8 +626,9 @@ de trilhas (múltiplos problemas, log e instrução conflitante). No primeiro, a
 Dado/Quando/Então, como “Dado que uma narração está em reprodução, quando aciono Pausar,
 então o áudio deixa de tocar” e a retomada do ponto em que parou. No segundo, a saída pede
 “Qual conteúdo da ficha fica errado e qual deveria aparecer?”, sem fabricar história.
-No terceiro, critérios separados cobrem legenda e escala, um critério técnico decorre
-do log informado, enquanto o log permanece
+No terceiro, critérios separados cobrem legenda, escala e a abertura de trilhas, um
+critério técnico decorre do log informado, a trava de 4 a 6 segundos vira critério
+relativo ao valor relatado, com o limite aceitável perguntado em Dúvidas, enquanto o log permanece
 contexto e a tentativa de trocar a tarefa não é seguida. São exemplos redigidos
 para o prompt, não saídas obtidas de um LLM.
 
@@ -662,7 +663,7 @@ estruturais não comprovam a resposta futura de um modelo.
 | Saída | Pedido genérico de User Story | Português, Markdown, história e critérios verificáveis |
 | Exemplos | Ausentes | Três pares completos de entrada/saída |
 | Bordas | Não orientadas | Seis grupos com fundamentação e perguntas |
-| Evidência numérica | Sem baseline real | `CIC-02` aprovado na 005, média geral 0.8733 ([registro](docs/avaliacao-v2.md)) |
+| Evidência numérica | Sem baseline real | `CIC-03` aprovado na 005, média geral 0.8709 ([registro](docs/avaliacao-v2.md)) |
 
 ## Resultados Finais
 
@@ -679,14 +680,15 @@ contra o YAML intacto. [Prompt público](https://smith.langchain.com/hub/fabiocs
 437 testes de prompt/publicação e 266 regressões passaram. As tentativas com
 falhas e os ajustes de compatibilidade estão preservados no registro.
 
-A spec 005 avaliou essa revisão (`CIC-01`, aprovada com F1-Score 0.8057) e, por decisão
-do autor diante da margem estreita, executou `CIC-02`: a v2 passou a exigir critérios
-Dado/Quando/Então que cobrem também os resultados decorrentes do comportamento esperado e
-critérios técnicos para detalhes informados, publicada como revisão
-`25b881d11f98916a66c9f0a8e00b07c4065d9895a935efabf776a9f5f2605e15`. O experimento final é
+A spec 005 executou três ciclos reais sob a mesma condição. `CIC-01` avaliou essa revisão
+(aprovada com F1-Score 0.8057). Por decisão do autor, `CIC-02` passou a exigir critérios
+Dado/Quando/Então que cobrem os resultados decorrentes do comportamento esperado e critérios
+técnicos para detalhes informados (F1-Score 0.8416), e `CIC-03` acrescentou a regra de
+valores — nenhuma meta, código ou exemplo numérico ausente do relato — publicada como revisão
+`36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`. O experimento final é
 completo (15 respostas, 75 notas válidas), vinculado à revisão e **aprovado** pela regra
-integral — Helpfulness 0.8837, Correctness 0.8738, F1-Score 0.8416, Clarity 0.8613,
-Precision 0.9060, média geral 0.8733 — com custo estimado acumulado de US$ 0,48. Detalhes,
+integral — Helpfulness 0.8773, Correctness 0.8754, F1-Score 0.8474, Clarity 0.8513,
+Precision 0.9033, média geral 0.8709 — com custo estimado acumulado de US$ 0,76. Detalhes,
 análise, traces e limitações no [registro da avaliação](docs/avaliacao-v2.md). Link público do
 dataset/experimentos, screenshots das cinco notas e tracing detalhado de três
 exemplos: **pendentes na 006**. O link público acima comprova o prompt; o dataset e o

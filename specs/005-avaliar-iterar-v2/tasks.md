@@ -14,7 +14,7 @@ description: "Tarefas da spec 005: avaliação íntegra e otimização guiada po
 Aceite da 004 e revisão `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`
 em [publicação da v2](../../docs/publicacao-v2.md) são pré-requisitos.
 
-**Estado**: 35/35 tarefas concluídas em 2026-10-19. `CIC-01` aprovado; por decisão do autor, `CIC-02` (T024–T025) executado e aprovado como final; T026–T028 não aplicáveis com justificativa; ver [registro de execução](#registro-de-execução).
+**Estado**: 35/35 tarefas concluídas em 2026-10-19. `CIC-01` aprovado; por decisão do autor, `CIC-02` (T024–T025) e `CIC-03` (T026) executados, `CIC-03` aprovado como final; T027–T028 não aplicáveis com justificativa; ver [registro de execução](#registro-de-execução).
 Duas análises SDD realizadas. Achados C1, I1, I2, U1, D1, I3, P1, U2, A1, I4 e U3 da
 primeira (ver [correção da análise](#correção-da-análise--2026-10-18)) e G1, U1, U2, I1,
 I2, U3, U4, I3 e A1 da segunda (ver [segunda correção](#segunda-correção-da-análise--2026-10-18))
@@ -465,3 +465,26 @@ T029–T035 foram refeitas sobre o novo experimento final.
 - **V11 após CIC-02**: hashes dos quatro protegidos e da v1 inalterados; v2 `5222d484…7857`
   igual à revisão avaliada; `git diff --check` aprovado; nenhum valor de credencial ou padrão
   de chave nos arquivos alterados; links locais resolvidos; `pytest -q` → **817 passed**.
+
+### Reabertura por decisão do autor — CIC-03, 2026-10-19
+
+Pedido do autor: “Open CIC-03 to stop invented thresholds like the 1-second one in trace
+#10, and run a full cycle.” T026 deixou de ser não aplicável; T029–T035 refeitas.
+
+- **T026**: varredura das 30 respostas anteriores por valores ausentes do relato (#10 “1
+  segundo” nos dois ciclos; #8 “ex: 403 ou 401” em `CIC-02`); problema/hipótese registrados
+  às 01:11:45-03:00. Edição só da v2: regra **Valores** e demonstração no Exemplo 3. Testes
+  466/817; push 01:12:15-03:00 código 0, `publication=confirmada`, revisão `36a96c05…696f`;
+  inspeção sem login; commit local `9386438`. Dataset `idêntico` → gate `gate_ok` (custo
+  0.484720) → avaliação 04:13:00–04:14:18 UTC, código 0 → auditoria `aprovado`: experimento
+  `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`, 15/75, vínculo confirmado, médias
+  0.8773/0.8754/0.8474/0.8513/0.9033, média geral 0.8709, US$ 0,270298. Nova varredura:
+  #10 corrigido, #8 limítrofe (opções numa dúvida), nova meta inventada em #14 (CPU 80%) —
+  hipótese parcialmente confirmada.
+- **T027–T028**: não aplicáveis — `CIC-03` aprovado.
+- **T029–T032**: parada (3 ciclos, acumulado US$ 0,755018), comparação com três linhas e
+  contagem de invenções, `CIC-02` `substituído`, SC-005 para `36a96c05`, traces #1/#10/#14.
+- **T033–T035**: README (Exemplo 3 e resultados), índices e `plan.md` atualizados.
+- **V11 após CIC-03**: protegidos e v1 inalterados; v2 `692df6ae…8974` igual à revisão
+  avaliada; `git diff --check` aprovado; nenhum segredo nos arquivos alterados; links locais
+  resolvidos; `pytest -q` → **817 passed**.
