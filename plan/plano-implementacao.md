@@ -9,11 +9,14 @@ fork público, configuração/contexto LangSmith, chamadas mínimas e tracing co
 Reprodução automatizada na mesma máquina concluída com ocorrência de leitura registrada.
 Recuperação da spec 002 concluída, com pull e fidelidade comprovados no
 [registro](../docs/recuperacao-v1.md). Planejamento e geração de tarefas da spec 003
-concluídos; análise realizada com I1 corrigido e revalidado. Ela é a spec ativa.
+concluídos; análise realizada com I1 corrigido e revalidado.
 A 003 está implementada e validada localmente: 30/30 tarefas, 188 testes da v2 e
 266 regressões aprovados, revisão semântica e integridade comprovadas no
 [registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
-Implementação das specs 004–006 e avaliações acadêmicas reais permanecem pendentes.
+O planejamento e as [35 tarefas da spec 004](../specs/004-publicar-prompt-v2/tasks.md)
+foram concluídos em 2026-10-18; ela é a spec ativa. Análise da 004 realizada com
+A1 corrigido e revalidado documentalmente. Implementação das
+specs 004–006 e avaliações acadêmicas reais permanecem pendentes.
 
 ## 1. Objetivo e referências
 
@@ -49,8 +52,21 @@ validação. Suas [30 tarefas](../specs/003-otimizar-validar-v2/tasks.md) foram 
 por história e dependência e foram concluídas. A análise da 003 identificou
 I1, corrigido no contrato e em T018/T020 com política explícita para falso positivo
 de TODO e controles de regressão, sem alterar o helper protegido. O adaptador
-e os testes foram comprovados localmente na 003. Planos/tarefas das specs 004–006 e
-avaliações reais permanecem pendentes; este plano continua sendo referência.
+e os testes foram comprovados localmente na 003. O
+[plano técnico da 004](../specs/004-publicar-prompt-v2/plan.md), concluído em
+2026-10-18, detalha a Fase 5 com pesquisa do SDK, modelo de dados, contrato de
+publicação e guia de validação. Define confirmação de escrita separada de
+equivalência/publicidade, resolução da revisão completa, hashes locais e prova
+anônima do mesmo commit. Suas [35 tarefas](../specs/004-publicar-prompt-v2/tasks.md)
+foram geradas por história/dependência, com US2 P1 antes de US1 P1 e US3 P2,
+mais gates locais e prova remota final. As tarefas estão pendentes; a geração não
+executa publicação ou LLM. A análise da 004 identificou A1, corrigido no contrato
+e nas tarefas: sucesso automatizado do CLI separado da inspeção visual posterior,
+obrigatória para aceite da 004 e entrega à 005. Revalidação documental no
+[registro de A1](../specs/004-publicar-prompt-v2/tasks.md#correção-da-análise--a1).
+Próxima etapa: implementar a 004.
+Planos/tarefas das specs 005–006
+e avaliações reais permanecem pendentes; este plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório
 

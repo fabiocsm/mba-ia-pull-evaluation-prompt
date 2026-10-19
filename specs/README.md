@@ -13,9 +13,12 @@ sequência incremental de validação alinhada e caminho do contrato em T005 cor
 A 002 foi implementada e comprovada: pull real, comparação de 2/2 mensagens idênticas,
 236 testes offline do pull e integridade preservada. Planejamento e geração de
 tarefas da 003 concluídos; análise realizada com I1 corrigido e revalidado.
-Ela é a spec ativa e foi implementada: 30/30 tarefas, 188 testes da v2 e
+Ela foi implementada: 30/30 tarefas, 188 testes da v2 e
 266 regressões aprovados, revisão semântica/documental e integridade conferidas.
-Planos/tarefas das specs 004–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
+O planejamento, as tarefas e a análise da 004 foram concluídos em 2026-10-18;
+A1 corrigido e revalidado documentalmente. Ela é a spec ativa.
+Planos/tarefas das specs 005–006, implementação das
+004–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
 [preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
@@ -41,8 +44,25 @@ de escrita. A análise SDD identificou I1 (falso positivo de TODO no helper);
 o contrato e T018/T020 agora definem o adaptador restrito e controles de regressão,
 preservando `src/utils.py`. O adaptador e seus controles passaram na implementação;
 comandos, resultados e limites no [registro da 003](003-otimizar-validar-v2/tasks.md#registro-de-execução).
-A v2 está pronta localmente para o planejamento da 004; publicação e métricas ainda
+A v2 está pronta localmente. O [plano da 004](004-publicar-prompt-v2/plan.md)
+detalha a Fase 5, com [pesquisa](004-publicar-prompt-v2/research.md),
+[modelo de dados](004-publicar-prompt-v2/data-model.md),
+[contrato](004-publicar-prompt-v2/contracts/publicacao-v2.md) e
+[guia de validação](004-publicar-prompt-v2/quickstart.md). Define validação antes
+da escrita, metadados suportados pelo SDK, revisão exata e acesso anônimo,
+distinguindo confirmação de publicação de conferência completa. O plano foi
+concluído sem implementação, push ou chamadas LLM; publicação e métricas ainda
 não foram executadas.
+As [35 tarefas da 004](004-publicar-prompt-v2/tasks.md) foram geradas: Setup (2),
+Foundational (2), US2 (8), US1 (10), US3 (7) e revisão final (6). US2 e US1 são
+P1, com rejeição de artefatos inválidos antes da escrita; US3 P2 completa vínculo
+local/revisão e invalidação. Seis marcadores de paralelismo formam três pares em
+arquivos distintos. Testes são offline e as provas reais de publicação/acesso
+ficam para a integração final. Todas as tarefas estão pendentes. A análise SDD
+da 004 identificou A1: o retorno zero do CLI depende de verificações automatizadas;
+a inspeção visual posterior e seu registro completam o aceite da 004 antes da
+entrega à 005. A correção está no contrato e em T014/T019/T026/T032–T034, com
+revalidação documental no [registro de A1](004-publicar-prompt-v2/tasks.md#correção-da-análise--a1).
 As [25 tarefas da 002](002-recuperar-prompt-v1/tasks.md), concluídas, cobrem
 Setup (2), Foundational (2), US1 (9), US2 (7) e revisão final (5). Elas separam
 validação offline de falhas e comprovação real da fidelidade da v1.
@@ -183,7 +203,8 @@ deve ser registrada e resolvida antes de qualquer proposta de mudança nesses ma
 
 Na especificação inicial foram criados `spec.md` e `checklists/requirements.md` por
 feature, além deste índice. A 001 e a 002 também têm planejamento e tarefas;
-a 003 tem os cinco artefatos de planejamento e `tasks.md` listados acima.
+a 003 tem os cinco artefatos de planejamento e `tasks.md` listados acima;
+a 004 tem os cinco artefatos de planejamento e `tasks.md`, com 35 tarefas pendentes.
 As descrições estão nos campos `Input`. O template ativo foi resolvido pela
 pilha local do Spec Kit e suas seções obrigatórias foram mantidas, com premissas e
 dependências. A revisão de cada checklist registra 16/16 itens de qualidade atendidos,
@@ -194,13 +215,13 @@ foram verificados e não havia hooks a executar. Nenhuma branch foi criada ou tr
 `dev` é a branch de trabalho existente, independente dos diretórios de spec.
 
 O ponteiro local `.specify/feature.json` foi atualizado em cada aplicação e agora
-seleciona `specs/003-otimizar-validar-v2`, conforme solicitação do autor. Esse
+seleciona `specs/004-publicar-prompt-v2`, conforme solicitação do autor. Esse
 arquivo é ignorado pelo Git por ser estado local. Para selecionar explicitamente uma
 spec antes da próxima skill, use a raiz do repositório e a variável reconhecida pelos
 scripts locais:
 
 ```bash
-export SPECIFY_FEATURE_DIRECTORY=specs/003-otimizar-validar-v2
+export SPECIFY_FEATURE_DIRECTORY=specs/004-publicar-prompt-v2
 # Em seguida, invocar $speckit-implement nesta conversa para essa feature.
 ```
 
@@ -208,11 +229,14 @@ Troque o valor pelo diretório da spec desejada; não presuma que a branch selec
 feature. Prossiga com `$speckit-plan`, `$speckit-tasks` e `$speckit-analyze` por feature,
 antes de `$speckit-implement`, respeitando as dependências de execução. Use
 `$speckit-clarify` apenas se aparecer lacuna que altere escopo ou aceite. Planos e
-tarefas das specs 004–006 ainda não foram gerados. A 001 e a 002 foram concluídas
-com a baseline preservada; o planejamento e as tarefas da 003 foram concluídos em 2026-10-18.
-A feature ativa é a 003, selecionada explicitamente pelo autor, sem trocar `dev`.
-A dependência de recuperação está atendida e a análise I1 foi corrigida/revalidada:
-a próxima etapa é `$speckit-implement` para o prompt e os seis testes obrigatórios.
+tarefas das specs 005–006 ainda não foram gerados. A 001 e a 002 foram concluídas
+com a baseline preservada; a 003 também foi implementada. O planejamento da 004
+e a geração de tarefas foram concluídos em 2026-10-18; a análise identificou A1,
+corrigido e revalidado documentalmente. Seus requisitos estão rastreados no
+plano/contrato/guia e nas 35 tarefas pendentes.
+A feature ativa é a 004, selecionada explicitamente pelo autor, sem trocar `dev`.
+As dependências 001/003 estão atendidas para implementação; a próxima etapa é
+`$speckit-implement` para a 004.
 A reprodução da 001 usa um executor Python separado na mesma máquina; não equivale
 a revisão humana independente nem comprova portabilidade para outro SO.
 A Fase 0 do plano mestre permanece parcialmente pendente.
