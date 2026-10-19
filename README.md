@@ -649,7 +649,7 @@ de geração; seus IDs estão registrados, ligados ao feedback por `source_run_i
 ### Capturas reais do LangSmith
 
 A tabela do dashboard usa duas casas decimais e foi rolada horizontalmente para mostrar
-todas as métricas. A primeira linha é CIC-03 (`9c836e20`). As duas imagens seguintes
+todas as métricas. Nas capturas anteriores à reprodução, a primeira linha é CIC-03 (`9c836e20`). As duas imagens seguintes
 mostram Clarity/Correctness/Precision e F1-Score/Helpfulness, respectivamente.
 
 ![Cinco médias — parte 1](docs/evidencias/avaliacao-v2-medias.png)
@@ -682,6 +682,16 @@ mostram Clarity/Correctness/Precision e F1-Score/Helpfulness, respectivamente.
 </details>
 
 As capturas, mensagens e links complementares estão no
-[registro da entrega](docs/entrega-publica.md). A reprodução em clone limpo está pendente;
-a verificação por segundo executor (SC-004) também permanece pendente. Publicação do
+[registro da entrega](docs/entrega-publica.md). A reprodução em clone limpo foi aprovada:
+
+**REP-006 — reprodução, não é o experimento final**: experimento
+`e3211f91-99f5-41d6-bb7e-36aad1085974`, [acesso público](https://smith.langchain.com/public/72eee98c-a991-4c8e-b825-b2b9b898df14/d/compare?selectedSessions=e3211f91-99f5-41d6-bb7e-36aad1085974),
+mesma revisão e COND-001, 15 respostas/75 notas, zero divergências. Médias: Helpfulness
+0.8767, Correctness 0.8758, F1-Score 0.8469, Clarity 0.8487, Precision 0.9047;
+média geral **0.8706**. Custo US$ 0,267300; acumulado das avaliações **US$ 1,022318**
+(US$ 1,022566 incluindo a preparação anterior). Cobrança efetiva não consultada.
+A reprodução encontrou a atualização dos metadados de coleta da v1; o roteiro foi corrigido
+para preservar a nova coleta e comparar o conteúdo antes de manter a baseline original.
+Detalhes, códigos de saída e tokens no registro acima. Os **872 testes** passaram na raiz
+e no clone corrigido. A verificação por segundo executor (SC-004) permanece **pendente**. Publicação do
 conteúdo final em `main` aguarda autorização específica do autor.

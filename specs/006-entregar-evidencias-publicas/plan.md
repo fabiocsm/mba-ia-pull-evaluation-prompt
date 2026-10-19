@@ -6,8 +6,11 @@
 [plano mestre](../../plan/plano-implementacao.md), com a entrega da
 [005](../../docs/avaliacao-v2.md#entrega-à-006) aprovada.
 
-**Estado**: planejamento e desenho concluídos em 2026-10-19; [25 tarefas](tasks.md) geradas;
-implementação pendente. O setup retornou `BRANCH=006-entregar-evidencias-publicas` como identificador da
+**Estado**: implementação preparada em 2026-10-19: dataset e seis traces compartilhados
+com autorização e conferidos sem login, 16 PNG reais versionadas, README consolidado e
+reprodução REP-006 aprovada (média 0.8706, custo US$ 0,267300), 872 testes aprovados.
+Publicação Git/main aguarda autorização (T020–T022); SC-004 por segundo executor permanece
+pendente. [Registro e evidências](../../docs/entrega-publica.md). O setup retornou `BRANCH=006-entregar-evidencias-publicas` como identificador da
 feature; a branch Git continua `dev`. O ponteiro local `.specify/feature.json` (ignorado
 pelo Git) seleciona a 006 por pedido do autor. Nenhuma branch criada ou trocada.
 
@@ -42,7 +45,7 @@ Fora do escopo: editar a v2 (reabre a 005), novo avaliador, métricas ou dados; 
 **Primary Dependencies**: pins existentes (`langsmith==0.13.0`, `langchain-core==1.6.4`,
 `langchain-openai==1.6.2`, `langchain-google-genai==4.4.0`, `python-dotenv==1.2.3`,
 `pyyaml==6.0.3`, `pytest==9.1.1`); `gh` CLI e Git para o fork; navegador integrado para
-conferência anônima e capturas. Nenhuma instalação nova.
+conferência anônima e capturas. Nenhuma dependência adicionada; instalação dos mesmos pins em venv novo para reprodução.
 
 **Storage**: `docs/entrega-publica.md` (registro), `docs/evidencias/*.png` (versionado),
 README; LangSmith (dataset/experimentos/traces) e GitHub (fork). `results/` e `screenshots/`
@@ -168,3 +171,13 @@ Sem violações a justificar.
 Planejamento sem compartilhamento, push, chamada LLM ou experimento. Consultas somente de
 leitura (`read_dataset_shared_schema`, `read_run_shared_link`, `list_projects`, `gh repo view`).
 `.specify/extensions.yml` ausente: nenhum hook antes/depois. Próxima etapa: `$speckit-tasks`.
+
+## Execução da 006 — 2026-10-19
+
+CIC-03 permanece final; REP-006 não substitui seus resultados. A reprodução do commit
+22e1e090a9786c79be8e11855e21430f264d9297 passou após corrigir o roteiro: guardar a nova
+coleta da v1 e comparar conteúdo/revisão antes de restaurar a baseline, pois datas/estatísticas
+variam em cada pull. Três testes verificam a guarda contra mensagem/revisão divergentes.
+US1/US2 e integridade prontas; pacote preparado. Autorização de publicação Git e prova por
+segundo executor pendentes, sem alegação de entrega integral. Custo acumulado das avaliações
+US$ 1,022318 (US$ 1,022566 incluindo preparação).

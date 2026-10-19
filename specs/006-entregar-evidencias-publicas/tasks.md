@@ -14,9 +14,10 @@ description: "Tarefas da spec 006: entrega pública com evidências acessíveis 
 [entrega da 005](../../docs/avaliacao-v2.md#entrega-à-006) (experimento final `CIC-03`
 `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`, revisão `36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`).
 
-**Estado**: 16/25 tarefas concluídas (T001–T016). Dataset, experimentos e seis traces
-públicos conferidos; 16 capturas reais, README consolidado e 14 testes documentais
-aprovados. Reprodução em clone limpo (T017) é a próxima etapa; push/main não autorizados.
+**Estado**: 22/25 tarefas concluídas (T001–T019, T023–T025). Pacote preparado,
+REP-006 aprovada, 872 testes, arquivos íntegros. T020–T022 aguardam autorização de
+push/main e conferência posterior. T023 registra SC-004 **pendente**, sem segundo executor.
+Entrega integral ainda não concluída.
 
 **Ações externas** (somente com autorização explícita do autor no chat, por ação):
 `share_dataset` (uma única vez), `share_run` (se necessário), `git push` e atualização de
@@ -110,8 +111,8 @@ reproduzido em clone limpo.
 - [X] T014 [US2] Reescrever `## Técnicas Aplicadas (Fase 2)` em `README.md`: Role Prompting e Few-shot Learning (o que, por que, trechos reais da v2 final, incluindo Exemplos 1–3), e as regras acrescentadas pelos ciclos (`CIC-02` critérios Dado/Quando/Então e critérios técnicos; `CIC-03` regra de valores) com o problema observado que as motivou; não declarar técnica não aplicada.
 - [X] T015 [US2] Reescrever `## Resultados Finais` em `README.md`: cinco médias e média geral de `CIC-03`, revisão e experimento finais, tabela `CIC-01`–`CIC-03` de `docs/avaliacao-v2.md`, comparação qualitativa v1/v2 (o que mudou e por quê), link público do dataset (T007), URL pública do experimento `CIC-03` (T008), link do prompt, links de traces e julgamentos se existirem (T009), sem URLs de workspace como evidência, as cinco PNG de T010, custo, limitações (notas individuais < 0.8, meta inventada em #14, opções de código em #8) e a declaração de que a comparação numérica da v1 não foi executada (D05); nenhuma nota ilustrativa do enunciado como resultado.
 - [X] T016 [US2] Reescrever `## Como Executar` em `README.md` como roteiro único: pré-requisitos (Python 3.10+, contas, chave do provedor), venv, `pip install -r requirements.txt`/`pip check`, `.env` a partir de `.env.example` (nomes das variáveis e valores não secretos de `COND-001`: `openai`, `gpt-4.1-2025-04-14` nos dois papéis, tracing `true`), alternativa Gemini preservada, comandos ordenados de cada fase (pull, testes, push, blocos de dataset/gate, avaliação com `pipefail`, auditoria), como obter cada entrada do gate (`AVALIACAO_DATASET_ID`/`AVALIACAO_DATASET` do bloco de dataset, `AVALIACAO_HUB_COMMIT` e `AVALIACAO_V2_*` da saída do push, `AVALIACAO_TESTES=aprovado` após os testes, `AVALIACAO_DASHBOARD=conferido` após inspeção própria da revisão no Hub, `AVALIACAO_CUSTO_ACUMULADO_USD`), quando definir `LANGSMITH_WORKSPACE_ID` (chave com acesso a mais de um workspace; `.env.example` só muda com concordância do autor) e interpretação de sucesso/falha de cada passo; executar `pytest tests/test_delivery.py -v` e `pytest -q` até passarem e fazer o commit local de entrega se autorizado em T001, registrando seu hash como `COMMIT_ENTREGA`.
-- [ ] T017 [US2] Executar W07 (`REP-006`, executor `autor`): `git clone` do repositório local no diretório temporário da sessão e `git checkout` do `COMMIT_ENTREGA` de T016 — ou, se commits locais não foram autorizados em T001, cópia da árvore de trabalho sem `venv/`, `.env`, `results/` e `screenshots/` —, registrando a origem usada; `python3.11 -m venv venv`, `pip install -r requirements.txt`, `pip check`, cópia do `.env` local (nunca versionado) e os comandos de `Como Executar` literalmente; esperado: v1 com hash `2cddcf8f…0d70`, testes aprovados, `push_prompts.py` código 0 sem nova revisão (HEAD continua `36a96c05…696f`; a reaplicação de descrição/tags no Hub é escrita remota esperada), dataset `idêntico`, gate `gate_ok` com o custo acumulado (US$ 0,755018), avaliação e auditoria completas; registrar em `docs/entrega-publica.md` (`RegistroReprodução`) cada passo com código, o novo experimento como reprodução (não substitui `CIC-03`), tokens e custo e o novo acumulado.
-- [ ] T018 [US2] Identificar `REP-006` em `README.md` (`Resultados Finais`: ID, decisão, custo, “reprodução, não é o experimento final”, pois aparece no link público do dataset) e em `docs/entrega-publica.md`; executar `pytest tests/test_delivery.py -v`. Tratar divergências de T017: corrigir `README.md` onde o roteiro documentado não correspondeu ao executado e repetir somente o passo afetado (sem nova avaliação, salvo se a divergência for nela); reprovação ou incompletude da reprodução é registrada em `docs/entrega-publica.md` sem substituir o resultado final; v2 nunca é editada (isso reabriria a 005).
+- [X] T017 [US2] Executar W07 (`REP-006`, executor `autor`): `git clone` do repositório local no diretório temporário da sessão e `git checkout` do `COMMIT_ENTREGA` de T016 — ou, se commits locais não foram autorizados em T001, cópia da árvore de trabalho sem `venv/`, `.env`, `results/` e `screenshots/` —, registrando a origem usada; `python3.11 -m venv venv`, `pip install -r requirements.txt`, `pip check`, cópia do `.env` local (nunca versionado) e os comandos de `Como Executar` literalmente; esperado: v1 com hash `2cddcf8f…0d70`, testes aprovados, `push_prompts.py` código 0 sem nova revisão (HEAD continua `36a96c05…696f`; a reaplicação de descrição/tags no Hub é escrita remota esperada), dataset `idêntico`, gate `gate_ok` com o custo acumulado (US$ 0,755018), avaliação e auditoria completas; registrar em `docs/entrega-publica.md` (`RegistroReprodução`) cada passo com código, o novo experimento como reprodução (não substitui `CIC-03`), tokens e custo e o novo acumulado.
+- [X] T018 [US2] Identificar `REP-006` em `README.md` (`Resultados Finais`: ID, decisão, custo, “reprodução, não é o experimento final”, pois aparece no link público do dataset) e em `docs/entrega-publica.md`; executar `pytest tests/test_delivery.py -v`. Tratar divergências de T017: corrigir `README.md` onde o roteiro documentado não correspondeu ao executado e repetir somente o passo afetado (sem nova avaliação, salvo se a divergência for nela); reprovação ou incompletude da reprodução é registrada em `docs/entrega-publica.md` sem substituir o resultado final; v2 nunca é editada (isso reabriria a 005).
 
 **Checkpoint**: README completo e roteiro reproduzido (SC-003/SC-004).
 
@@ -124,11 +125,11 @@ reproduzido em clone limpo.
 **Independent Test**: abrir o fork sem login e comparar v2, protegidos e evidências com a
 referência e a revisão aprovada (W08/W09).
 
-- [ ] T019 [US3] Executar W08 e registrar em `docs/entrega-publica.md` (`ConferênciaIntegridade`): hashes dos quatro protegidos e da v1; 15 exemplos 5/7/3; `git diff main..dev -- src/evaluate.py src/metrics.py src/utils.py datasets/` vazio; `langchain-openai` e `langchain-google-genai` instalados e `src/utils.py` intacto; v2 local = `36a96c05`; varredura de segredos (valores do `.env` e padrões) em todos os arquivos versionados e inspeção das PNG; `pytest -q`; `git diff --check`.
+- [X] T019 [US3] Executar W08 e registrar em `docs/entrega-publica.md` (`ConferênciaIntegridade`): hashes dos quatro protegidos e da v1; 15 exemplos 5/7/3; `git diff main..dev -- src/evaluate.py src/metrics.py src/utils.py datasets/` vazio; `langchain-openai` e `langchain-google-genai` instalados e `src/utils.py` intacto; v2 local = `36a96c05`; varredura de segredos (valores do `.env` e padrões) em todos os arquivos versionados e inspeção das PNG; `pytest -q`; `git diff --check`.
 - [ ] T020 [US3] Pedir ao autor no chat autorização explícita para `git push origin dev` e para atualizar `main` com `dev` (fast-forward local + push, ou PR `dev → main` no fork — escolha do autor); registrar pedido, decisão e estado `PacoteEntrega` (`preparado`/`autorizado`) em `docs/entrega-publica.md`. Sem autorização: parar aqui e registrar.
 - [ ] T021 [US3] Com a autorização de T020, executar o push de `dev` e a atualização de `main` escolhida, sem force-push nem reescrita de histórico; registrar commits enviados e o estado `publicado` em `docs/entrega-publica.md`.
 - [ ] T022 [US3] Conferir sem login `https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt` na branch `main`: README com as três seções, `prompts/bug_to_user_story_v2.yml` com SHA-256 `692df6ae…8974` (via conteúdo bruto público), código e as PNG de `docs/evidencias/` abrindo; links do README (dataset, prompt, traces) abrindo sem login; registrar `PacoteEntrega=conferido` em `docs/entrega-publica.md`.
-- [ ] T023 [US3] SC-004 (`REP-006B`, executor `segundo_executor`): pedir ao autor que indique outra pessoa para seguir `Como Executar` a partir do fork público (`git clone https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt`, branch `main`) com credenciais próprias; registrar em `docs/entrega-publica.md` o papel do executor (sem dados pessoais), os passos com código, divergências e, se houver avaliação, o experimento como reprodução e seu custo. Se ninguém executar até o fim da 006, registrar o SC-004 como **pendente** e declará-lo na conclusão (T024) — a execução `REP-006` do próprio autor não o substitui.
+- [X] T023 [US3] SC-004 (`REP-006B`, executor `segundo_executor`): pedir ao autor que indique outra pessoa para seguir `Como Executar` a partir do fork público (`git clone https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt`, branch `main`) com credenciais próprias; registrar em `docs/entrega-publica.md` o papel do executor (sem dados pessoais), os passos com código, divergências e, se houver avaliação, o experimento como reprodução e seu custo. Se ninguém executar até o fim da 006, registrar o SC-004 como **pendente** e declará-lo na conclusão (T024) — a execução `REP-006` do próprio autor não o substitui.
 
 **Checkpoint**: entrega publicada e conferida (SC-005); SC-004 comprovado por segundo executor ou pendente e declarado.
 
@@ -136,8 +137,8 @@ referência e a revisão aprovada (W08/W09).
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T024 Registrar no fim de `docs/entrega-publica.md` o encerramento: links finais, PNG, reproduções (`REP-006` e `REP-006B` ou pendência do SC-004) e custo total, separando o verificado sem login do que ficou pendente; atualizar o estado em `specs/006-entregar-evidencias-publicas/plan.md`, `specs/README.md` e `plan/plano-implementacao.md` (seção 9 do plano mestre).
-- [ ] T025 Conferência final: links locais dos Markdown alterados, `pytest -q`, `git diff --check`, todas as tarefas marcadas ou justificadas em `specs/006-entregar-evidencias-publicas/tasks.md`; commit local final se autorizado; push adicional somente com nova autorização.
+- [X] T024 Registrar no fim de `docs/entrega-publica.md` o encerramento: links finais, PNG, reproduções (`REP-006` e `REP-006B` ou pendência do SC-004) e custo total, separando o verificado sem login do que ficou pendente; atualizar o estado em `specs/006-entregar-evidencias-publicas/plan.md`, `specs/README.md` e `plan/plano-implementacao.md` (seção 9 do plano mestre).
+- [X] T025 Conferência final: links locais dos Markdown alterados, `pytest -q`, `git diff --check`, todas as tarefas marcadas ou justificadas em `specs/006-entregar-evidencias-publicas/tasks.md`; commit local final se autorizado; push adicional somente com nova autorização.
 
 ---
 
@@ -331,3 +332,27 @@ Contagem inalterada: 25 tarefas e mesmas fases; T023 deixou de ser opcional.
   coleta e restaurar baseline só após comparar conteúdo/revisão/metadados do template;
   três testes negativos/positivo adicionados (3 falhas pertinentes antes do bloco).
   Link local do roteiro de preparação também corrigido para a âncora real.
+
+- **T017/T018 concluídas**: COMMIT_ENTREGA corrigido 22e1e090a9786c79be8e11855e21430f264d9297.
+  Retomada no clone, com nova coleta preservada e baseline conferida; testes 872, push 0
+  (conflito idêntico conferido, sem nova revisão), dataset idêntico, gate_ok, avaliação 0 e
+  auditoria 0. REP-006 e3211f91-99f5-41d6-bb7e-36aad1085974 completo/estável/aprovado;
+  médias 0.8767/0.8758/0.8469/0.8487/0.9047, geral 0.8706, sem divergências. Geração
+  27671/6455 tokens; juízes 57267/5723; US$ 0,267300. Acumulado avaliações US$ 1,022318.
+  Identificado no README/registro como reprodução, não final; link público conferido.
+- **T019 concluída**: quatro protegidos/v1/v2 íntegros, 15 casos 5/7/3, diff main..dev
+  dos protegidos vazio, OpenAI 1.6.2/Gemini 4.4.0. Varredura real de segredos/padrões
+  em 140 arquivos versionados: zero ocorrências; capturas inspecionadas. Sem edição da v2.
+- **T020–T022 pendentes**: pacote preparado; solicitar autorização de push dev e escolha
+  de atualização de main. Nenhum git push executado. Leitura remota confirmou main
+  a94ce443299b4928d0f1e08cecdacf7a36ff5fb1 e branch dev ainda ausente.
+- **T023 executada com SC-004 pendente**: pedido ao autor para indicar segundo executor
+  enviado no chat. Nenhuma execução independente apresentada; REP-006B pendente,
+  declarado no README/registro. T023 assinala o tratamento exigido, não aprovação de SC-004.
+- **T024 concluída como encerramento parcial**: registro, plano da 006, índice de specs e
+  seção 9 do plano mestre atualizados; evidências/reprodução separadas de publicação e
+  SC-004 pendentes. Custo total conhecido incluindo preparação US$ 1,022566.
+- **T025 conferência final antes da publicação**: todos os itens restantes justificados,
+  links Markdown locais/âncoras sem erros, suíte e diff conferidos antes do commit final.
+  Nenhum extensions.yml presente: nenhum hook de pós-execução. Commit local autorizado;
+  envio remoto depende da autorização específica T020.

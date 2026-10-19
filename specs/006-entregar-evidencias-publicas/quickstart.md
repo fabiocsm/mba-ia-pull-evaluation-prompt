@@ -62,7 +62,9 @@ git clone . "$TMPDIR/rep-006" && git -C "$TMPDIR/rep-006" checkout "$COMMIT_ENTR
 
 `COMMIT_ENTREGA` é o commit registrado em T016; sem commits autorizados, usar cópia da árvore
 de trabalho sem `venv/`, `.env`, `results/` e `screenshots/`. Copiar o `.env` local e seguir
-`Como Executar`. O push reaplica descrição/tags sem nova revisão (HEAD `36a96c05`). Esperado: todos os passos com o
+`Como Executar`, incluindo o bloco `PRESERVAR_BASELINE_V1`: datas/estatísticas mudam
+no pull; guardar a coleta e comparar conteúdo/revisão antes de manter a v1 auditada.
+Esse ajuste foi validado em REP-006, sem mudar o script nem a referência. O push reaplica descrição/tags sem nova revisão (HEAD `36a96c05`). Esperado: todos os passos com o
 código documentado; experimento `REP-006` auditado, registrado com custo e identificado no
 README; divergências resolvidas ou pendentes explícitas. SC-004 exige ainda `REP-006B`: um
 segundo executor segue `Como Executar` a partir do fork com credenciais próprias; sem ele, o

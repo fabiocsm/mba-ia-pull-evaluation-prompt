@@ -88,10 +88,11 @@ no Hub na mesma sessão; páginas públicas de dataset/traces usam cabeçalho co
 | EV-23 | screenshot | trace médio | evidencias/avaliacao-v2-trace-medio-resposta.png | experiment_id d864cfbb-6ab9-4901-ab06-62f68ccd96fc | visível — 2026-10-19 | inspecionado; sem credenciais ou dados de acesso |
 | EV-24 | screenshot | trace médio | evidencias/avaliacao-v2-trace-medio.png | experiment_id d864cfbb-6ab9-4901-ab06-62f68ccd96fc | visível — 2026-10-19 | inspecionado; sem credenciais ou dados de acesso |
 | EV-25 | screenshot | trace simples | evidencias/avaliacao-v2-trace-simples.png | experiment_id d864cfbb-6ab9-4901-ab06-62f68ccd96fc | visível — 2026-10-19 | inspecionado; sem credenciais ou dados de acesso |
+| EV-26 | link_experimento | reprodução REP-006 | https://smith.langchain.com/public/72eee98c-a991-4c8e-b825-b2b9b898df14/d/compare?selectedSessions=e3211f91-99f5-41d6-bb7e-36aad1085974 | experiment_id e3211f91-99f5-41d6-bb7e-36aad1085974; hub_commit 36a96c05 | visível — 2026-10-19 | inspecionado; sem dados de acesso |
 
 ### Capturas reais
 
-A primeira linha do dashboard é CIC-03 (`9c836e20`); a interface arredonda as médias para
+Nas capturas anteriores à reprodução, a primeira linha do dashboard é CIC-03 (`9c836e20`); a interface arredonda as médias para
 0.88 / 0.88 / 0.85 / 0.85 / 0.90. A tabela foi rolada horizontalmente em duas capturas,
 sem editar o conteúdo. O navegador devolveu capturas em JPEG; foram recodificadas para PNG via sips, sem
 recorte, retoque ou alteração de conteúdo. Originais locais em results/capturas-originais/.
@@ -134,7 +135,7 @@ A inspeção não encontrou chaves, e-mails de acesso, cabeçalhos ou configura�
 
 ## RegistroReprodução
 
-`REP-006` (autor, clone limpo): em execução. Commit inicial `460bc3c227d4f5e002839f662a276bfb0ac15015`,
+`REP-006` (autor, clone limpo): **concluída e aprovada**, após correção documental. Commit inicial `460bc3c227d4f5e002839f662a276bfb0ac15015`,
 clone local sem hardlinks em diretório temporário da sessão, Python 3.11.14/venv novo,
 requirements.txt instalado, pip check aprovado, .env local copiado sem versionamento.
 
@@ -146,7 +147,51 @@ nessa tentativa. Correção documental: guardar `results/v1-nova-coleta.yml`, co
 revisão e metadados do template e restaurar baseline versionada somente com igualdade.
 Três testes offline verificam os caminhos de metadados dinâmicos, mensagem alterada e revisão
 divergente. Nenhuma alteração em pull_prompts.py, na v1 da entrega ou nos protegidos.
-A tentativa será retomada no passo afetado a partir do commit corrigido; custo LLM até aqui zero.
+A tentativa foi retomada no passo afetado a partir do commit corrigido
+`22e1e090a9786c79be8e11855e21430f264d9297` (`COMMIT_ENTREGA` efetivamente reproduzido).
+Até a retomada não houve custo LLM. O clone recebeu esse commit pelo fetch do repositório
+local, mantendo o venv novo e o .env local; nenhuma cópia de venv ou dependências da raiz.
+
+| Passo literal do README | Código | Resultado |
+| --- | --- | --- |
+| python3 -m venv / ativação / pip install | 0 | CPython 3.11.14; pins do requirements.txt instalados em venv novo |
+| pip check | 0 | Nenhum conflito |
+| Bloco de configuração | 0 | Variáveis presentes, tracing efetivo habilitado, COND-001 |
+| python src/pull_prompts.py | 0 | Origem/revisão iguais; snapshot da coleta arquivado |
+| PRESERVAR_BASELINE_V1 | 0 | Mensagens e revisão iguais; baseline v1 original preservada |
+| pytest tests/test_prompts.py -v | 0 | 466 aprovados |
+| pytest -q | 0 | 872 aprovados no clone corrigido |
+| python src/push_prompts.py | 0 | Revisão existente conferida após conflito; descrição/tags reaplicadas; nenhuma nova revisão |
+| AVALIACAO_DATASET | 0 | 15 casos, 5/7/3, idêntico; criado=false |
+| AVALIACAO_GATE | 0 | gate_ok; custo anterior 0.755018; HEAD 36a96c05 |
+| python src/evaluate.py com pipefail | 0 | APROVADO; novo experimento abaixo |
+| AVALIACAO_AUDITORIA | 0 | Completo, estável, aprovado; zero divergências |
+
+REP-006_EXPERIMENT_ID: `e3211f91-99f5-41d6-bb7e-36aad1085974`
+
+[Reprodução pública — não é o experimento final](https://smith.langchain.com/public/72eee98c-a991-4c8e-b825-b2b9b898df14/d/compare?selectedSessions=e3211f91-99f5-41d6-bb7e-36aad1085974), nome
+`fabiocsm-bug_to_user_story_v2-c6bb5cf0`. Execução iniciada em 2026-10-19T02:57:38-03:00;
+15 respostas/75 notas válidas, mesma revisão final nos 15 templates, HEAD antes/depois igual,
+nenhuma divergência da auditoria. Acesso público conferido no navegador integrado sem login.
+
+| Métrica da reprodução | Média |
+| --- | --- |
+| Helpfulness | 0.8767 |
+| Correctness | 0.8758 |
+| F1-Score | 0.8469 |
+| Clarity | 0.8487 |
+| Precision | 0.9047 |
+| Média geral | 0.8706 |
+
+Tokens reportados (nenhum substituído por estimativa): geração 27.671 entrada/6.455 saída;
+juízes 57.267 entrada/5.723 saída. Custo estimado US$ 0,267300 pelas tarifas de COND-001;
+acumulado das avaliações US$ 1,022318. Preparação anterior US$ 0,000248; total conhecido
+incluindo preparação US$ 1,022566. Cobrança efetiva não consultada; cálculo não desconta cache.
+Há notas individuais abaixo de 0.8, como Clarity/Precision 0.70 do caso #1. A reprodução
+não substitui CIC-03 nem afirma ausência de alucinações. Não houve edição da v2.
+Logs completos locais em results/REP-006-preflight.log e results/REP-006-execucao-auditoria.log;
+resumo auditado acima e experimento público são as evidências entregues, além dos logs locais.
+
 `REP-006B` (segundo_executor, fork público, credenciais próprias): pendente; SC-004 não é
 satisfeito pela reprodução do próprio autor.
 
@@ -155,8 +200,11 @@ satisfeito pela reprodução do próprio autor.
 Entrada em 2026-10-19: quatro hashes iguais a [integridade-inicial.json](integridade-inicial.json);
 v1 SHA-256 `2cddcf8f8183b4d29a5bca4d4efca17601962aa98ac75323f7dabbfa905c0d70`;
 v2 igual ao hash acima e HEAD público conferido. Dataset local: 15 casos, distribuição 5/7/3.
-Diff `main..dev` dos quatro protegidos vazio. Conferência final, regressão, provedores e
-varredura de segredos: pendentes (T019).
+Diff `main..dev` dos quatro protegidos vazio. Conferência final T019 em 2026-10-19: quatro protegidos e ambos os prompts iguais;
+OpenAI 1.6.2/Gemini 4.4.0 instalados; utils.py intacto. Varredura de 140 arquivos versionados
+por valores secretos reais do .env e padrões de chaves: zero ocorrências. Imagens inspecionadas
+visualmente. Testes 872 aprovados; git diff --check limpo. Links Markdown locais conferidos,
+incluindo âncoras; zero erros. Nova leitura do Hub após reprodução confirmou HEAD estável.
 
 ## PacoteEntrega
 
@@ -164,14 +212,22 @@ Fork: [fabiocsm/mba-ia-pull-evaluation-prompt](https://github.com/fabiocsm/mba-i
 público, fork de `devfullcycle/mba-ia-pull-evaluation-prompt`, branch padrão `main`.
 `origin/main` local aponta para `a94ce44`; consulta ao GitHub confirma o fork, sem fetch ou push.
 
-Estado: preparação em andamento; ainda não alcançou `preparado`.
+Estado: **preparado**, aguardando autorização explícita de push de dev e atualização de main (T020).
 Transições previstas: `preparado` → `autorizado` → `publicado` → `conferido`.
-Nenhum commit de entrega definido, nenhum push executado e nenhuma atualização de main.
+Commits locais autorizados: `460bc3c` (evidências/README) e `22e1e09` (roteiro corrigido);
+a reprodução usou o segundo, cujo hash completo está acima. Commit final de registro será
+identificado pelo histórico Git. Nenhum push executado e nenhuma atualização de main.
+Leitura `git ls-remote origin refs/heads/main refs/heads/dev` confirmou main remoto em
+`a94ce443299b4928d0f1e08cecdacf7a36ff5fb1`; dev ainda ausente no remoto.
 
 ## Encerramento
 
-Implementação em andamento. Evidências públicas, reprodução, publicação e segundo executor
-permanecem pendentes. Este registro não declara a entrega concluída.
+Encerramento parcial: evidências LangSmith públicas e conferidas; 16 PNG versionadas;
+README/testes/integração íntegros; REP-006 aprovada, custo acumulado das avaliações US$ 1,022318.
+CIC-03 continua final, média 0.8709. Publicação Git e conferência de main (T020–T022) aguardam
+autorização. SC-004 por segundo executor (REP-006B) permanece **pendente**: pedido feito ao autor,
+nenhuma execução independente apresentada até este registro. A reprodução do autor não o substitui.
+Este registro não declara a entrega integral concluída.
 
 ## Compartilhamento dos traces
 

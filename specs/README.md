@@ -1,6 +1,6 @@
 # Especificações do desafio
 
-**Data:** 2026-10-18
+**Data:** 2026-10-19
 
 **Estado:** seis especificações iniciais revisadas; planejamento, tarefas e análise
 da 001 concluídos. Preparação implementada: 30/30 tarefas (incluindo duas de convergência), ambiente, integridade,
@@ -16,7 +16,7 @@ tarefas da 003 concluídos; análise realizada com I1 corrigido e revalidado.
 Ela foi implementada: 30/30 tarefas, 188 testes da v2 e
 266 regressões aprovados, revisão semântica/documental e integridade conferidas.
 O planejamento, as tarefas e a análise da 004 foram concluídos em 2026-10-18;
-A1 corrigido e revalidado documentalmente. A 004 está implementada e comprovada: 35/35 tarefas, 437 testes de prompt/publicação e 266 regressões, escrita real e leitura pública/visual da revisão 4278de75. Em 2026-10-18 a 005 passou a ser a spec ativa e teve plano técnico e 35 tarefas concluídos ([plano](005-avaliar-iterar-v2/plan.md), [tarefas](005-avaliar-iterar-v2/tasks.md)) e duas análises SDD com achados corrigidos; Em 2026-10-19 a implementação da 005 foi concluída: 35/35 tarefas, 85 testes offline dos blocos de auditoria (817 na suíte), dataset `8c78638d-37a5-4175-9984-8db0e3473228` criado e auditado idêntico, três ciclos reais: `CIC-01` (revisão 4278de75, F1-Score 0.8057) e, por decisão do autor, `CIC-02` (25b881d1) e `CIC-03` (revisão 36a96c05, experimento `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`) completo, vinculado e aprovado pela regra integral (média geral 0.8709; menor média F1-Score 0.8474), com custo estimado acumulado de US$ 0,76 ([registro](../docs/avaliacao-v2.md)). A spec 006 e as evidências públicas permanecem pendentes. Em 2026-10-19 a 006 passou a ser a spec ativa e teve [plano técnico](006-entregar-evidencias-publicas/plan.md) concluído (pesquisa D01–D09, contrato E01–E09, guia W01–W09); tarefas e implementação pendentes. Evidências e limites nos registros de
+A1 corrigido e revalidado documentalmente. A 004 está implementada e comprovada: 35/35 tarefas, 437 testes de prompt/publicação e 266 regressões, escrita real e leitura pública/visual da revisão 4278de75. Em 2026-10-18 a 005 passou a ser a spec ativa e teve plano técnico e 35 tarefas concluídos ([plano](005-avaliar-iterar-v2/plan.md), [tarefas](005-avaliar-iterar-v2/tasks.md)) e duas análises SDD com achados corrigidos; Em 2026-10-19 a implementação da 005 foi concluída: 35/35 tarefas, 85 testes offline dos blocos de auditoria (817 na suíte), dataset `8c78638d-37a5-4175-9984-8db0e3473228` criado e auditado idêntico, três ciclos reais: `CIC-01` (revisão 4278de75, F1-Score 0.8057) e, por decisão do autor, `CIC-02` (25b881d1) e `CIC-03` (revisão 36a96c05, experimento `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`) completo, vinculado e aprovado pela regra integral (média geral 0.8709; menor média F1-Score 0.8474), com custo estimado acumulado de US$ 0,76 ([registro](../docs/avaliacao-v2.md)). A 006 é a spec ativa e teve [plano técnico](006-entregar-evidencias-publicas/plan.md), tarefas e implementação local concluídos até a preparação do pacote; evidências LangSmith públicas e reprodução aprovadas, publicação Git e SC-004 por segundo executor pendentes (estado atual abaixo). Evidências e limites nos registros de
 [preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
@@ -72,6 +72,16 @@ Os achados I1, A1 e I2 da análise da 001 foram corrigidos: seleção de modelos
 da validação da configuração, distinção entre contexto comprovado e projeto ainda
 ausente, e remoção do caractere isolado no plano. Dependências e rastreabilidade
 foram atualizadas antes da implementação; os resultados atuais estão no registro acima.
+
+## Entrega da 006 — estado atual
+
+Em 2026-10-19, evidências LangSmith públicas conferidas sem login e 16 PNG versionadas;
+README preserva o enunciado e consolida as três seções. REP-006 (mesma revisão final)
+aprovada, 15 respostas/75 notas, média 0.8706, custo US$ 0,267300; 872 testes aprovados.
+Pacote preparado em dev, com commits locais autorizados; push e atualização de main
+aguardam autorização. SC-004 por segundo executor permanece pendente. Ciclo final
+CIC-03 continua com média 0.8709. [Registro público e limites](../docs/entrega-publica.md).
+O estado descrito acima para a fase de planejamento é histórico.
 
 ## Avaliação do plano e decisão de divisão
 
