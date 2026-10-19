@@ -622,10 +622,12 @@ números, prioridade ou prazo” limita essa atuação.
 **Few-shot Learning.** Três pares próprios completos em System demonstram decisões
 e saídas: audioguia do museu (simples), ficha do acervo (ambíguo/incompleto) e mapa
 de trilhas (múltiplos problemas, log e instrução conflitante). No primeiro, a entrada
-“aperto Pausar e a narração continua tocando” resulta no critério “Dada uma narração
-em reprodução, ao acionar Pausar, o áudio deixa de tocar”. No segundo, a saída pede
+“aperto Pausar e a narração continua tocando” resulta em quatro critérios no padrão
+Dado/Quando/Então, como “Dado que uma narração está em reprodução, quando aciono Pausar,
+então o áudio deixa de tocar” e a retomada do ponto em que parou. No segundo, a saída pede
 “Qual conteúdo da ficha fica errado e qual deveria aparecer?”, sem fabricar história.
-No terceiro, critérios separados cobrem legenda e escala, enquanto o log permanece
+No terceiro, critérios separados cobrem legenda e escala, um critério técnico decorre
+do log informado, enquanto o log permanece
 contexto e a tentativa de trocar a tarefa não é seguida. São exemplos redigidos
 para o prompt, não saídas obtidas de um LLM.
 
@@ -660,7 +662,7 @@ estruturais não comprovam a resposta futura de um modelo.
 | Saída | Pedido genérico de User Story | Português, Markdown, história e critérios verificáveis |
 | Exemplos | Ausentes | Três pares completos de entrada/saída |
 | Bordas | Não orientadas | Seis grupos com fundamentação e perguntas |
-| Evidência numérica | Sem baseline real | `CIC-01` aprovado na 005 ([registro](docs/avaliacao-v2.md)) |
+| Evidência numérica | Sem baseline real | `CIC-02` aprovado na 005, média geral 0.8733 ([registro](docs/avaliacao-v2.md)) |
 
 ## Resultados Finais
 
@@ -677,11 +679,15 @@ contra o YAML intacto. [Prompt público](https://smith.langchain.com/hub/fabiocs
 437 testes de prompt/publicação e 266 regressões passaram. As tentativas com
 falhas e os ajustes de compatibilidade estão preservados no registro.
 
-A spec 005 avaliou essa revisão sem edição: experimento `CIC-01` completo (15 respostas,
-75 notas válidas), vinculado à revisão e **aprovado** pela regra integral — Helpfulness
-0.8687, Correctness 0.8492, F1-Score 0.8057, Clarity 0.8447, Precision 0.8927, média
-geral 0.8522 — com aprovação antecipada justificada e custo estimado de US$ 0,22. Detalhes,
-análise e traces no [registro da avaliação](docs/avaliacao-v2.md). Link público do
+A spec 005 avaliou essa revisão (`CIC-01`, aprovada com F1-Score 0.8057) e, por decisão
+do autor diante da margem estreita, executou `CIC-02`: a v2 passou a exigir critérios
+Dado/Quando/Então que cobrem também os resultados decorrentes do comportamento esperado e
+critérios técnicos para detalhes informados, publicada como revisão
+`25b881d11f98916a66c9f0a8e00b07c4065d9895a935efabf776a9f5f2605e15`. O experimento final é
+completo (15 respostas, 75 notas válidas), vinculado à revisão e **aprovado** pela regra
+integral — Helpfulness 0.8837, Correctness 0.8738, F1-Score 0.8416, Clarity 0.8613,
+Precision 0.9060, média geral 0.8733 — com custo estimado acumulado de US$ 0,48. Detalhes,
+análise, traces e limitações no [registro da avaliação](docs/avaliacao-v2.md). Link público do
 dataset/experimentos, screenshots das cinco notas e tracing detalhado de três
 exemplos: **pendentes na 006**. O link público acima comprova o prompt; o dataset e o
 experimento ainda estão apenas no workspace do autor, sem acesso público. As ilustrações do enunciado não representam resultados desta entrega.

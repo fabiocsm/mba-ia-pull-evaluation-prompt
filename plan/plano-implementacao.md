@@ -15,7 +15,7 @@ A 003 está implementada e validada localmente: 30/30 tarefas, 188 testes da v2 
 [registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
 O planejamento e as [35 tarefas da spec 004](../specs/004-publicar-prompt-v2/tasks.md)
 foram concluídos em 2026-10-18; ela é a spec ativa. Análise da 004 realizada com
-A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Em 2026-10-18 a 005 passou a ser a spec ativa e seu [plano técnico](../specs/005-avaliar-iterar-v2/plan.md) foi concluído, com 35 tarefas e duas análises SDD corrigidas. Em 2026-10-19 a implementação da 005 foi concluída: 35/35 tarefas, 85 testes offline dos blocos de auditoria (817 na suíte), dataset `8c78638d-37a5-4175-9984-8db0e3473228` criado e auditado idêntico, e experimento real `CIC-01` (`86196746-1c83-42cc-868b-6b57f977f19b`) da revisão 4278de75 completo, vinculado e aprovado pela regra integral (média geral 0.8522; menor média F1-Score 0.8057), com aprovação antecipada justificada e custo estimado de US$ 0,22 ([registro](../docs/avaliacao-v2.md)). Evidências públicas e a spec 006 permanecem pendentes.
+A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Em 2026-10-18 a 005 passou a ser a spec ativa e seu [plano técnico](../specs/005-avaliar-iterar-v2/plan.md) foi concluído, com 35 tarefas e duas análises SDD corrigidas. Em 2026-10-19 a implementação da 005 foi concluída: 35/35 tarefas, 85 testes offline dos blocos de auditoria (817 na suíte), dataset `8c78638d-37a5-4175-9984-8db0e3473228` criado e auditado idêntico, `CIC-01` (revisão 4278de75, aprovado com F1-Score 0.8057) e, por decisão do autor, `CIC-02` (revisão 25b881d1, experimento `c7d175e1-0f37-4afe-9b2a-88e061b01666`) completo, vinculado e aprovado pela regra integral (média geral 0.8733; menor média F1-Score 0.8416), com custo estimado acumulado de US$ 0,48 ([registro](../docs/avaliacao-v2.md)). Evidências públicas e a spec 006 permanecem pendentes.
 
 ## 1. Objetivo e referências
 
@@ -66,7 +66,7 @@ obrigatória para aceite da 004 e entrega à 005. Revalidação documental no
 concluído em 2026-10-18 com a 005 como spec ativa, detalha as Fases 6–7: auditoria do
 dataset antes do primeiro experimento, vínculo de cada run ao commit do Hub, 75 notas
 válidas sem zeros de falha dos juízes, regra integral, ciclos e custo. A 005 foi implementada
-em 2026-10-19 (`CIC-01` aprovado; [registro](../docs/avaliacao-v2.md)); plano/tarefas da 006 e
+em 2026-10-19 (`CIC-02` aprovado após `CIC-01`; [registro](../docs/avaliacao-v2.md)); plano/tarefas da 006 e
 evidências públicas permanecem pendentes; este plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório

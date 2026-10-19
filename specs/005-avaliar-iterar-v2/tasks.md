@@ -14,7 +14,7 @@ description: "Tarefas da spec 005: avaliação íntegra e otimização guiada po
 Aceite da 004 e revisão `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`
 em [publicação da v2](../../docs/publicacao-v2.md) são pré-requisitos.
 
-**Estado**: 35/35 tarefas concluídas em 2026-10-19 (T024–T028 e T032 registradas como não aplicáveis, com justificativa). `CIC-01` real completo e aprovado; ver [registro de execução](#registro-de-execução).
+**Estado**: 35/35 tarefas concluídas em 2026-10-19. `CIC-01` aprovado; por decisão do autor, `CIC-02` (T024–T025) executado e aprovado como final; T026–T028 não aplicáveis com justificativa; ver [registro de execução](#registro-de-execução).
 Duas análises SDD realizadas. Achados C1, I1, I2, U1, D1, I3, P1, U2, A1, I4 e U3 da
 primeira (ver [correção da análise](#correção-da-análise--2026-10-18)) e G1, U1, U2, I1,
 I2, U3, U4, I3 e A1 da segunda (ver [segunda correção](#segunda-correção-da-análise--2026-10-18))
@@ -437,3 +437,31 @@ seguir a ordem dataset → gate.
   ao dataset/experimentos, screenshots, seções finais do README e push Git.
 
 `.specify/extensions.yml` ausente: nenhum hook antes ou depois da implementação.
+
+### Reabertura por decisão do autor — CIC-02, 2026-10-19
+
+Pedido do autor após o aceite: “F1 at 0.8057 is too tight. Open CIC-02 with an F1/omission
+hypothesis and run a full cycle.” T024/T025 deixaram de ser não aplicáveis e foram executadas;
+T029–T035 foram refeitas sobre o novo experimento final.
+
+- **T024**: problema/hipótese registrados às 00:47:45-03:00, antes da edição (F1 → omissões,
+  D10). Edição só da v2 (critérios Dado/Quando/Então com resultados decorrentes, critérios
+  técnicos, 3–5 critérios em bug simples, dúvidas só bloqueantes; Exemplos 1 e 3). Testes:
+  `tests/test_prompts.py` 466 e suíte 817 aprovados (o teste documental foi ajustado para
+  aceitar ciclo **Em andamento** apenas com a decisão de parada reaberta). Push 00:48:49-03:00
+  código 0, `publication=confirmada`, revisão `25b881d1…5e15`; inspeção sem login no navegador
+  integrado; commit local `c40f511`.
+- **T025**: dataset `idêntico` (leitura) → gate `gate_ok` (custo 0.222376) → avaliação
+  03:49:37–03:50:50 UTC, `AVALIACAO_EXIT_CODE=0` → auditoria `aprovado`: experimento
+  `c7d175e1-0f37-4afe-9b2a-88e061b01666`, 15 runs, 75 notas válidas, vínculo confirmado,
+  médias 0.8837/0.8738/0.8416/0.8613/0.9060, média geral 0.8733, US$ 0,262344.
+- **T026–T028**: não aplicáveis — `CIC-02` aprovado; C09 proíbe ciclos só para completar a contagem.
+- **T029/T030**: decisão de parada (aprovação em `CIC-02`, 2 ciclos, acumulado US$ 0,484720) e
+  tabela comparativa com as duas linhas; `CIC-01` marcado `substituído` (FR-010).
+- **T031/T032**: SC-005 conferido para `25b881d1`; três traces de `CIC-02` (#1 simple, #10
+  medium, #15 complex) registrados, com a limitação do número “1 segundo” inventado em #10.
+- **T033–T035**: README (citação do Exemplo 1 e resultados), índices e `plan.md` atualizados;
+  verificações finais abaixo.
+- **V11 após CIC-02**: hashes dos quatro protegidos e da v1 inalterados; v2 `5222d484…7857`
+  igual à revisão avaliada; `git diff --check` aprovado; nenhum valor de credencial ou padrão
+  de chave nos arquivos alterados; links locais resolvidos; `pytest -q` → **817 passed**.

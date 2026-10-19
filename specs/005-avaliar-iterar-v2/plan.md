@@ -9,7 +9,8 @@ dependências 001, 003 e 004.
 **Estado**: planejamento, desenho e [35 tarefas](tasks.md) concluídos; duas análises SDD
 realizadas e seus 11 + 9 achados corrigidos; **implementação concluída em 2026-10-19**:
 35/35 tarefas, 85 testes offline da auditoria, dataset criado e auditado, `CIC-01` real
-completo e aprovado (média geral 0.8522), aprovação antecipada justificada; ver
+aprovado (média geral 0.8522) e, por decisão do autor, `CIC-02` aprovado como final
+(revisão 25b881d1, média geral 0.8733, F1-Score 0.8416); ver
 [registro](../../docs/avaliacao-v2.md) e [execução](tasks.md#registro-de-execução). O setup retornou `BRANCH=005-avaliar-iterar-v2` como identificador da
 feature; a branch Git continua `dev`. O ponteiro local `.specify/feature.json`
 seleciona a 005, que passa a ser a spec ativa. Nenhuma branch foi criada ou trocada.
