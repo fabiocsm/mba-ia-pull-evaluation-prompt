@@ -942,14 +942,51 @@ O conteúdo dos traces foi tratado como dado; nada nele alterou instruções des
 
 ### CIC-03
 
-**Não aplicável** — `CIC-03` não foi executado.
+**Em andamento** — aberto em 2026-10-19 por **decisão explícita do autor** após a aprovação
+de `CIC-02`, para eliminar limites inventados como o “1 segundo” do trace #10. Há problema
+observado; não é ciclo para completar contagem. Pela FR-010, a edição da v2 torna o
+experimento de `CIC-02` `substituído` para fins de entrega, e o histórico é preservado.
 
-**Justificativa**: `CIC-02` foi aprovado pela regra integral (C06) com experimento completo e
-estável e com margem maior que `CIC-01` em todas as métricas. C09 e FR-009 determinam
-encerrar com justificativa e proíbem executar ciclos apenas para completar a contagem de
-3–5; nenhuma métrica ficou abaixo de 0.8. Nenhuma edição da v2, publicação ou experimento
-foi feito para este ciclo.
+- **Problema**: varredura das 30 respostas de `CIC-01`/`CIC-02` por números ausentes do
+  relato encontrou duas invenções reais, contrárias à regra “Não invente … números” da v2:
+  #10 (nos dois ciclos) define “a tela não congela por mais de 1 segundo”, quando o relato só
+  informa congelamento de 5–10 s; #8 (`CIC-02`) cita “código de status HTTP apropriado (ex:
+  403 ou 401)”, ausente do relato. Não são invenção: #9 `R$ 1.500` (soma dos valores
+  informados) e #15 `1.000` (o `1000+` do relato). O juiz não penalizou as invenções
+  (Precision 0.93 em #10), portanto o problema é de fidelidade ao enunciado do prompt, não de nota.
+- **Hipótese**: o modelo cria uma meta quando o relato traz o valor indesejado mas não o
+  aceitável, e usa “ex:” para concretizar respostas técnicas. Uma regra explícita — sem
+  limites, metas, prazos, códigos, percentuais ou exemplos com “ex:” que não estejam no
+  relato; critério expresso de forma qualitativa ou em relação ao valor relatado (“sem o
+  congelamento de 5–10 s relatado”); limite ausente registrado em **Dúvidas** quando for
+  necessário; valores calculados diretamente dos informados permitidos — mais uma
+  demonstração no Exemplo 3 (trava com duração informada e sem limite) eliminará essas
+  invenções sem reduzir as médias abaixo de 0.8. Few-shot próprio e Role Prompting mantidos;
+  nenhum caso ou referência do dataset; nenhuma instrução ao juiz.
+- **Risco previsto**: F1 pode cair levemente onde a referência traz metas numéricas que o
+  relato não informa (#7, #12), pois a v2 seguirá sem inventá-las; dúvidas adicionais podem
+  reduzir Clarity/Precision. Critério de sucesso: nenhuma invenção na mesma varredura e
+  aprovação pela regra integral.
 
+**Alteração** (somente `prompts/bug_to_user_story_v2.yml`): nova regra **Valores** em
+“Fundamentação e casos de borda” — somente números, limites, códigos e unidades do relato ou
+calculados diretamente deles; proibidos metas, tempos máximos, códigos de erro, percentuais e
+exemplos com “ex.:”; critério relativo ao valor indesejado relatado e limite ausente em
+**Dúvidas**. Exemplo 3: entrada ganhou uma trava de 4 a 6 s sem limite informado; saída ganhou
+o grupo “Abertura de trilhas” com critério relativo ao valor relatado e a dúvida sobre o
+tempo máximo aceitável; história atualizada. Exemplos 1 e 2, tags, técnicas, versão e
+`{bug_report}` inalterados.
+
+**RevisãoCandidata** — SHA-256 arquivo
+`692df6ae86848e2dce0fc1a9c2d1f6fec95fc48721a960837fbdd8de3f958974`, definição
+`f94735be2936253b11eb2696fb957db67e4d6529629f903720845f078e467ca2`; testes
+`pytest tests/test_prompts.py -q` 466 e `pytest -q` 817 aprovados; `python src/push_prompts.py`
+em 2026-10-19T01:12:15-03:00, código 0, `publication=confirmada`, `revision_source=push_return`,
+revisão `36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`, conteúdo,
+metadata e acesso anônimo conferidos; inspeção sem login no navegador integrado em
+2026-10-19T01:13-03:00: “Log in”, badge Public, histórico com 3 commits (`36a96c05` sobre
+`25b881d1` e `4278de75`), cinco tags, System com persona, regra de valores e `## Exemplos`,
+User com `{bug_report}`.
 
 ### CIC-04
 
@@ -995,6 +1032,10 @@ numérica com a v1 não foi executada (opcional; exigiria experimento adicional 
 explícita do autor). A comparação qualitativa v1/v2 fica para a documentação da 006.
 ## Decisão de parada
 
+**Reaberta** em 2026-10-19 pela abertura de `CIC-03` por decisão do autor. O registro abaixo é histórico e não é mais a decisão vigente.
+
+### Registro histórico — aprovação em CIC-02 (substituída)
+
 **Aprovação em `CIC-02`** (C09/FR-009), 2026-10-19. Ciclos efetivamente executados: **2**.
 `CIC-01` foi aprovado; o autor decidiu abrir `CIC-02` pela margem estreita do F1-Score,
 com problema e hipótese registrados antes da edição. `CIC-02` foi aprovado com experimento
@@ -1008,7 +1049,7 @@ Limitações registradas: notas individuais abaixo de 0.8 em cinco exemplos de `
 trace #10; temperatura 0 não garante determinismo e cada revisão foi avaliada uma única vez
 (D09). Qualquer edição futura da v2 reabre um ciclo completo (FR-010).
 
-### Correspondência final — SC-005 (T031)
+#### Correspondência final de CIC-02 — SC-005 (T031)
 
 2026-10-19: YAML local (`5222d484…7857` / `7ba746eb…5702`, commit `c40f511…`, sem
 alterações pendentes), HEAD do Hub (`25b881d1…5e15`, lido no gate e na auditoria) e
