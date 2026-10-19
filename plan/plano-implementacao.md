@@ -15,7 +15,7 @@ A 003 está implementada e validada localmente: 30/30 tarefas, 188 testes da v2 
 [registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
 O planejamento e as [35 tarefas da spec 004](../specs/004-publicar-prompt-v2/tasks.md)
 foram concluídos em 2026-10-18; ela é a spec ativa. Análise da 004 realizada com
-A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Implementação das specs 005–006 e avaliações acadêmicas reais permanecem pendentes.
+A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Em 2026-10-18 a 005 passou a ser a spec ativa e seu [plano técnico](../specs/005-avaliar-iterar-v2/plan.md) foi concluído, com 35 tarefas e duas análises SDD corrigidas. Implementação das specs 005–006 e avaliações acadêmicas reais permanecem pendentes.
 
 ## 1. Objetivo e referências
 
@@ -62,9 +62,11 @@ mais gates locais e prova remota final. As tarefas foram concluídas na implemen
 e nas tarefas: sucesso automatizado do CLI separado da inspeção visual posterior,
 obrigatória para aceite da 004 e entrega à 005. Revalidação documental no
 [registro de A1](../specs/004-publicar-prompt-v2/tasks.md#correção-da-análise--a1).
-004 implementada e comprovada; próxima etapa: planejar a 005 após seleção explícita.
-Planos/tarefas das specs 005–006
-e avaliações reais permanecem pendentes; este plano continua sendo referência.
+004 implementada e comprovada. O [plano técnico da 005](../specs/005-avaliar-iterar-v2/plan.md),
+concluído em 2026-10-18 com a 005 como spec ativa, detalha as Fases 6–7: auditoria do
+dataset antes do primeiro experimento, vínculo de cada run ao commit do Hub, 75 notas
+válidas sem zeros de falha dos juízes, regra integral, ciclos e custo. Implementação da 005,
+plano/tarefas da 006 e avaliações reais permanecem pendentes; este plano continua sendo referência.
 
 ## 2. Diagnóstico do repositório
 
@@ -145,7 +147,8 @@ das validações de cada fase; este quadro não declara implementação concluí
 - [x] Usar `$speckit-specify` para especificar o fluxo completo e os critérios da seção 6,
   desdobrados nas [seis specs iniciais](../specs/README.md).
 - [ ] Usar `$speckit-clarify` somente para lacunas que alterem o comportamento ou o aceite.
-- [ ] Usar `$speckit-plan` para detalhar contratos YAML/CLI, decisões e guia de execução.
+- [ ] Usar `$speckit-plan` para detalhar contratos YAML/CLI, decisões e guia de execução
+  (001–005 planejadas; 006 pendente).
 - [ ] Usar `$speckit-tasks` para decompor as fases em tarefas dependentes e verificáveis.
 - [ ] Usar `$speckit-analyze` para conferir consistência e cobertura antes de implementar.
 

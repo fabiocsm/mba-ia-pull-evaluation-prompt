@@ -16,7 +16,7 @@ tarefas da 003 concluídos; análise realizada com I1 corrigido e revalidado.
 Ela foi implementada: 30/30 tarefas, 188 testes da v2 e
 266 regressões aprovados, revisão semântica/documental e integridade conferidas.
 O planejamento, as tarefas e a análise da 004 foram concluídos em 2026-10-18;
-A1 corrigido e revalidado documentalmente. A 004 está implementada e comprovada: 35/35 tarefas, 437 testes de prompt/publicação e 266 regressões, escrita real e leitura pública/visual da revisão 4278de75. Ela continua ativa. Planos/tarefas e implementação das specs 005–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
+A1 corrigido e revalidado documentalmente. A 004 está implementada e comprovada: 35/35 tarefas, 437 testes de prompt/publicação e 266 regressões, escrita real e leitura pública/visual da revisão 4278de75. Em 2026-10-18 a 005 passou a ser a spec ativa e teve plano técnico e 35 tarefas concluídos ([plano](005-avaliar-iterar-v2/plan.md), [tarefas](005-avaliar-iterar-v2/tasks.md)) e duas análises SDD com achados corrigidos; implementação da 005, a spec 006 e os experimentos permanecem pendentes. Evidências e limites nos registros de
 [preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
@@ -212,13 +212,13 @@ foram verificados e não havia hooks a executar. Nenhuma branch foi criada ou tr
 `dev` é a branch de trabalho existente, independente dos diretórios de spec.
 
 O ponteiro local `.specify/feature.json` foi atualizado em cada aplicação e agora
-seleciona `specs/004-publicar-prompt-v2`, conforme solicitação do autor. Esse
+seleciona `specs/005-avaliar-iterar-v2`, conforme solicitação do autor. Esse
 arquivo é ignorado pelo Git por ser estado local. Para selecionar explicitamente uma
 spec antes da próxima skill, use a raiz do repositório e a variável reconhecida pelos
 scripts locais:
 
 ```bash
-export SPECIFY_FEATURE_DIRECTORY=specs/004-publicar-prompt-v2
+export SPECIFY_FEATURE_DIRECTORY=specs/005-avaliar-iterar-v2
 # Em seguida, invocar $speckit-implement nesta conversa para essa feature.
 ```
 
@@ -231,8 +231,21 @@ com a baseline preservada; a 003 também foi implementada. O planejamento da 004
 e a geração de tarefas foram concluídos em 2026-10-18; a análise identificou A1,
 corrigido e revalidado documentalmente. Seus requisitos estão rastreados no
 plano/contrato/guia e nas 35 tarefas concluídas, com tentativas e ajustes registrados.
-A feature ativa é a 004, selecionada explicitamente pelo autor, sem trocar `dev`.
-A implementação da 004 foi concluída. Próxima etapa: selecionar explicitamente a 005 e executar seu planejamento/tarefas/análise antes da implementação. [Evidências e gate à avaliação](../docs/publicacao-v2.md).
+A feature ativa passou a ser a 005, selecionada explicitamente pelo autor, sem trocar `dev`.
+A implementação da 004 foi concluída. A 005 foi selecionada explicitamente como feature ativa e seu
+[plano](005-avaliar-iterar-v2/plan.md) foi concluído com [pesquisa](005-avaliar-iterar-v2/research.md),
+[modelo de dados](005-avaliar-iterar-v2/data-model.md),
+[contrato](005-avaliar-iterar-v2/contracts/avaliacao-v2.md) e
+[guia de validação](005-avaliar-iterar-v2/quickstart.md): dataset auditado antes do primeiro
+experimento, vínculo por commit do Hub em cada run, 75 notas válidas sem zeros de falha
+dos juízes, regra integral e 3–5 ciclos com gate de custo. As [35 tarefas da 005](005-avaliar-iterar-v2/tasks.md) foram geradas em 2026-10-18:
+Setup (3), Foundational (2), US1 (12), US2 (4), US3 (9) e Polish (5). A análise SDD da 005 encontrou 11 achados
+(1 CRITICAL: inspeção no dashboard das novas revisões), todos corrigidos e registrados
+em [correção da análise](005-avaliar-iterar-v2/tasks.md#correção-da-análise--2026-10-18).
+A segunda análise encontrou 9 achados (1 HIGH: gate sem conferir dataset/workspace e
+executado antes do dataset), todos corrigidos em
+[segunda correção](005-avaliar-iterar-v2/tasks.md#segunda-correção-da-análise--2026-10-18);
+commits locais por ciclo autorizados pelo autor. Próxima etapa: `$speckit-implement` da 005. [Evidências e gate à avaliação](../docs/publicacao-v2.md).
 A reprodução da 001 usa um executor Python separado na mesma máquina; não equivale
 a revisão humana independente nem comprova portabilidade para outro SO.
 A Fase 0 do plano mestre permanece parcialmente pendente.
