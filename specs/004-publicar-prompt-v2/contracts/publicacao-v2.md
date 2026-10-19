@@ -113,7 +113,7 @@ Timeout/retorno inválido não prova inexistência de escrita; investigar por le
 
 ## C06 — Confirmação e resolução da revisão
 
-O retorno deve ser URL não vazia do serviço esperado e do prompt correto, sem
+No caminho normal, o retorno deve ser URL não vazia do serviço esperado e do prompt correto, sem
 userinfo ou parâmetros secretos. No SDK 0.13.0, aceitar os formatos reconhecidos
 `/prompts/{name}/{prefixo}` e `/hub/{owner}/{name}:{prefixo}`, validando owner
 quando presente. Não imprimir retornos arbitrários. Guardar a URL válida retornada
@@ -137,7 +137,7 @@ uma inspeção posterior obrigatória para o aceite da 004 e a entrega à 005.
    idênticos a C03. Comparar metadados autorais; conferir separadamente
    `lc_hub_owner`, `lc_hub_repo`, `lc_hub_commit_hash` adicionados pelo SDK.
 2. Consultar `get_prompt(destino)`: conferir owner/nome, descrição, conjunto de
-   tags esperado, `is_public is True` e `last_commit_hash == hash_completo`.
+   tags autorais esperado (mais somente a tag técnica opcional `ChatPromptTemplate`), `is_public is True` e `last_commit_hash == hash_completo`.
    Retorno `None` ou acesso negado não são confirmação. Guardar snapshot datado.
 3. Em nova `requests.Session`, definir `trust_env=False`, sem auth/cookies ou
    headers secretos; GET no endpoint configurado `/repos/{owner}/{name}` e
@@ -230,3 +230,30 @@ para impor esse gate. Cada experimento liga-se ao registro desta feature.
 Conclusão da 004 exige escrita pública real, equivalência e documentação; não
 comprova 15 respostas, 75 feedbacks, métricas `>= 0.8`, 3–5 iterações ou dataset
 compartilhado. Essas provas pertencem às specs 005/006.
+
+## Descoberta na implementação — tag técnica do serviço (2026-10-18)
+
+A primeira escrita real acrescentou `ChatPromptTemplate` às cinco tags autorais.
+Confirmado por leitura autenticada; registro PUB-004-01 em
+[publicação](../../../docs/publicacao-v2.md). A comparação exige o conjunto autoral
+integral e admite somente essa tag técnica opcional adicional; desconhecidas
+continuam divergentes. O snapshot registra todas as tags observadas. A projeção
+no push permanece inalterada. Esta correção operacional não altera o YAML nem
+requisitos acadêmicos de descrição, técnicas e tags. Complementa a regra de
+igualdade de tags acima, que não previa metadados derivados pelo serviço.
+
+## Descoberta na implementação — conflito no reuso de commit (2026-10-18)
+
+O SDK/serviço retornou `LangSmithConflictError` ao reenviar conteúdo já existente
+(PUB-004-02/03). Complemento excepcional a C05/C06/C08: depois de uma única
+chamada de push, esse conflito permite somente leitura para conferir uma revisão
+existente. O HEAD serve como candidato existente, nunca como identidade de escrita
+própria. Exigir hash completo e todos os gates C07/estabilidade; o manifesto
+precisa ser exatamente igual ao local antes de desserializar. Outra exceção ou
+qualquer divergência reprova. Sem retry de escrita ou sucesso pelo conflito em si.
+
+O resumo registra `returned_url: null`, `revision_source: existing_after_conflict`
+e `publication: revisão existente conferida; push em conflito`. Não se fabrica
+URL devolvida pelo SDK nem se alega nova revisão criada. URLs anônimas continuam
+sendo as efetivamente verificadas. O fluxo normal mantém a regra prefixo do
+retorno → hash completo. Materializa C10 (reuso permitido) sem relaxar o enunciado.

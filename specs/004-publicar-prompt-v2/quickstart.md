@@ -206,3 +206,14 @@ concluídos com serviço externo impedido devem permanecer como implementação
 concluída e prova remota pendente. Publicação aprovada não significa aprovação
 acadêmica: cinco métricas e média `>= 0.8`, 15 respostas/75 feedbacks e evidências
 finais continuam nas specs 005/006.
+
+## Compatibilidade observada na execução da 004
+
+O serviço acrescenta a tag técnica `ChatPromptTemplate`: a conferência aceita
+somente essa tag extra conhecida e conserva todas as autorais. Reenvio idêntico
+pode gerar `LangSmithConflictError`; nesse caso o script não repete push e confere
+uma revisão existente por hash completo/manifesto e todos os gates. O resumo tem
+`returned_url: null` e procedência `existing_after_conflict`, sem atribuir o HEAD
+a uma nova escrita própria. O caminho normal continua resolvendo a URL retornada.
+Consulte o histórico de tentativas em `docs/publicacao-v2.md` e os complementos
+C05–C08 no contrato. Uma divergência continua retornando 1.

@@ -16,9 +16,7 @@ tarefas da 003 concluídos; análise realizada com I1 corrigido e revalidado.
 Ela foi implementada: 30/30 tarefas, 188 testes da v2 e
 266 regressões aprovados, revisão semântica/documental e integridade conferidas.
 O planejamento, as tarefas e a análise da 004 foram concluídos em 2026-10-18;
-A1 corrigido e revalidado documentalmente. Ela é a spec ativa.
-Planos/tarefas das specs 005–006, implementação das
-004–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
+A1 corrigido e revalidado documentalmente. A 004 está implementada e comprovada: 35/35 tarefas, 437 testes de prompt/publicação e 266 regressões, escrita real e leitura pública/visual da revisão 4278de75. Ela continua ativa. Planos/tarefas e implementação das specs 005–006 e experimentos permanecem pendentes. Evidências e limites nos registros de
 [preparação](../docs/preparacao.md) e [recuperação](../docs/recuperacao-v1.md).
 
 O [plano da 001](001-preparar-experimentos/plan.md) detalha a Fase 1 do plano mestre,
@@ -51,14 +49,13 @@ detalha a Fase 5, com [pesquisa](004-publicar-prompt-v2/research.md),
 [guia de validação](004-publicar-prompt-v2/quickstart.md). Define validação antes
 da escrita, metadados suportados pelo SDK, revisão exata e acesso anônimo,
 distinguindo confirmação de publicação de conferência completa. O plano foi
-concluído sem implementação, push ou chamadas LLM; publicação e métricas ainda
-não foram executadas.
+concluído sem implementação naquela etapa; publicação/conferência foram executadas posteriormente, sem chamadas LLM. Métricas continuam pendentes.
 As [35 tarefas da 004](004-publicar-prompt-v2/tasks.md) foram geradas: Setup (2),
 Foundational (2), US2 (8), US1 (10), US3 (7) e revisão final (6). US2 e US1 são
 P1, com rejeição de artefatos inválidos antes da escrita; US3 P2 completa vínculo
 local/revisão e invalidação. Seis marcadores de paralelismo formam três pares em
 arquivos distintos. Testes são offline e as provas reais de publicação/acesso
-ficam para a integração final. Todas as tarefas estão pendentes. A análise SDD
+foram obtidas na integração final. Todas as tarefas foram concluídas. A análise SDD
 da 004 identificou A1: o retorno zero do CLI depende de verificações automatizadas;
 a inspeção visual posterior e seu registro completam o aceite da 004 antes da
 entrega à 005. A correção está no contrato e em T014/T019/T026/T032–T034, com
@@ -204,7 +201,7 @@ deve ser registrada e resolvida antes de qualquer proposta de mudança nesses ma
 Na especificação inicial foram criados `spec.md` e `checklists/requirements.md` por
 feature, além deste índice. A 001 e a 002 também têm planejamento e tarefas;
 a 003 tem os cinco artefatos de planejamento e `tasks.md` listados acima;
-a 004 tem os cinco artefatos de planejamento e `tasks.md`, com 35 tarefas pendentes.
+a 004 tem os cinco artefatos de planejamento e `tasks.md`, com 35 tarefas concluídas.
 As descrições estão nos campos `Input`. O template ativo foi resolvido pela
 pilha local do Spec Kit e suas seções obrigatórias foram mantidas, com premissas e
 dependências. A revisão de cada checklist registra 16/16 itens de qualidade atendidos,
@@ -233,10 +230,9 @@ tarefas das specs 005–006 ainda não foram gerados. A 001 e a 002 foram conclu
 com a baseline preservada; a 003 também foi implementada. O planejamento da 004
 e a geração de tarefas foram concluídos em 2026-10-18; a análise identificou A1,
 corrigido e revalidado documentalmente. Seus requisitos estão rastreados no
-plano/contrato/guia e nas 35 tarefas pendentes.
+plano/contrato/guia e nas 35 tarefas concluídas, com tentativas e ajustes registrados.
 A feature ativa é a 004, selecionada explicitamente pelo autor, sem trocar `dev`.
-As dependências 001/003 estão atendidas para implementação; a próxima etapa é
-`$speckit-implement` para a 004.
+A implementação da 004 foi concluída. Próxima etapa: selecionar explicitamente a 005 e executar seu planejamento/tarefas/análise antes da implementação. [Evidências e gate à avaliação](../docs/publicacao-v2.md).
 A reprodução da 001 usa um executor Python separado na mesma máquina; não equivale
 a revisão humana independente nem comprova portabilidade para outro SO.
 A Fase 0 do plano mestre permanece parcialmente pendente.

@@ -72,7 +72,7 @@ autorais nem comparar objetos integrais sem essa distinção.
 | --- | --- |
 | `owner`, `repo_handle`, `full_name` | destino configurado, sem identidade inesperada |
 | `description` | igualdade exata com descrição local |
-| `tags` | conjunto igual à união estável de tags locais + nomes das técnicas |
+| `tags` | conjunto autoral igual à união estável de tags locais + nomes das técnicas; admite somente a tag técnica opcional `ChatPromptTemplate` |
 | `is_public` | booleano `True` observado, não apenas solicitado |
 | `last_commit_hash` | igual à revisão conferida no momento da liberação |
 | `observed_at` | ISO 8601 com fuso/UTC explícito |
@@ -125,3 +125,30 @@ ainda se exige revalidar revisão remota/HEAD antes do experimento.
 Novo HEAD ou metadados divergentes não apagam a prova histórica da revisão
 fixada; impedem usá-la como estado atual sem nova conferência. A 005 registra o
 experimento correspondente e verifica estabilidade, pois seu avaliador usa HEAD.
+
+## Descoberta na implementação — tag técnica do serviço (2026-10-18)
+
+A primeira escrita real acrescentou `ChatPromptTemplate` às cinco tags autorais.
+Confirmado por leitura autenticada; registro PUB-004-01 em
+[publicação](../../docs/publicacao-v2.md). A comparação exige o conjunto autoral
+integral e admite somente essa tag técnica opcional adicional; desconhecidas
+continuam divergentes. O snapshot registra todas as tags observadas. A projeção
+no push permanece inalterada. Esta correção operacional não altera o YAML nem
+requisitos acadêmicos de descrição, técnicas e tags. Complementa a regra de
+igualdade de tags acima, que não previa metadados derivados pelo serviço.
+
+## Descoberta na implementação — conflito no reuso de commit (2026-10-18)
+
+O SDK/serviço retornou `LangSmithConflictError` ao reenviar conteúdo já existente
+(PUB-004-02/03). Complemento excepcional a C05/C06/C08: depois de uma única
+chamada de push, esse conflito permite somente leitura para conferir uma revisão
+existente. O HEAD serve como candidato existente, nunca como identidade de escrita
+própria. Exigir hash completo e todos os gates C07/estabilidade; o manifesto
+precisa ser exatamente igual ao local antes de desserializar. Outra exceção ou
+qualquer divergência reprova. Sem retry de escrita ou sucesso pelo conflito em si.
+
+O resumo registra `returned_url: null`, `revision_source: existing_after_conflict`
+e `publication: revisão existente conferida; push em conflito`. Não se fabrica
+URL devolvida pelo SDK nem se alega nova revisão criada. URLs anônimas continuam
+sendo as efetivamente verificadas. O fluxo normal mantém a regra prefixo do
+retorno → hash completo. Materializa C10 (reuso permitido) sem relaxar o enunciado.

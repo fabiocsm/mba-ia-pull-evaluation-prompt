@@ -3,6 +3,7 @@
 from copy import deepcopy
 import hashlib
 import importlib
+import json
 import os
 from pathlib import Path
 import re
@@ -592,3 +593,578 @@ def unchanged_artifact():
     yield
     assert PROMPT_PATH.read_bytes() == original, 'Suíte alterou o YAML real'
     assert hashlib.sha256(PROMPT_PATH.read_bytes()).digest() == hashlib.sha256(original).digest()
+
+
+# Spec 004: contratos do script, mantendo os seis testes originais independentes.
+@pytest.fixture
+def publisher(utilities, monkeypatch):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('push_v2_offline', ROOT / 'src/push_prompts.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, 'load_dotenv', lambda *a, **kw: False)
+    return module
+
+
+@pytest.mark.parametrize('field', TEXT_FIELDS + LIST_FIELDS)
+@pytest.mark.parametrize('value', ['missing', None, 7, False, {}, '', ' ', [], [None], [' ']])
+def test_push_validation_fields(publisher, prompt, field, value):
+    candidate = deepcopy(prompt)
+    if value == 'missing':
+        del candidate[field]
+    else:
+        candidate[field] = value
+    before = deepcopy(candidate)
+    valid, errors = publisher.validate_prompt(candidate)
+    assert valid is False and isinstance(errors, list) and errors
+    assert field in ' '.join(errors)
+    assert candidate == before
+    assert publisher.push_prompt_to_langsmith('bug_to_user_story_v2', candidate) is False
+
+
+@pytest.mark.parametrize('candidate', [None, [], '', {}, {'extra': 'value'}])
+def test_push_validation_shape(publisher, candidate):
+    valid, errors = publisher.validate_prompt(candidate)
+    assert valid is False and errors
+
+
+@pytest.mark.parametrize('field,values,reason', [
+    ('version', 'v1', 'version'), ('extra', 'value', 'campos'),
+    ('techniques_applied', ['Few-shot Learning'], 'techniques'),
+    ('techniques_applied', ['Few-shot Learning', ' few-SHOT learning '], 'techniques'),
+    ('techniques_applied', ['Role Prompting', 'ReAct'], 'techniques'),
+    ('user_prompt', 'Relato: {bug_report}', 'user_prompt'),
+    ('user_prompt', '{bug_report}{bug_report}', 'user_prompt'),
+])
+def test_push_validation_contract(publisher, prompt, field, values, reason):
+    candidate = deepcopy(prompt)
+    candidate[field] = values
+    valid, errors = publisher.validate_prompt(candidate)
+    assert valid is False and reason in ' '.join(errors)
+
+
+@pytest.mark.parametrize('field', TEXT_FIELDS + LIST_FIELDS + ('TODO',))
+@pytest.mark.parametrize('marker', ['TODO', 'FIXME', 'TBD', '[ todo ]', '[ fIxMe ]', '[tbd]'])
+def test_push_validation_pending(publisher, prompt, field, marker):
+    candidate = deepcopy(prompt)
+    if field == 'TODO':
+        candidate[field] = marker
+    elif isinstance(candidate[field], list):
+        candidate[field].append(marker)
+    else:
+        candidate[field] += '\n' + marker
+    valid, errors = publisher.validate_prompt(candidate)
+    assert valid is False and errors
+
+
+@pytest.mark.parametrize('word', ['TODOS', 'todos', 'todo', 'áTODOé', 'TODO_escopo'])
+def test_push_validation_positive_i1(publisher, prompt, word):
+    prompt['system_prompt'] += '\nConsidere ' + word + ' os fatos.'
+    before = deepcopy(prompt)
+    assert publisher.validate_prompt(prompt) == (True, [])
+    assert prompt == before
+
+
+@pytest.mark.parametrize('reply', [None, [True, []], (True,), (1, []), (True, None),
+                                    (False, [7]), (False, ['']), (False, []),
+                                    (True, ['erro']), (False, ['Outro erro']),
+                                    (False, ['system_prompt ainda contém TODOs', 'Outro erro'])])
+def test_push_validation_helper(publisher, prompt, monkeypatch, reply):
+    prompt['system_prompt'] += '\nTODOS os fatos.'
+    monkeypatch.setattr(publisher, 'validate_prompt_structure', lambda data: reply)
+    valid, errors = publisher.validate_prompt(prompt)
+    assert valid is False and errors
+
+
+@pytest.mark.parametrize('defect', ['persona', 'format', 'examples', 'pair', 'brace', 'variable', 'system-input'])
+def test_push_validation_content(publisher, prompt, defect):
+    if defect == 'persona':
+        prompt['system_prompt'] = prompt['system_prompt'].replace('Você é um Product Manager', 'Atue')
+    elif defect == 'format':
+        prompt['system_prompt'] = prompt['system_prompt'].replace('Markdown', '')
+    elif defect == 'examples':
+        prompt['system_prompt'] = rules(prompt)
+    elif defect == 'pair':
+        prompt['system_prompt'] = prompt['system_prompt'].replace('#### Saída', '#### Resposta', 1)
+    else:
+        prompt['system_prompt'] += {'brace': '{', 'variable': '{other}', 'system-input': '{bug_report}'}[defect]
+    valid, errors = publisher.validate_prompt(prompt)
+    assert valid is False and errors
+
+
+@pytest.mark.parametrize('content', [None, '', '[invalid', '[]', 'texto', '{}',
+    'bug_to_user_story_v2: null', 'bug_to_user_story_v2: []',
+    'bug_to_user_story_v2: {}\nextra: {}'])
+def test_push_validation_main_file(publisher, tmp_path, monkeypatch, content, capsys):
+    path = tmp_path / 'v2.yml'
+    if content is not None:
+        path.write_text(content)
+    monkeypatch.setattr(publisher, 'PROMPT_PATH', path, raising=False)
+    assert publisher.main() == 1
+    output = capsys.readouterr()
+    assert 'rejeitada' in output.out
+
+
+def test_push_validation_loader_secret(publisher, tmp_path, monkeypatch, capsys):
+    path = tmp_path / 'v2.yml'
+    path.write_text('invalid')
+    monkeypatch.setattr(publisher, 'PROMPT_PATH', path, raising=False)
+    def loader(*args):
+        print('SECRET_SENTINEL')
+        raise ValueError('SECRET_SENTINEL')
+    monkeypatch.setattr(publisher, 'load_yaml', loader)
+    assert publisher.main() == 1
+    result = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in result.out + result.err
+
+
+def test_push_validation_real_template(publisher, prompt):
+    prompt['system_prompt'] += '\nJSON: {{"status":"erro"}}'
+    assert publisher.validate_prompt(prompt) == (True, [])
+    assert publisher.push_prompt_to_langsmith('other', prompt) is False
+
+
+@pytest.fixture
+def publication(publisher, prompt, monkeypatch):
+    from types import SimpleNamespace
+    from langchain_core.load import dumps
+    from langsmith import client as sdk_client
+    import requests
+    env = {'PATH': os.defpath, 'LANGSMITH_API_KEY': 'synthetic-key',
+           'LANGSMITH_PROJECT': 'project', 'USERNAME_LANGSMITH_HUB': 'other-author',
+           'LANGSMITH_TRACING': 'true', 'LLM_PROVIDER': 'openai',
+           'LLM_MODEL': 'generation-model', 'EVAL_MODEL': 'judge-model',
+           'OPENAI_API_KEY': 'synthetic-provider',
+           'LANGSMITH_WORKSPACE_ID': '12345678-1234-1234-1234-123456789012',
+           'LANGSMITH_ENDPOINT': 'https://api.smith.langchain.com'}
+    monkeypatch.setattr(os, 'environ', env)
+    monkeypatch.setattr(publisher, 'tracing_is_enabled', lambda: True)
+    state = SimpleNamespace(calls=[], pushes=[], pulls=[], requests=[], exists=False,
+                            commit='a' * 64, url=None, fault=None, repo_changes=0)
+    def response(payload, status=200):
+        return SimpleNamespace(status_code=status, json=lambda: deepcopy(payload),
+            request=SimpleNamespace(headers={}), headers={'Content-Type': 'application/json'},
+            raise_for_status=lambda: None)
+    state.response = response
+    class FakeClient:
+        def __init__(self, **kwargs):
+            state.calls.append(('client', kwargs))
+        def request_with_retries(self, method, path):
+            state.calls.append((method, path))
+            if state.fault == 'settings':
+                raise PermissionError('SECRET_SENTINEL')
+            return response({'tenant_handle': 'bad' if state.fault == 'handle' else env['USERNAME_LANGSMITH_HUB'],
+                'id': 'bad' if state.fault == 'tenant' else env['LANGSMITH_WORKSPACE_ID']})
+        def _prompt_exists(self, identifier):
+            return state.exists
+        def create_prompt(self, identifier, **kwargs):
+            state.calls.append(('create', kwargs))
+            if state.fault == 'create':
+                raise TimeoutError('SECRET_SENTINEL')
+        def update_prompt(self, identifier, **kwargs):
+            state.calls.append(('update', kwargs))
+            if state.fault == 'update':
+                raise PermissionError('SECRET_SENTINEL')
+        def create_commit(self, identifier, object, **kwargs):
+            if state.fault == 'push':
+                raise TimeoutError('SECRET_SENTINEL')
+            state.object = deepcopy(object)
+            state.manifest = json.loads(dumps(object))
+            if state.fault in {'conflict', 'conflict-different'}:
+                if state.fault == 'conflict-different':
+                    state.manifest = {}
+                from langsmith.utils import LangSmithConflictError
+                raise LangSmithConflictError('SECRET_SENTINEL')
+            return state.url if state.url is not None else 'https://smith.langchain.com/prompts/bug_to_user_story_v2/aaaaaaaa?organizationId=' + env['LANGSMITH_WORKSPACE_ID']
+        def push_prompt(self, identifier, **kwargs):
+            state.pushes.append((identifier, kwargs))
+            return sdk_client.Client.push_prompt(self, identifier, **kwargs)
+        def pull_prompt_commit(self, identifier, **kwargs):
+            state.pulls.append(('commit', identifier, kwargs))
+            if state.fault == 'commit-read':
+                raise ConnectionError('SECRET_SENTINEL')
+            return SimpleNamespace(owner=env['USERNAME_LANGSMITH_HUB'], repo=NAME004,
+                commit_hash='b' * 64 if state.fault == 'hash' else state.commit,
+                manifest=deepcopy(state.manifest))
+        def pull_prompt(self, identifier, **kwargs):
+            state.pulls.append(('prompt', identifier, kwargs))
+            if state.fault == 'pull':
+                raise PermissionError('SECRET_SENTINEL')
+            if state.fault == 'type':
+                return 'wrong'
+            obj = deepcopy(state.object)
+            obj.metadata.update(lc_hub_owner=env['USERNAME_LANGSMITH_HUB'], lc_hub_repo=NAME004,
+                                lc_hub_commit_hash=state.commit)
+            if state.fault == 'content':
+                obj.messages[0].prompt.template += ' different'
+            if state.fault == 'metadata':
+                obj.metadata['version'] = 'wrong'
+            if state.fault == 'variables':
+                obj.input_variables = ['other']
+            return obj
+        def get_prompt(self, identifier):
+            state.repo_changes += 1
+            record = dict(owner=env['USERNAME_LANGSMITH_HUB'], repo_handle=NAME004,
+                full_name=identifier, description=prompt['description'],
+                tags=state.pushes[-1][1]['tags'].copy(), is_public=True,
+                last_commit_hash=state.commit)
+            if state.fault in {'head', 'late-head'} and (state.fault == 'head' or state.repo_changes > 1):
+                record['last_commit_hash'] = 'b' * 64
+            if state.fault in {'repo-metadata', 'late-metadata'} and (state.fault == 'repo-metadata' or state.repo_changes > 1):
+                record['description'] = 'changed'
+            if state.fault == 'private':
+                record['is_public'] = False
+            state.repo = record
+            return SimpleNamespace(**record)
+        def close(self):
+            pass
+    class FakeSession:
+        def __init__(self):
+            self.trust_env = True
+            self.auth = None
+            self.cookies = requests.cookies.RequestsCookieJar()
+            self.headers = {}
+        def get(self, url, **kwargs):
+            assert self.trust_env is False and self.auth is None and not self.cookies
+            assert not set(map(str.lower, self.headers)) & {'authorization', 'x-api-key', 'cookie'}
+            assert kwargs == {'timeout': (10, 30), 'allow_redirects': False}
+            state.requests.append(url)
+            payload = {'repo': deepcopy(state.repo)} if '/repos/' in url else {
+                'commit_hash': state.commit, 'manifest': deepcopy(state.manifest)}
+            result = response(payload)
+            if state.fault == 'http':
+                raise requests.Timeout('SECRET_SENTINEL')
+            if state.fault == 'status':
+                result.status_code = 403
+            if state.fault == 'redirect':
+                result.status_code = 302
+            if state.fault == 'html':
+                result.json = lambda: (_ for _ in ()).throw(ValueError('SECRET_SENTINEL'))
+            if state.fault == 'manifest' and '/commits/' in url:
+                payload['manifest'] = {}
+                result = response(payload)
+            if state.fault == 'auth-header':
+                result.request.headers = {'Cookie': 'SECRET_SENTINEL'}
+            return result
+        def close(self):
+            pass
+    monkeypatch.setattr(publisher, 'Client', FakeClient)
+    monkeypatch.setattr(publisher.requests, 'Session', FakeSession)
+    state.env = env
+    return state
+
+
+NAME004 = 'bug_to_user_story_v2'
+
+
+@pytest.mark.parametrize('exists', [False, True])
+@pytest.mark.parametrize('style', ['prompts', 'hub'])
+def test_push_publication_success(publisher, prompt, publication, exists, style, capsys):
+    publication.exists = exists
+    if style == 'hub':
+        publication.url = 'https://smith.langchain.com/hub/other-author/bug_to_user_story_v2:aaaaaaaa'
+    before = deepcopy(prompt)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is True
+    assert prompt == before
+    assert len(publication.pushes) == 1
+    dest, payload = publication.pushes[0]
+    assert dest == 'other-author/bug_to_user_story_v2'
+    assert payload['is_public'] is True and payload['description'] == prompt['description']
+    assert payload['tags'] == prompt['tags'] + prompt['techniques_applied']
+    template = payload['object']
+    assert isinstance(template, ChatPromptTemplate)
+    assert template.metadata['version'] == 'v2'
+    assert template.metadata['techniques_applied'] == prompt['techniques_applied']
+    canonical = json.dumps(prompt, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    assert template.metadata['local_definition_sha256'] == hashlib.sha256(canonical).hexdigest()
+    assert ('update' if exists else 'create') in [c[0] for c in publication.calls]
+    assert len(publication.requests) == 2
+    for kind, identifier, options in publication.pulls:
+        assert options == dict(include_model=False, skip_cache=True, dangerously_pull_public_prompt=True)
+        assert identifier.endswith('a' * (8 if kind == 'commit' else 64))
+    output = capsys.readouterr()
+    assert 'conferida automaticamente' in output.out and 'visual' in output.out
+    assert 'synthetic' not in output.out + output.err
+
+
+@pytest.mark.parametrize('field', ['LANGSMITH_API_KEY', 'LANGSMITH_PROJECT', 'USERNAME_LANGSMITH_HUB',
+    'LANGSMITH_TRACING', 'LLM_PROVIDER', 'LLM_MODEL', 'EVAL_MODEL', 'OPENAI_API_KEY'])
+@pytest.mark.parametrize('value', [None, '', ' '])
+def test_push_publication_configuration(publisher, prompt, publication, field, value):
+    if value is None:
+        publication.env.pop(field)
+    else:
+        publication.env[field] = value
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert not publication.pushes
+
+
+@pytest.mark.parametrize('field,value', [
+    ('USERNAME_LANGSMITH_HUB', 'bad/name'), ('USERNAME_LANGSMITH_HUB', 'bad:rev'),
+    ('USERNAME_LANGSMITH_HUB', 'https://host'), ('LLM_PROVIDER', 'unknown'),
+    ('LANGSMITH_TRACING', 'false'), ('LANGSMITH_ENDPOINT', 'https://secret@host'),
+    ('LANGSMITH_ENDPOINT', 'https://host?key=SECRET_SENTINEL'),
+    ('LANGSMITH_WORKSPACE_ID', 'invalid'),
+])
+def test_push_publication_invalid_config(publisher, prompt, publication, field, value):
+    publication.env[field] = value
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert not publication.pushes
+
+
+def test_push_publication_effective_tracing(publisher, prompt, publication, monkeypatch):
+    monkeypatch.setattr(publisher, 'tracing_is_enabled', lambda: False)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert not publication.pushes
+
+
+def test_push_publication_google(publisher, prompt, publication):
+    publication.env['LLM_PROVIDER'] = 'google'
+    publication.env.pop('OPENAI_API_KEY')
+    publication.env['GOOGLE_API_KEY'] = 'synthetic-google'
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is True
+
+
+@pytest.mark.parametrize('fault', ['settings', 'handle', 'tenant', 'create', 'update', 'push',
+    'commit-read', 'hash', 'pull', 'type', 'content', 'metadata', 'variables',
+    'head', 'repo-metadata', 'private', 'http', 'status', 'redirect', 'html', 'manifest', 'auth-header'])
+def test_push_publication_failures(publisher, prompt, publication, fault, capsys):
+    publication.fault = fault
+    publication.exists = fault == 'update'
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert len(publication.pushes) == (0 if fault in {'settings', 'handle', 'tenant'} else 1)
+    output = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+    assert 'conferida automaticamente' not in output.out
+    assert 'etapa=' in output.out
+
+
+@pytest.mark.parametrize('url', ['', 'SECRET_SENTINEL', 'https://secret@smith.langchain.com/prompts/bug_to_user_story_v2/aaaaaaaa',
+    'https://evil.example/prompts/bug_to_user_story_v2/aaaaaaaa',
+    'https://smith.langchain.com/prompts/other/aaaaaaaa',
+    'https://smith.langchain.com/prompts/bug_to_user_story_v2/nothex',
+    'https://smith.langchain.com/prompts/bug_to_user_story_v2/aaaaaaaa?api_key=SECRET_SENTINEL',
+    'https://smith.langchain.com/hub/wrong/bug_to_user_story_v2:aaaaaaaa'])
+def test_push_publication_invalid_url(publisher, prompt, publication, url, capsys):
+    publication.url = url
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert len(publication.pushes) == 1
+    output = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+
+
+@pytest.mark.parametrize('fault', ['late-head', 'late-metadata'])
+def test_push_tracking_concurrent_repo(publisher, prompt, publication, fault, capsys):
+    publication.fault = fault
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert len(publication.pushes) == 1
+    assert any(identifier.endswith('a' * 64) for _, identifier, _ in publication.pulls)
+    output = capsys.readouterr()
+    assert 'conferida automaticamente' not in output.out
+
+
+@pytest.mark.parametrize('when', ['loader', 'end'])
+def test_push_tracking_changed_file(publisher, prompt, publication, tmp_path, monkeypatch, capsys, when):
+    import yaml
+    path = tmp_path / 'v2.yml'
+    original = yaml.safe_dump({NAME004: prompt}, allow_unicode=True).encode()
+    path.write_bytes(original)
+    monkeypatch.setattr(publisher, 'PROMPT_PATH', path)
+    if when == 'loader':
+        real_loader = publisher.load_yaml
+        def changing_loader(*args):
+            data = real_loader(*args)
+            path.write_bytes(original + b'\n')
+            return data
+        monkeypatch.setattr(publisher, 'load_yaml', changing_loader)
+    else:
+        real_anonymous = publisher._anonymous
+        def changing_anonymous(*args):
+            result = real_anonymous(*args)
+            path.write_bytes(original + b'\n')
+            return result
+        monkeypatch.setattr(publisher, '_anonymous', changing_anonymous)
+    assert publisher.main() == 1
+    output = capsys.readouterr()
+    assert 'conferida automaticamente' not in output.out
+    assert len(publication.pushes) == (0 if when == 'loader' else 1)
+
+
+def test_push_tracking_main_summary(publisher, prompt, publication, tmp_path, monkeypatch, capsys):
+    import yaml
+    path = tmp_path / 'v2.yml'
+    original = yaml.safe_dump({NAME004: prompt}, allow_unicode=True).encode()
+    path.write_bytes(original)
+    monkeypatch.setattr(publisher, 'PROMPT_PATH', path)
+    assert publisher.main() == 0
+    output = capsys.readouterr().out
+    summary = json.loads(output.strip().splitlines()[-1])
+    assert summary['local_file_sha256'] == hashlib.sha256(original).hexdigest()
+    canonical = json.dumps(prompt, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    assert summary['local_definition_sha256'] == hashlib.sha256(canonical).hexdigest()
+    assert summary['commit_hash'] == 'a' * 64
+    assert summary['visual_inspection'] == 'pendente'
+    assert summary['repo_snapshot']['observed_at'].endswith('+00:00')
+    assert path.read_bytes() == original
+
+
+def test_push_tracking_format_and_metadata_hash(publisher, prompt, publication):
+    original = publisher._definition_hash(prompt)
+    changed = deepcopy(prompt)
+    changed['description'] += ' Nova descrição.'
+    assert publisher._definition_hash(changed) != original
+    assert publisher._definition_hash(deepcopy(prompt)) == original
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is True
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is True
+    assert len(publication.pushes) == 2  # duas execuções explícitas; commit reutilizado
+
+
+def test_push_validation_unreadable(publisher, monkeypatch, capsys):
+    def unreadable(*args):
+        raise PermissionError('SECRET_SENTINEL')
+    monkeypatch.setattr(Path, 'read_bytes', unreadable)
+    assert publisher.main() == 1
+    output = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+
+
+def test_push_validation_helper_secret(publisher, prompt, monkeypatch, capsys):
+    def broken(data):
+        print('SECRET_SENTINEL')
+        raise ValueError('SECRET_SENTINEL')
+    monkeypatch.setattr(publisher, 'validate_prompt_structure', broken)
+    assert publisher.validate_prompt(prompt) == (False, ['helper: falha na validação'])
+    output = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+
+
+def test_push_validation_i1_other_defect(publisher, prompt):
+    prompt['system_prompt'] += '\nTODOS os fatos.'
+    del prompt['description']
+    valid, errors = publisher.validate_prompt(prompt)
+    assert valid is False and 'description' in ' '.join(errors)
+
+
+def test_push_publication_dotenv_precedence(publisher, prompt, publication, monkeypatch):
+    calls = []
+    def dotenv_disabled(path, **kwargs):
+        calls.append((path, kwargs))
+        return False
+    monkeypatch.setattr(publisher, 'load_dotenv', dotenv_disabled)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is True
+    assert calls == [(ROOT / '.env', {'override': False})]
+    assert publication.pushes[0][0].startswith('other-author/')
+    assert publication.calls[0][1]['timeout_ms'] == (10000, 30000)
+
+
+def test_push_publication_manifest_rejected_before_deserialization(publisher, prompt, publication, monkeypatch):
+    client_class = publisher.Client
+    original = client_class.pull_prompt_commit
+    def malicious_manifest(self, *args, **kwargs):
+        result = original(self, *args, **kwargs)
+        result.manifest = {'lc': 1, 'type': 'constructor', 'id': ['unexpected', 'Model']}
+        return result
+    monkeypatch.setattr(client_class, 'pull_prompt_commit', malicious_manifest)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert not any(kind == 'prompt' for kind, _, _ in publication.pulls)
+
+
+@pytest.mark.parametrize('result', [None, {}, [], {'repo': {}}, {'repo': {'is_public': True}}])
+def test_push_publication_anonymous_missing_fields(publisher, prompt, publication, monkeypatch, result):
+    original = publisher.requests.Session.get
+    def bad_json(self, *args, **kwargs):
+        response = original(self, *args, **kwargs)
+        response.json = lambda: result
+        return response
+    monkeypatch.setattr(publisher.requests.Session, 'get', bad_json)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert len(publication.pushes) == 1
+
+
+@pytest.mark.parametrize('error', [TimeoutError, ConnectionError, PermissionError])
+def test_push_publication_client_construction_failure(publisher, prompt, publication, monkeypatch, capsys, error):
+    def reject(**kwargs):
+        raise error('SECRET_SENTINEL')
+    monkeypatch.setattr(publisher, 'Client', reject)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert not publication.pushes
+    output = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+
+
+@pytest.mark.parametrize('mutation', ['null-repo', 'owner', 'name', 'full-name', 'tags', 'commit-owner', 'commit-name', 'commit-short'])
+def test_push_publication_identity_fields(publisher, prompt, publication, monkeypatch, mutation):
+    cls = publisher.Client
+    if mutation.startswith('commit-'):
+        original = cls.pull_prompt_commit
+        def changed_commit(self, *args, **kwargs):
+            result = original(self, *args, **kwargs)
+            if mutation == 'commit-owner':
+                result.owner = 'wrong'
+            elif mutation == 'commit-name':
+                result.repo = 'wrong'
+            else:
+                result.commit_hash = 'a' * 8
+            return result
+        monkeypatch.setattr(cls, 'pull_prompt_commit', changed_commit)
+    else:
+        original = cls.get_prompt
+        def changed_repo(self, *args, **kwargs):
+            result = original(self, *args, **kwargs)
+            if mutation == 'null-repo':
+                return None
+            key = {'owner': 'owner', 'name': 'repo_handle', 'full-name': 'full_name', 'tags': 'tags'}[mutation]
+            setattr(result, key, [] if key == 'tags' else 'wrong')
+            return result
+        monkeypatch.setattr(cls, 'get_prompt', changed_repo)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is False
+    assert len(publication.pushes) == 1
+
+
+def test_push_publication_stable_tag_union(publisher, prompt, publication, monkeypatch):
+    prompt['tags'] += [' PT-BR ', 'Few-shot Learning']
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is True
+    expected = ['bug-to-user-story', 'product-management', 'pt-br', 'Few-shot Learning', 'Role Prompting']
+    assert publication.pushes[0][1]['tags'] == expected
+
+
+def test_push_validation_helper_receives_original(publisher, prompt, monkeypatch):
+    prompt['system_prompt'] += '\nTODOS os fatos.'
+    before = deepcopy(prompt)
+    calls = []
+    def helper(data):
+        assert data is prompt and data == before
+        calls.append(data)
+        return False, ['system_prompt ainda contém TODOs']
+    monkeypatch.setattr(publisher, 'validate_prompt_structure', helper)
+    assert publisher.validate_prompt(prompt) == (True, [])
+    assert calls == [before] and prompt == before
+
+
+@pytest.mark.parametrize('extra,expected', [('ChatPromptTemplate', True), ('unknown-platform-tag', False)])
+def test_push_publication_platform_tag(publisher, prompt, publication, monkeypatch, extra, expected):
+    original = publisher.Client.get_prompt
+    def platform_repo(self, *args, **kwargs):
+        result = original(self, *args, **kwargs)
+        result.tags = result.tags + [extra]
+        publication.repo['tags'] = result.tags.copy()
+        return result
+    monkeypatch.setattr(publisher.Client, 'get_prompt', platform_repo)
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is expected
+    assert len(publication.pushes) == 1
+
+
+@pytest.mark.parametrize('fault,expected', [('conflict', True), ('conflict-different', False)])
+def test_push_publication_conflict_reuse(publisher, prompt, publication, fault, expected, capsys):
+    publication.fault = fault
+    publication.exists = True
+    assert publisher.push_prompt_to_langsmith(NAME004, prompt) is expected
+    assert len(publication.pushes) == 1
+    output = capsys.readouterr()
+    assert 'SECRET_SENTINEL' not in output.out + output.err
+    if expected:
+        summary = json.loads(output.out.strip().splitlines()[-1])
+        assert summary['returned_url'] is None
+        assert summary['revision_source'] == 'existing_after_conflict'
+        assert summary['publication'] == 'revisão existente conferida; push em conflito'
+        assert summary['commit_hash'] == 'a' * 64

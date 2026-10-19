@@ -480,7 +480,7 @@ no registro. Os IDs V01–V16 são os mesmos; as transições não apagam as fal
 | V12 | FR-001,005 / SC-001 | Diagnóstico e precedência | pronto | 2026-10-17T19:07:26-03:00 | T014: subprocessos isolados bloquearam variável ausente e provaram override=False | Todas |
 | V13 | FR-008 / SC-001 | Contratos SDK/CLI | pronto | 2026-10-17T19:06:09-03:00 | T005: assinaturas e template System/User conferidos offline; não comprova publicação | Pull, preparação da v2, push |
 | V14 | FR-008,009 / SC-004 | Reprodução em ambiente limpo | pronto | 2026-10-17T19:37:45-03:00 | T024/T025: REP-001B em processo/venv separados; duas chamadas e reconsulta de traces concluídas, ocorrência registrada | Todas |
-| V15 | FR-002 / SC-001 | Permissão efetiva de publicação | pendente | — | Sem tentativa: comprovar escrita no push real da spec 004, após v2 e testes; não é gate de conclusão da 001 | Push |
+| V15 | FR-002 / SC-001 | Permissão efetiva de publicação | pronto | 2026-10-18T21:38:48.084510-03:00 | [004 / PUB-004-01 e PUB-004-04](publicacao-v2.md): escrita pública real, revisão fixa e conteúdo conferidos anonimamente; inspeção visual com três capturas | Push |
 | V16 | FR-001,004 / SC-001 | Valores não secretos iniciais | pronto | 2026-10-17T19:35:27-03:00 | T008/T010: provider, handle, tracing, projeto, workspace e dois modelos conforme COND-001 | Pull, push, avaliação |
 
 V05 passou de impedido a pronto somente após correção e revalidação. V06–V11 e
@@ -491,15 +491,14 @@ de credencial, workspace, dependências ou modelo exige revalidar os IDs afetado
 
 | Operação futura | Estado atual | Dependências da 001 comprovadas | O que falta / próxima ação |
 | --- | --- | --- | --- |
-| Pull — 002 | pendente | V01/V02/V05/V07/V13 | Implementar o pull e conferir acesso efetivo a leonanluppi/bug_to_user_story_v1; não recuperado nesta preparação |
-| Preparação local da v2 — 003 | pendente | V01/V02/V13 | Recuperar a v1 na 002; criar v2 e implementar/executar os seis testes na 003 |
-| Push — 004 | pendente | V01/V05/V07/V13/V16 | v2/testes aprovados e prova V15 de escrita pública no push real |
+| Pull — 002 | concluído | V01/V02/V05/V07/V13 | [Recuperação real](recuperacao-v1.md), posterior à preparação |
+| Preparação local da v2 — 003 | concluída | V01/V02/V13 | V2 e seis testes concluídos na 003; preservados na 004 |
+| Push — 004 | concluído | V01/V05/V07/V13/V16 | [V15 comprovado, revisão fixa, leitura anônima e inspeção visual](publicacao-v2.md) |
 | Avaliação — 005 | pendente | V01–V14 e V16, conforme papel | Specs 002–004; prompt publicado; auditar/criar dataset na 005 e executar avaliação completa |
 | Entrega pública — 006 | pendente | V02/V03 | Resultados aprovados, evidências e compartilhamento público verificados na 006 |
 
-Não há impedimento conhecido remanescente na preparação. As operações futuras
-continuam pendentes pelos artefatos ainda não implementados; nenhum estado acima
-declara o pipeline, a publicação ou as métricas acadêmicas concluídos.
+Não há impedimento conhecido remanescente na preparação. As operações 002–004 foram concluídas posteriormente conforme os registros
+indicados; avaliação/entrega acadêmica permanecem pendentes nas 005/006.
 
 <a id="roteiro-executavel"></a>
 
@@ -766,3 +765,7 @@ Diagnósticos não incluíram respostas HTTP, stderr ou valores sensíveis dos t
 Esses cenários não são evidência acadêmica de qualidade nem substituem os traces reais.
 
 Revisão final em 2026-10-17T20:15:31-03:00: 30 tarefas marcadas; V01–V16 completos na matriz atual; links locais e sintaxe do bloco aprovados; histórico preservado; hashes dos quatro protegidos e 15 casos iguais ao manifesto/origem; diff de protegidos vazio; `git diff --check` status 0; nenhum valor de credencial nos artefatos de entrega; ignores conferidos. `.specify/extensions.yml` ausente: sem hooks antes/depois de implementação.
+
+## Atualização V15 pela 004 — 2026-10-18T21:38:48.084510-03:00
+
+Escrita real PUB-004-01 e conferência completa PUB-004-04/visual comprovadas em [publicação da v2](publicacao-v2.md). Matriz atual atualizada; registros históricos permanecem. Nenhuma nova chamada LLM, avaliação ou dataset compartilhado nesta atualização.

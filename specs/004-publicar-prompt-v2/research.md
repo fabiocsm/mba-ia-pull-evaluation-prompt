@@ -149,3 +149,30 @@ Todas as incertezas técnicas de desenho foram resolvidas. Prontidão de acesso,
 permissão de escrita, igualdade e publicidade da v2 exigem execução real futura.
 Plano não certifica essas condições nem métricas; não há mudança de modelo,
 instalação ou exceção à constituição nesta etapa.
+
+## Descoberta na implementação — tag técnica do serviço (2026-10-18)
+
+A primeira escrita real acrescentou `ChatPromptTemplate` às cinco tags autorais.
+Confirmado por leitura autenticada; registro PUB-004-01 em
+[publicação](../../docs/publicacao-v2.md). A comparação exige o conjunto autoral
+integral e admite somente essa tag técnica opcional adicional; desconhecidas
+continuam divergentes. O snapshot registra todas as tags observadas. A projeção
+no push permanece inalterada. Esta correção operacional não altera o YAML nem
+requisitos acadêmicos de descrição, técnicas e tags. Complementa a regra de
+igualdade de tags acima, que não previa metadados derivados pelo serviço.
+
+## Descoberta na implementação — conflito no reuso de commit (2026-10-18)
+
+O SDK/serviço retornou `LangSmithConflictError` ao reenviar conteúdo já existente
+(PUB-004-02/03). Complemento excepcional a C05/C06/C08: depois de uma única
+chamada de push, esse conflito permite somente leitura para conferir uma revisão
+existente. O HEAD serve como candidato existente, nunca como identidade de escrita
+própria. Exigir hash completo e todos os gates C07/estabilidade; o manifesto
+precisa ser exatamente igual ao local antes de desserializar. Outra exceção ou
+qualquer divergência reprova. Sem retry de escrita ou sucesso pelo conflito em si.
+
+O resumo registra `returned_url: null`, `revision_source: existing_after_conflict`
+e `publication: revisão existente conferida; push em conflito`. Não se fabrica
+URL devolvida pelo SDK nem se alega nova revisão criada. URLs anônimas continuam
+sendo as efetivamente verificadas. O fluxo normal mantém a regra prefixo do
+retorno → hash completo. Materializa C10 (reuso permitido) sem relaxar o enunciado.

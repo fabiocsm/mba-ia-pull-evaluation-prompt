@@ -362,16 +362,16 @@ o [manifesto de integridade](docs/integridade-inicial.json) e o
 [inventário de dependências instalado](docs/dependencias-preparacao.txt).
 A [matriz atual por pré-requisito e operação](docs/preparacao.md#matriz-atual)
 registra V01–V16, datas e evidências: os pré-requisitos da 001 passaram; a prova
-de escrita pública V15 pertence ao push da 004. A recuperação da 002 foi concluída;
+de escrita pública V15 está comprovada no [registro da 004](docs/publicacao-v2.md). A recuperação da 002 foi concluída;
 seu [registro de execução](docs/recuperacao-v1.md) comprova o acesso à origem.
-A otimização e os testes da 003 foram concluídos localmente; as operações das
-specs 004–006 continuam pendentes.
+A otimização e os testes da 003 foram concluídos localmente; a publicação/conferência da 004 foi concluída; as operações das
+specs 005–006 continuam pendentes.
 A instalação, a integridade e a autenticação LangSmith passaram. A API key local
 confirmou o workspace com handle `fabiocsm`; os dois papéis de modelo responderam
 com temperatura zero e seus traces foram conferidos. Não há resultados de avaliação
 acadêmica obtidos nesta etapa. O pull tem comprovação própria na 002;
-publicação, experimentos e evidências finais pertencem às specs 004–006
-e dependem de suas implementações e dos respectivos pré-requisitos.
+publicação e conferência estão comprovadas na 004; experimentos e evidências
+finais pertencem às specs 005–006 e dependem de seus pré-requisitos.
 
 Pré-requisitos: Git, Python 3.10+ (validado com CPython 3.11.14), LangSmith CLI,
 acesso ao workspace/handle `fabiocsm` e chaves locais LangSmith/OpenAI. Execute da raiz.
@@ -497,8 +497,8 @@ arquivo ilustrativo foram substituídas apenas pelos valores efetivamente retorn
 
 A 002 passou em 236 testes offline e na comparação real da revisão recuperada.
 Os seis testes obrigatórios da v2 em `tests/test_prompts.py` foram implementados
-na 003, com resultados locais abaixo. Não há notas, publicação v2 ou experimentos
-acadêmicos comprovados nesta etapa.
+na 003, com resultados locais abaixo. A publicação foi comprovada posteriormente
+na 004; notas e experimentos acadêmicos continuam pendentes.
 
 ### Otimização e validação offline — spec 003
 
@@ -528,10 +528,46 @@ outros erros. Detalhes e comandos incrementais estão no
 
 Saída zero comprova o contrato estrutural e a sensibilidade dos testes. A revisão
 semântica está abaixo; comportamento de LLM e notas reais continuam por verificar.
-A v2 está pronta localmente para o planejamento da 004. O push ainda deve ser
-implementado e conferido nessa spec; só depois a 005 executará `python src/evaluate.py`
-com a revisão publicada. Cada alteração futura exige testar, publicar novamente e
+A publicação e a conferência posteriores na 004 estão documentadas a seguir.
+A 005 executará `python src/evaluate.py` com a revisão publicada após seu preflight. Cada alteração futura exige testar, publicar novamente e
 avaliar. As 3–5 iterações e a exigência de cada métrica e média >= 0.8 permanecem.
+
+
+### Publicação e conferência — spec 004
+
+Após os testes da v2, execute da raiz no venv ativo:
+
+```bash
+python -m pytest tests/test_prompts.py -v
+python src/push_prompts.py
+```
+
+O script lê `USERNAME_LANGSMITH_HUB` e confirma o handle/workspace autenticado
+antes de escrever. Reutiliza dotenv sem sobrescrever variáveis exportadas e exige
+as variáveis de prontidão acima, provider/chave correspondente e tracing efetivo.
+Publica somente System/Human, sem modelo, com descrição intacta, união das tags e
+nomes das técnicas; metadata do template contém versão, técnicas e hash canônico.
+
+Status 1 significa validação rejeitada, publicação não confirmada ou conferência
+pendente/divergente, com etapa segura. Timeout pode ocorrer após escrita; investigar
+por leitura antes de tentar publicar outra vez. Status 0 exige revisão completa
+resolvida do retorno, round-trip idêntico, repo público, HEAD correspondente,
+leitura HTTP sem autenticação e bytes locais estáveis. A inspeção visual posterior
+e seu registro continuam obrigatórios para aceitar a 004. Acompanhe as tentativas
+e provas em [publicação da v2](docs/publicacao-v2.md).
+
+Qualquer edição local, inclusive só metadados ou formatação, exige testes → push →
+conferência antes do próximo experimento. Commits equivalentes podem ser
+reutilizados; registros anteriores conservam valor histórico. A 005 deve conferir
+hashes/HEAD/metadados antes e depois e manter a revisão estável durante a execução:
+o avaliador fornecido usa HEAD e não implementa esse gate automaticamente.
+A publicação real e a inspeção pública passaram: revisão `4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`,
+CLI final com status 0 e 437 testes de prompt/publicação + 266 regressões aprovados.
+[Abra a revisão pública](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/4278de75?tab=0).
+O serviço pode acrescentar a tag técnica `ChatPromptTemplate` e devolver conflito
+no reenvio idêntico. Nesse conflito, o script confere uma revisão existente por
+leitura, com todos os gates, registra `returned_url: null` e não alega nova escrita.
+Outras falhas continuam retornando 1; não há repetição automática de push.
 
 ## Técnicas Aplicadas (Fase 2)
 
@@ -612,8 +648,13 @@ semântica. A v1 e os quatro arquivos protegidos mantêm seus hashes, preservand
 os 15 exemplos/referências e a distribuição 5/7/3. A comparação qualitativa está
 na seção anterior; não há comparação numérica v1/v2 executada.
 
-Publicação pública da v2 e revisão do Hub: **pendentes na 004**. Experimentos,
+A spec 004 está **concluída**: 35/35 tarefas, publicação pública real e revisão
+`4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595` conferida
+contra o YAML intacto. [Prompt público](https://smith.langchain.com/hub/fabiocsm/bug_to_user_story_v2/4278de75?tab=0),
+[histórico e três capturas reais](docs/publicacao-v2.md). O script final retornou 0;
+437 testes de prompt/publicação e 266 regressões passaram. As tentativas com
+falhas e os ajustes de compatibilidade estão preservados no registro. Experimentos,
 cinco métricas, média >= 0.8 e ciclos reais: **pendentes na 005**. Link público do
 dataset/experimentos, screenshots das cinco notas e tracing detalhado de três
-exemplos: **pendentes na 006**. Não há link público nem nota acadêmica da v2 para
-apresentar ainda. As ilustrações do enunciado não representam resultados desta entrega.
+exemplos: **pendentes na 006**. O link público acima comprova o prompt; ainda não há notas acadêmicas ou
+dataset/experimentos públicos da v2 para apresentar. As ilustrações do enunciado não representam resultados desta entrega.

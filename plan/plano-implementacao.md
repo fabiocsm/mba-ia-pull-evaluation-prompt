@@ -15,8 +15,7 @@ A 003 está implementada e validada localmente: 30/30 tarefas, 188 testes da v2 
 [registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
 O planejamento e as [35 tarefas da spec 004](../specs/004-publicar-prompt-v2/tasks.md)
 foram concluídos em 2026-10-18; ela é a spec ativa. Análise da 004 realizada com
-A1 corrigido e revalidado documentalmente. Implementação das
-specs 004–006 e avaliações acadêmicas reais permanecem pendentes.
+A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Implementação das specs 005–006 e avaliações acadêmicas reais permanecem pendentes.
 
 ## 1. Objetivo e referências
 
@@ -59,12 +58,11 @@ publicação e guia de validação. Define confirmação de escrita separada de
 equivalência/publicidade, resolução da revisão completa, hashes locais e prova
 anônima do mesmo commit. Suas [35 tarefas](../specs/004-publicar-prompt-v2/tasks.md)
 foram geradas por história/dependência, com US2 P1 antes de US1 P1 e US3 P2,
-mais gates locais e prova remota final. As tarefas estão pendentes; a geração não
-executa publicação ou LLM. A análise da 004 identificou A1, corrigido no contrato
+mais gates locais e prova remota final. As tarefas foram concluídas na implementação posterior, sem chamadas LLM. A análise da 004 identificou A1, corrigido no contrato
 e nas tarefas: sucesso automatizado do CLI separado da inspeção visual posterior,
 obrigatória para aceite da 004 e entrega à 005. Revalidação documental no
 [registro de A1](../specs/004-publicar-prompt-v2/tasks.md#correção-da-análise--a1).
-Próxima etapa: implementar a 004.
+004 implementada e comprovada; próxima etapa: planejar a 005 após seleção explícita.
 Planos/tarefas das specs 005–006
 e avaliações reais permanecem pendentes; este plano continua sendo referência.
 
@@ -274,21 +272,21 @@ O checkbox transversal de falhas dos scripts permanece aberto até essa conclus�
 
 **Dependência:** Fases 3 e 4.
 
-- [ ] Implementar `validate_prompt()`, `push_prompt_to_langsmith()` e `main()`.
-- [ ] Reutilizar `load_yaml`, `check_env_vars` e `validate_prompt_structure`, acrescentando
+- [X] Implementar `validate_prompt()`, `push_prompt_to_langsmith()` e `main()`.
+- [X] Reutilizar `load_yaml`, `check_env_vars` e `validate_prompt_structure`, acrescentando
   no script as verificações que o helper não cobre, sem alterar `src/utils.py`.
-- [ ] Rejeitar arquivo ausente, estrutura inválida, campos vazios, técnicas insuficientes
+- [X] Rejeitar arquivo ausente, estrutura inválida, campos vazios, técnicas insuficientes
   e variáveis inesperadas antes de publicar.
-- [ ] Ler o handle do ambiente e montar `fabiocsm/bug_to_user_story_v2` sem username
+- [X] Ler o handle do ambiente e montar `fabiocsm/bug_to_user_story_v2` sem username
   fixado no código. Montar `ChatPromptTemplate` com mensagens System e User.
-- [ ] Publicar com `is_public=True`, descrição e tags. Representar também as técnicas
+- [X] Publicar com `is_public=True`, descrição e tags. Representar também as técnicas
   nos metadados suportados pelo SDK, como tags e descrição; não inventar parâmetros
   de API para transmitir `techniques_applied`.
-- [ ] Exibir URL de publicação; retornar sucesso somente após confirmação do cliente.
+- [X] Exibir URL de publicação; retornar sucesso somente após confirmação do cliente.
   Em falha, retornar código diferente de zero e diagnóstico útil.
-- [ ] Executar `python src/push_prompts.py`, recuperar a revisão publicada e comparar
+- [X] Executar `python src/push_prompts.py`, recuperar a revisão publicada e comparar
   suas mensagens e variáveis com o YAML local. Registrar ID/commit do Hub e hash local.
-- [ ] Conferir conteúdo e visibilidade pública no dashboard; usar o CLI como apoio.
+- [X] Conferir conteúdo e visibilidade pública no dashboard; usar o CLI como apoio.
 
 **Critério de saída:** prompt público correto, rastreável e equivalente à v2 local,
 incluindo descrição, tags e técnicas. Os scripts continuam sendo os entregáveis;

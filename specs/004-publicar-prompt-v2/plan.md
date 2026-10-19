@@ -6,7 +6,7 @@
 [plano mestre](../../plan/plano-implementacao.md), com as dependências 001 e 003.
 
 **Estado**: planejamento, desenho, tarefas e análise SDD concluídos; A1 corrigido
-e revalidado documentalmente. Implementação e publicação real pendentes. O setup retornou
+e revalidado documentalmente. Implementação e publicação real concluídas em 2026-10-18: 35/35 tarefas; evidências no registro abaixo. O setup retornou
 `BRANCH=004-publicar-prompt-v2` como identificador da feature; a branch Git
 continua `dev`. O ponteiro local `.specify/feature.json` seleciona a 004.
 Nenhuma branch foi criada ou trocada.
@@ -121,7 +121,7 @@ As [35 tarefas](tasks.md) foram geradas posteriormente por `$speckit-tasks` em
 2026-10-18: Setup (2), Foundational (2), US2 (8), US1 (10), US3 (7) e revisão
 final (6). US2/US1 são P1 e seguem a dependência rejeição → escrita; US3 é P2.
 Há seis marcadores de paralelismo, em três pares sem conflito de arquivos.
-Todas permanecem pendentes. A análise SDD identificou A1, corrigido no contrato
+Todas foram concluídas na implementação posterior, registrada ao final. A análise SDD identificou A1, corrigido no contrato
 e em T014/T019/T026/T032–T034, com estados automatizado/visual separados.
 
 ### Source Code (repository root)
@@ -235,3 +235,21 @@ com inspeção visual pendente e reprovação em qualquer falha automatizada.
 Revalidação documental da correção concluída, sem novo achado nessa relação.
 Próxima etapa: `$speckit-implement` para a 004, mantendo todas as tarefas pendentes
 até sua execução e as provas remotas até a publicação real.
+
+## Implementação concluída — 2026-10-18
+
+35/35 tarefas executadas; 437 testes de v2/publicação e 266 regressões passaram.
+[Publicação e três capturas reais](../../docs/publicacao-v2.md): primeira escrita
+real confirmada, falhas preservadas, CLI final zero com conferência do commit
+`4278de75a2fca03a17cc1e3ab9d66d552c2c1aaebe543a085a34772637fa9595`.
+
+Duas suposições de desenho foram corrigidas com provas reais e testes prévios:
+tag técnica opcional `ChatPromptTemplate` acrescentada pelo serviço; conflito
+no reenvio de conteúdo idêntico. O conflito leva somente à conferência integral
+de revisão existente, sem atribuir HEAD ao próprio push nem fabricar URL retornada.
+Detalhes nos complementos C05–C08/modelo/pesquisa/guia. Não relaxam o README.
+
+004 permanece ativa e `dev` preservada. V1/v2/quatro protegidos íntegros, nenhum
+modelo/juiz, avaliação, dataset compartilhado ou push Git. Entrega à 005 habilitada
+com os hashes/revisão do registro; requer revalidar HEAD/metadados antes/depois dos
+experimentos. Aprovação acadêmica e entrega final continuam nas specs 005/006.
