@@ -389,7 +389,7 @@ EVAL_MODEL=gpt-4.1-2025-04-14
 Defina `LANGSMITH_WORKSPACE_ID` se a chave acessar mais de um workspace. O ID da
 condição está em [Condições experimentais](docs/avaliacao-v2.md#condições-experimentais);
 use esse workspace para reproduzir `COND-001`. Variáveis exportadas prevalecem sobre
-`.env`; confira aliases de tracing pelo SDK, conforme o [roteiro de preparação](docs/preparacao.md#roteiro-executavel).
+`.env`; confira aliases de tracing pelo SDK, conforme o [roteiro de preparação](docs/preparacao.md#roteiro-executável-de-contexto-e-traces--t030).
 A alternativa Gemini permanece disponível com `LLM_PROVIDER=google`, `GOOGLE_API_KEY`
 e modelos compatíveis com `temperature=0`. Uma troca de provedor/modelo/workspace exige
 outra condição experimental documentada, com suas tarifas; não reutilize `COND-001`.
@@ -423,6 +423,37 @@ Recupere a origem e valide a v2:
 
 ```bash
 python src/pull_prompts.py
+```
+
+Uma nova coleta muda datas e estatísticas do Hub. Para reproduzir esta entrega mantendo
+a baseline byte a byte, guarde o novo snapshot e confira revisão, mensagens e metadados
+do template antes de restaurar a cópia versionada. Divergência nesses campos interrompe
+a reprodução; não atualize a referência para contornar o gate.
+
+```bash
+python - <<'PY'
+# PRESERVAR_BASELINE_V1 — guardar nova coleta e manter a referência auditada.
+from pathlib import Path
+import hashlib
+import subprocess
+import yaml
+path = Path('prompts/bug_to_user_story_v1.yml')
+collected = path.read_bytes()
+Path('results').mkdir(exist_ok=True)
+Path('results/v1-nova-coleta.yml').write_bytes(collected)
+baseline = subprocess.run(['git', 'show', 'HEAD:prompts/bug_to_user_story_v1.yml'],
+                          check=True, capture_output=True).stdout
+fresh = yaml.safe_load(collected)['bug_to_user_story_v1']
+original = yaml.safe_load(baseline)['bug_to_user_story_v1']
+assert {k: v for k, v in fresh.items() if k != 'source'} == {
+    k: v for k, v in original.items() if k != 'source'}, 'Conteúdo da v1 divergente'
+dynamic = {'retrieved_at', 'repository_observed_at', 'repository_metadata'}
+assert {k: v for k, v in fresh['source'].items() if k not in dynamic} == {
+    k: v for k, v in original['source'].items() if k not in dynamic}, 'Revisão da v1 divergente'
+assert hashlib.sha256(baseline).hexdigest() == '2cddcf8f8183b4d29a5bca4d4efca17601962aa98ac75323f7dabbfa905c0d70'
+path.write_bytes(baseline)
+print('v1: nova coleta guardada, mensagens/revisão idênticas, baseline preservada')
+PY
 pytest tests/test_prompts.py -v
 pytest -q
 python src/push_prompts.py

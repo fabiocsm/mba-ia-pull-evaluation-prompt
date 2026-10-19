@@ -323,3 +323,11 @@ Contagem inalterada: 25 tarefas e mesmas fases; T023 deixou de ser opcional.
 - **Gate antes do commit de entrega**: suíte completa 869 aprovados, pip check sem
   conflitos e git diff --check limpo. Verificação dos valores secretos reais nos arquivos
   versionados e novos textos: nenhuma ocorrência.
+
+- **T017 em execução**: COMMIT_ENTREGA inicial 460bc3c227d4f5e002839f662a276bfb0ac15015.
+  Clone novo/venv 3.11.14, instalação e pip check passaram. Pull atualizou apenas
+  metadados dinâmicos da v1, rompendo o hash esperado: suíte 812 aprovados/57 falhas.
+  Antes de push/LLM, execução interrompida. README corrigido para preservar a nova
+  coleta e restaurar baseline só após comparar conteúdo/revisão/metadados do template;
+  três testes negativos/positivo adicionados (3 falhas pertinentes antes do bloco).
+  Link local do roteiro de preparação também corrigido para a âncora real.

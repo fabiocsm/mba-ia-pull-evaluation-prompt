@@ -134,8 +134,19 @@ A inspeção não encontrou chaves, e-mails de acesso, cabeçalhos ou configura�
 
 ## RegistroReprodução
 
-`REP-006` (autor, clone limpo): pendente. Registrar origem/commit, configuração sem segredos,
-passos e códigos, escritas remotas, experimento, tokens, custo e divergências.
+`REP-006` (autor, clone limpo): em execução. Commit inicial `460bc3c227d4f5e002839f662a276bfb0ac15015`,
+clone local sem hardlinks em diretório temporário da sessão, Python 3.11.14/venv novo,
+requirements.txt instalado, pip check aprovado, .env local copiado sem versionamento.
+
+Primeira tentativa: pull código 0, 466 testes estruturais aprovados; suíte conjunta
+812 aprovados/57 falhas da auditoria. Diagnóstico: a nova coleta mudou somente datas
+`retrieved_at`/`repository_observed_at` e estatística `num_downloads`; mensagens e revisão
+continuaram idênticas, mas o hash da v1 divergiu. Push, gate e avaliação não foram executados
+nessa tentativa. Correção documental: guardar `results/v1-nova-coleta.yml`, comparar conteúdo,
+revisão e metadados do template e restaurar baseline versionada somente com igualdade.
+Três testes offline verificam os caminhos de metadados dinâmicos, mensagem alterada e revisão
+divergente. Nenhuma alteração em pull_prompts.py, na v1 da entrega ou nos protegidos.
+A tentativa será retomada no passo afetado a partir do commit corrigido; custo LLM até aqui zero.
 `REP-006B` (segundo_executor, fork público, credenciais próprias): pendente; SC-004 não é
 satisfeito pela reprodução do próprio autor.
 

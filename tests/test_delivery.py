@@ -6,6 +6,7 @@ Read only local files and Git metadata. No dotenv, credentials, SDK or LLM calls
 from pathlib import Path
 import re
 import subprocess
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -21,13 +22,27 @@ def read_document(relative):
 
 
 def section(document, title, level=2):
-    marker = "#" * level
-    found = re.search(
-        rf"^{marker} {re.escape(title)}\s*\n(.*?)(?=^#{{1,{level}}} |\Z)",
-        document, re.M | re.S,
-    )
+    fence = None
+    content = []
+    found = False
+    for line in document.splitlines(keepends=True):
+        delimiter = re.match(r"^(`{3,}|~{3,})", line)
+        if delimiter:
+            marker = delimiter.group(1)
+            if fence is None:
+                fence = marker
+            elif marker[0] == fence[0] and len(marker) >= len(fence):
+                fence = None
+        elif fence is None:
+            if line.rstrip() == "#" * level + " " + title:
+                found = True
+                continue
+            if found and re.match(rf"^#{{1,{level}}} ", line):
+                break
+        if found:
+            content.append(line)
     assert found, f"Missing section: {title}"
-    return found.group(1)
+    return "".join(content)
 
 
 def base_readme():
@@ -203,3 +218,37 @@ def test_reproduction_is_identified_when_experiment_exists():
 def test_delivery_docs_contain_no_key_patterns():
     for path in ("README.md", "docs/entrega-publica.md"):
         assert not re.search(r"sk-|lsv2_|AIza", read_document(path)), path
+
+
+@pytest.mark.parametrize("changed", ["metadata", "message", "revision"])
+def test_reproduction_preserves_baseline_only_when_content_matches(tmp_path, monkeypatch, changed):
+    document = section(read_document("README.md"), "Como Executar")
+    blocks = re.findall(r"^python - <<'PY'\n(.*?)^PY$", document, re.M | re.S)
+    selected = [block for block in blocks if "# PRESERVAR_BASELINE_V1" in block]
+    assert len(selected) == 1, "Missing guarded baseline-preservation step"
+    baseline = (ROOT / "prompts/bug_to_user_story_v1.yml").read_bytes()
+    fresh = yaml.safe_load(baseline)
+    data = fresh["bug_to_user_story_v1"]
+    data["source"]["retrieved_at"] = "new collection time"
+    data["source"]["repository_metadata"]["num_downloads"] += 1
+    if changed == "message":
+        data["system_prompt"] += " changed message"
+    elif changed == "revision":
+        data["source"]["commit_hash"] = "0" * 64
+    target = tmp_path / "prompts/bug_to_user_story_v1.yml"
+    target.parent.mkdir()
+    collected = yaml.safe_dump(fresh).encode()
+    target.write_bytes(collected)
+    monkeypatch.chdir(tmp_path)
+    def git_only(args, **kwargs):
+        assert args == ["git", "show", "HEAD:prompts/bug_to_user_story_v1.yml"]
+        return SimpleNamespace(stdout=baseline)
+    monkeypatch.setattr(subprocess, "run", git_only)
+    if changed == "metadata":
+        exec(compile(selected[0], "readme-baseline", "exec"), {})
+        assert target.read_bytes() == baseline
+    else:
+        with pytest.raises(AssertionError):
+            exec(compile(selected[0], "readme-baseline", "exec"), {})
+        assert target.read_bytes() == collected
+    assert (tmp_path / "results/v1-nova-coleta.yml").read_bytes() == collected
