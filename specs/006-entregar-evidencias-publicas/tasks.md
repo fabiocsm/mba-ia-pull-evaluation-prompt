@@ -14,10 +14,10 @@ description: "Tarefas da spec 006: entrega pública com evidências acessíveis 
 [entrega da 005](../../docs/avaliacao-v2.md#entrega-à-006) (experimento final `CIC-03`
 `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`, revisão `36a96c0540682ed6b8569487222b88e11d1889a3976b75fea83553dc662b696f`).
 
-**Estado**: 22/25 tarefas concluídas (T001–T019, T023–T025). Pacote preparado,
-REP-006 aprovada, 872 testes, arquivos íntegros. T020–T022 aguardam autorização de
-push/main e conferência posterior. T023 registra SC-004 **pendente**, sem segundo executor.
-Entrega integral ainda não concluída.
+**Estado**: 24/25 tarefas concluídas (T001–T021, T023–T025). Dev publicada e PR #1
+aberto conforme autorização, REP-006 aprovada, 872 testes, arquivos íntegros.
+T022 aguarda merge e conferência de main. T023 registra SC-004 **pendente** por decisão
+explícita do autor, sem segundo executor. Entrega integral ainda não concluída.
 
 **Ações externas** (somente com autorização explícita do autor no chat, por ação):
 `share_dataset` (uma única vez), `share_run` (se necessário), `git push` e atualização de
@@ -126,8 +126,8 @@ reproduzido em clone limpo.
 referência e a revisão aprovada (W08/W09).
 
 - [X] T019 [US3] Executar W08 e registrar em `docs/entrega-publica.md` (`ConferênciaIntegridade`): hashes dos quatro protegidos e da v1; 15 exemplos 5/7/3; `git diff main..dev -- src/evaluate.py src/metrics.py src/utils.py datasets/` vazio; `langchain-openai` e `langchain-google-genai` instalados e `src/utils.py` intacto; v2 local = `36a96c05`; varredura de segredos (valores do `.env` e padrões) em todos os arquivos versionados e inspeção das PNG; `pytest -q`; `git diff --check`.
-- [ ] T020 [US3] Pedir ao autor no chat autorização explícita para `git push origin dev` e para atualizar `main` com `dev` (fast-forward local + push, ou PR `dev → main` no fork — escolha do autor); registrar pedido, decisão e estado `PacoteEntrega` (`preparado`/`autorizado`) em `docs/entrega-publica.md`. Sem autorização: parar aqui e registrar.
-- [ ] T021 [US3] Com a autorização de T020, executar o push de `dev` e a atualização de `main` escolhida, sem force-push nem reescrita de histórico; registrar commits enviados e o estado `publicado` em `docs/entrega-publica.md`.
+- [X] T020 [US3] Pedir ao autor no chat autorização explícita para `git push origin dev` e para atualizar `main` com `dev` (fast-forward local + push, ou PR `dev → main` no fork — escolha do autor); registrar pedido, decisão e estado `PacoteEntrega` (`preparado`/`autorizado`) em `docs/entrega-publica.md`. Sem autorização: parar aqui e registrar.
+- [X] T021 [US3] Com a autorização de T020, executar o push de `dev` e a atualização de `main` escolhida, sem force-push nem reescrita de histórico; registrar commits enviados e o estado `publicado` em `docs/entrega-publica.md`.
 - [ ] T022 [US3] Conferir sem login `https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt` na branch `main`: README com as três seções, `prompts/bug_to_user_story_v2.yml` com SHA-256 `692df6ae…8974` (via conteúdo bruto público), código e as PNG de `docs/evidencias/` abrindo; links do README (dataset, prompt, traces) abrindo sem login; registrar `PacoteEntrega=conferido` em `docs/entrega-publica.md`.
 - [X] T023 [US3] SC-004 (`REP-006B`, executor `segundo_executor`): pedir ao autor que indique outra pessoa para seguir `Como Executar` a partir do fork público (`git clone https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt`, branch `main`) com credenciais próprias; registrar em `docs/entrega-publica.md` o papel do executor (sem dados pessoais), os passos com código, divergências e, se houver avaliação, o experimento como reprodução e seu custo. Se ninguém executar até o fim da 006, registrar o SC-004 como **pendente** e declará-lo na conclusão (T024) — a execução `REP-006` do próprio autor não o substitui.
 
@@ -356,3 +356,22 @@ Contagem inalterada: 25 tarefas e mesmas fases; T023 deixou de ser opcional.
   links Markdown locais/âncoras sem erros, suíte e diff conferidos antes do commit final.
   Nenhum extensions.yml presente: nenhum hook de pós-execução. Commit local autorizado;
   envio remoto depende da autorização específica T020.
+
+### Publicação autorizada — 2026-10-19
+
+- Autor respondeu “Registrar segundo executor como pendente”: SC-004 mantido pendente,
+  sem substituir a prova independente pela reprodução do autor.
+- **T020 concluída**: “Autorizar dev e criar PR para main”. Opção registrada no pacote;
+  autorização para publicar dev e abrir PR, sem merge automático.
+- **T021 concluída pela rota de PR**: git push -u origin dev código 0, HEAD inicial
+  017e72492a6cd247b996f4b93e13617b8bcaaa32 (27 commits). Criado PR #1
+  https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/pull/1, aberto/ready,
+  base main/head dev, sem conflitos, anexado ao chat e conferido sem login (Sign in visível).
+  Publicação de dev não altera main; registro da operação mantido no mesmo PR autorizado.
+- Conferência pública de dev: 24 arquivos por HTTP anônimo, incluindo README, scripts,
+  dataset, v2 e 16 PNG, iguais ao payload publicado. Histórico inicialmente enviado:
+  233 blobs verificados por valores reais de credenciais e padrões, nenhuma ocorrência.
+- **T022 permanece pendente**: main ainda em a94ce443299b4928d0f1e08cecdacf7a36ff5fb1.
+  Só após merge do PR conferir README/v2/capturas/links em main; nenhuma integração realizada.
+- T024/T025 atualizados para refletir publicação em dev/PR e manter as duas pendências
+  explícitas: conferência em main após merge e SC-004 por segundo executor.

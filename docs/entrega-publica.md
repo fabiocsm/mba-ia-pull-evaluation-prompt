@@ -89,6 +89,8 @@ no Hub na mesma sessão; páginas públicas de dataset/traces usam cabeçalho co
 | EV-24 | screenshot | trace médio | evidencias/avaliacao-v2-trace-medio.png | experiment_id d864cfbb-6ab9-4901-ab06-62f68ccd96fc | visível — 2026-10-19 | inspecionado; sem credenciais ou dados de acesso |
 | EV-25 | screenshot | trace simples | evidencias/avaliacao-v2-trace-simples.png | experiment_id d864cfbb-6ab9-4901-ab06-62f68ccd96fc | visível — 2026-10-19 | inspecionado; sem credenciais ou dados de acesso |
 | EV-26 | link_experimento | reprodução REP-006 | https://smith.langchain.com/public/72eee98c-a991-4c8e-b825-b2b9b898df14/d/compare?selectedSessions=e3211f91-99f5-41d6-bb7e-36aad1085974 | experiment_id e3211f91-99f5-41d6-bb7e-36aad1085974; hub_commit 36a96c05 | visível — 2026-10-19 | inspecionado; sem dados de acesso |
+| EV-27 | fork | código e evidências em dev | https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/tree/dev | publicação inicial 017e724; v2 692df6ae | visível — 2026-10-19 | inspecionado; sem credenciais |
+| EV-28 | fork | PR de dev para main | https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/pull/1 | PR 1; base main; head dev | visível — 2026-10-19 | inspecionado; sem credenciais |
 
 ### Capturas reais
 
@@ -192,8 +194,9 @@ não substitui CIC-03 nem afirma ausência de alucinações. Não houve edição
 Logs completos locais em results/REP-006-preflight.log e results/REP-006-execucao-auditoria.log;
 resumo auditado acima e experimento público são as evidências entregues, além dos logs locais.
 
-`REP-006B` (segundo_executor, fork público, credenciais próprias): pendente; SC-004 não é
-satisfeito pela reprodução do próprio autor.
+`REP-006B` (segundo_executor, fork público, credenciais próprias): **pendente**, conforme
+resposta explícita do autor em 2026-10-19: “Registrar segundo executor como pendente”.
+SC-004 não é satisfeito pela reprodução do próprio autor.
 
 ## ConferênciaIntegridade
 
@@ -212,21 +215,34 @@ Fork: [fabiocsm/mba-ia-pull-evaluation-prompt](https://github.com/fabiocsm/mba-i
 público, fork de `devfullcycle/mba-ia-pull-evaluation-prompt`, branch padrão `main`.
 `origin/main` local aponta para `a94ce44`; consulta ao GitHub confirma o fork, sem fetch ou push.
 
-Estado: **preparado**, aguardando autorização explícita de push de dev e atualização de main (T020).
-Transições previstas: `preparado` → `autorizado` → `publicado` → `conferido`.
-Commits locais autorizados: `460bc3c` (evidências/README) e `22e1e09` (roteiro corrigido);
-a reprodução usou o segundo, cujo hash completo está acima. Commit final de registro será
-identificado pelo histórico Git. Nenhum push executado e nenhuma atualização de main.
-Leitura `git ls-remote origin refs/heads/main refs/heads/dev` confirmou main remoto em
-`a94ce443299b4928d0f1e08cecdacf7a36ff5fb1`; dev ainda ausente no remoto.
+Estado: **publicado em dev**, com [PR #1](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/pull/1) aberto de `dev` para `main`.
+A conferência final de `main` (T022) aguarda o merge do PR. A autorização do autor em
+2026-10-19 foi “Autorizar dev e criar PR para main”; não houve merge nem atualização direta
+de main. O PR foi anexado ao chat e conferido sem login, com “Sign in” e estado “Open”.
+
+Publicação inicial: `git push -u origin dev`, código 0, HEAD
+`017e72492a6cd247b996f4b93e13617b8bcaaa32`, 27 commits da entrega. `gh pr create` retornou
+PR #1, aberto e pronto para revisão, base main/head dev, sem conflitos. O registro desta
+operação integra o mesmo PR; o histórico de commits identifica sua revisão final.
+
+[Conteúdo público em dev](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/tree/dev): README, scripts, v2 e 16 PNG conferidos por HTTP sem
+credenciais (24 arquivos idênticos byte a byte ao payload local inicial). V2 SHA-256
+`692df6ae86848e2dce0fc1a9c2d1f6fec95fc48721a960837fbdd8de3f958974`.
+Varredura dos 233 objetos de arquivo do histórico inicialmente enviado, além da árvore
+atual: nenhuma credencial real ou padrão de chave encontrado. O PR descreve os resultados,
+verificações e pendências; links LangSmith originais preservados.
+
+`main` remoto permanece em `a94ce443299b4928d0f1e08cecdacf7a36ff5fb1`. Publicação em dev e
+conferência do PR não substituem a conferência pós-merge da branch padrão (T022).
 
 ## Encerramento
 
 Encerramento parcial: evidências LangSmith públicas e conferidas; 16 PNG versionadas;
 README/testes/integração íntegros; REP-006 aprovada, custo acumulado das avaliações US$ 1,022318.
-CIC-03 continua final, média 0.8709. Publicação Git e conferência de main (T020–T022) aguardam
-autorização. SC-004 por segundo executor (REP-006B) permanece **pendente**: pedido feito ao autor,
-nenhuma execução independente apresentada até este registro. A reprodução do autor não o substitui.
+CIC-03 continua final, média 0.8709. T020/T021 concluídas pela opção autorizada de PR:
+dev publicada e PR #1 aberto. T022 aguarda merge e conferência em main.
+SC-004 por segundo executor (REP-006B) permanece **pendente** por decisão explícita do autor,
+sem execução independente apresentada. A reprodução do autor não o substitui.
 Este registro não declara a entrega integral concluída.
 
 ## Compartilhamento dos traces

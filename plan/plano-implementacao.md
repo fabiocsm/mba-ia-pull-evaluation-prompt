@@ -15,7 +15,7 @@ A 003 está implementada e validada localmente: 30/30 tarefas, 188 testes da v2 
 [registro](../specs/003-otimizar-validar-v2/tasks.md#registro-de-execução).
 O planejamento e as [35 tarefas da spec 004](../specs/004-publicar-prompt-v2/tasks.md)
 foram concluídos em 2026-10-18; ela é a spec ativa. Análise da 004 realizada com
-A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Em 2026-10-18 a 005 passou a ser a spec ativa e seu [plano técnico](../specs/005-avaliar-iterar-v2/plan.md) foi concluído, com 35 tarefas e duas análises SDD corrigidas. Em 2026-10-19 a implementação da 005 foi concluída: 35/35 tarefas, 85 testes offline dos blocos de auditoria (817 na suíte), dataset `8c78638d-37a5-4175-9984-8db0e3473228` criado e auditado idêntico, três ciclos reais: `CIC-01` (revisão 4278de75, F1-Score 0.8057) e, por decisão do autor, `CIC-02` (25b881d1) e `CIC-03` (revisão 36a96c05, experimento `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`) completo, vinculado e aprovado pela regra integral (média geral 0.8709; menor média F1-Score 0.8474), com custo estimado acumulado de US$ 0,76 ([registro](../docs/avaliacao-v2.md)). A 006 preparou evidências públicas LangSmith, 16 PNG, README consolidado e reprodução aprovada (média 0.8706), com 872 testes; publicação Git e SC-004 por segundo executor permanecem pendentes. [Estado da entrega](../docs/entrega-publica.md).
+A1 corrigido e revalidado documentalmente. A 004 foi implementada: 35/35 tarefas, 437 testes de prompt/publicação + 266 regressões e revisão 4278de75 pública, equivalente e inspecionada. [Evidências](../docs/publicacao-v2.md). Em 2026-10-18 a 005 passou a ser a spec ativa e seu [plano técnico](../specs/005-avaliar-iterar-v2/plan.md) foi concluído, com 35 tarefas e duas análises SDD corrigidas. Em 2026-10-19 a implementação da 005 foi concluída: 35/35 tarefas, 85 testes offline dos blocos de auditoria (817 na suíte), dataset `8c78638d-37a5-4175-9984-8db0e3473228` criado e auditado idêntico, três ciclos reais: `CIC-01` (revisão 4278de75, F1-Score 0.8057) e, por decisão do autor, `CIC-02` (25b881d1) e `CIC-03` (revisão 36a96c05, experimento `d864cfbb-6ab9-4901-ab06-62f68ccd96fc`) completo, vinculado e aprovado pela regra integral (média geral 0.8709; menor média F1-Score 0.8474), com custo estimado acumulado de US$ 0,76 ([registro](../docs/avaliacao-v2.md)). A 006 preparou evidências públicas LangSmith, 16 PNG, README consolidado e reprodução aprovada (média 0.8706), com 872 testes; dev publicada e PR #1 aberto, com conferência pós-merge em main e SC-004 por segundo executor pendentes. [Estado da entrega](../docs/entrega-publica.md).
 
 ## 1. Objetivo e referências
 
@@ -465,14 +465,15 @@ definido no avaliador, e investigar limites antes de repetir experimentos com fa
 - [X] README com as três seções obrigatórias, comparação v1/v2 e screenshots legíveis.
 - [X] Acesso público ao dataset/experimentos e demais evidências conferido sem login.
 - [ ] Fork público contém código, YAML v2 e documentação da entrega.
-- [ ] Arquivos protegidos íntegros e nenhuma credencial nos artefatos publicados.
+- [X] Arquivos protegidos íntegros e nenhuma credencial nos artefatos publicados.
 
 Estado em 2026-10-19: evidências LangSmith e 16 PNG preparadas, README consolidado,
 REP-006 aprovada (média 0.8706), 872 testes e integridade local aprovados;
 [registro](../docs/entrega-publica.md). Acumulado das avaliações US$ 1,022318.
-Push de dev/main e conferência do conteúdo publicado aguardam autorização (T020–T022).
+Dev publicada e [PR #1](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/pull/1)
+aberto conforme autorização (T020/T021); merge e conferência do conteúdo em main pendentes (T022).
 SC-004 da 006 por segundo executor permanece pendente; reprodução do autor não o substitui.
-Os dois itens finais serão fechados após publicação e inspeção do fork sem login.
+O item do fork na branch padrão será fechado após o merge e a inspeção de main sem login.
 
 ## 10. Ordem operacional resumida
 

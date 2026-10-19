@@ -9,8 +9,9 @@
 **Estado**: implementação preparada em 2026-10-19: dataset e seis traces compartilhados
 com autorização e conferidos sem login, 16 PNG reais versionadas, README consolidado e
 reprodução REP-006 aprovada (média 0.8706, custo US$ 0,267300), 872 testes aprovados.
-Publicação Git/main aguarda autorização (T020–T022); SC-004 por segundo executor permanece
-pendente. [Registro e evidências](../../docs/entrega-publica.md). O setup retornou `BRANCH=006-entregar-evidencias-publicas` como identificador da
+Dev publicada e PR #1 aberto para main conforme autorização (T020/T021); conferência
+pós-merge em main (T022) e SC-004 por segundo executor permanecem
+pendentes. [Registro e evidências](../../docs/entrega-publica.md). O setup retornou `BRANCH=006-entregar-evidencias-publicas` como identificador da
 feature; a branch Git continua `dev`. O ponteiro local `.specify/feature.json` (ignorado
 pelo Git) seleciona a 006 por pedido do autor. Nenhuma branch criada ou trocada.
 
@@ -178,6 +179,6 @@ CIC-03 permanece final; REP-006 não substitui seus resultados. A reprodução d
 22e1e090a9786c79be8e11855e21430f264d9297 passou após corrigir o roteiro: guardar a nova
 coleta da v1 e comparar conteúdo/revisão antes de restaurar a baseline, pois datas/estatísticas
 variam em cada pull. Três testes verificam a guarda contra mensagem/revisão divergentes.
-US1/US2 e integridade prontas; pacote preparado. Autorização de publicação Git e prova por
-segundo executor pendentes, sem alegação de entrega integral. Custo acumulado das avaliações
+US1/US2 e integridade prontas; dev publicada e PR #1 aberto para main. Conferência
+pós-merge de main (T022) e prova por segundo executor pendentes, sem alegação de entrega integral. Custo acumulado das avaliações
 US$ 1,022318 (US$ 1,022566 incluindo preparação).

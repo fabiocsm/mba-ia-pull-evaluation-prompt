@@ -693,5 +693,6 @@ média geral **0.8706**. Custo US$ 0,267300; acumulado das avaliações **US$ 1,
 A reprodução encontrou a atualização dos metadados de coleta da v1; o roteiro foi corrigido
 para preservar a nova coleta e comparar o conteúdo antes de manter a baseline original.
 Detalhes, códigos de saída e tokens no registro acima. Os **872 testes** passaram na raiz
-e no clone corrigido. A verificação por segundo executor (SC-004) permanece **pendente**. Publicação do
-conteúdo final em `main` aguarda autorização específica do autor.
+e no clone corrigido. A verificação por segundo executor (SC-004) permanece **pendente**, conforme decisão do autor.
+O conteúdo está [publicado em dev](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/tree/dev), com [PR #1 para main](https://github.com/fabiocsm/mba-ia-pull-evaluation-prompt/pull/1)
+aberto para revisão. A conferência final da branch padrão ocorrerá após o merge.
