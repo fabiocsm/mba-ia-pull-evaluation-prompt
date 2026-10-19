@@ -890,10 +890,15 @@ def test_cycle_records_have_every_required_field():
     assert list(sections) == ["CIC-01", "CIC-02", "CIC-03", "CIC-04", "CIC-05"]
     stop = document.split("\n## Decisão de parada\n", 1)[1].split("\n## ", 1)[0]
     assert sections["CIC-01"].strip() != "Pendente."
+    stop_open = stop.strip().startswith(("Pendente.", "**Reaberta**"))
     for cycle, body in sections.items():
         text = body.strip()
         if text == "Pendente.":
-            assert stop.strip() == "Pendente.", f"{cycle} pendente após a decisão de parada"
+            assert stop_open, f"{cycle} pendente após a decisão de parada"
+            continue
+        if text.startswith("**Em andamento**"):
+            assert stop_open, f"{cycle} em andamento após a decisão de parada"
+            assert "**Problema**" in text and "**Hipótese**" in text, cycle
             continue
         if text.startswith("**Não aplicável**"):
             assert "**Justificativa**" in text, cycle

@@ -796,14 +796,51 @@ chamada LLM (ver [decisão de parada](#decisão-de-parada)).
 
 ### CIC-02
 
-**Não aplicável** — `CIC-02` não foi executado.
+**Em andamento** — aberto em 2026-10-19 por **decisão explícita do autor** após a aprovação de `CIC-01`:
+a margem do F1-Score (0.8057, e 0.7809 nos casos `medium`) foi considerada pequena demais
+para a entrega. Não é ciclo para completar contagem: há problema observado em `CIC-01`.
+Pela FR-010, a edição da v2 torna o experimento de `CIC-01` `substituído` para fins de
+entrega; o resultado de `CIC-01` permanece no histórico.
 
-**Justificativa**: `CIC-01` foi aprovado pela regra integral (C06) com experimento completo e
-estável. C09 e FR-009 determinam encerrar com justificativa e proíbem executar ciclos apenas
-para completar a contagem de 3–5; nenhuma métrica ficou abaixo de 0.8, portanto não há
-problema observado que fundamente uma hipótese de ajuste (C08/FR-007). Nenhuma edição da v2,
-publicação ou experimento foi feito para este ciclo.
+- **Problema**: em `CIC-01` o F1-Score foi a métrica mais baixa (0.8057) e os comentários do
+  juiz nas menores notas (#12 0.6154, #1 0.6857, #10 0.6857) apontam **omissão** de critérios
+  verificáveis, não invenção (Precision sem alucinações apontadas). A v2 instrui “Para bug
+  simples, prefira uma história curta e poucos critérios concretos” e só demonstra um
+  critério no Exemplo 1; as respostas simples tiveram de 1 a 3 critérios. Nos casos
+  `medium`/`complex`, detalhes técnicos informados no relato (valores, condições, erros)
+  ficaram fora dos critérios ou apenas no contexto.
+- **Hipótese**: (D10, F1 → omissões) exigir que os critérios cubram, além do fluxo principal,
+  os resultados observáveis **decorrentes diretamente** do comportamento esperado (estado
+  visível após a ação, retorno ao usuário, bloqueio/mensagem em validação, condições e
+  limites informados) e, quando o relato trouxer detalhes técnicos, critérios técnicos
+  verificáveis para cada detalhe informado, aumentará a cobertura (F1) sem inventar fatos
+  — números, causas e soluções ausentes continuam proibidos. Critérios no padrão
+  Dado/Quando/Então tornam cada resultado verificável. Dúvidas ficam restritas a lacunas
+  que impedem um critério, para não reduzir Clarity/Precision. Few-shot próprio e Role
+  Prompting mantidos; nenhum caso ou referência do dataset é usado; nenhuma instrução ao juiz.
+- **Risco previsto**: Precision pode cair se critérios decorrentes forem lidos como excesso;
+  será comparada com `CIC-01` (0.8927).
 
+**Alteração** (somente `prompts/bug_to_user_story_v2.yml`): critérios no padrão Dado/Quando/
+Então cobrindo também os resultados que decorrem diretamente do comportamento esperado;
+nova seção opcional **Critérios técnicos** para detalhes técnicos informados; regra “3 a 5
+critérios” para bug simples no lugar de “poucos critérios”; cobertura de cada sintoma,
+número, condição e restrição em relatos detalhados; dúvidas só para lacunas que impedem um
+critério; esclarecimento de que resultados decorrentes não são invenção (números, causas e
+soluções ausentes continuam proibidos). Exemplo 1 passou de 1 para 4 critérios e o Exemplo 3
+ganhou critérios simétricos e um critério técnico; Exemplo 2 inalterado. Tags, técnicas
+(`Few-shot Learning`, `Role Prompting`), versão e `{bug_report}` inalterados. Teste documental
+ajustado para aceitar ciclo marcado **Em andamento** só com a decisão de parada reaberta.
+
+**RevisãoCandidata** — SHA-256 arquivo
+`5222d484c6a26b92d9012f653e9b55869c4d5e0ed207ebdaa323de080bef7857`, definição
+`7ba746eb03689e0fbd984fc02f0abd99d60dc503965949b9b51984a29dc45702`; testes
+`pytest tests/test_prompts.py -q` 466 e `pytest -q` 817 aprovados; `python src/push_prompts.py`
+em 2026-10-19T00:48:49-03:00, código 0, `publication=confirmada`, `revision_source=push_return`,
+revisão `25b881d11f98916a66c9f0a8e00b07c4065d9895a935efabf776a9f5f2605e15`, conteúdo,
+metadata e acesso anônimo conferidos; inspeção sem login no navegador integrado em
+2026-10-19T00:50-03:00: “Log in”, badge Public, histórico com 2 commits (`25b881d1` sobre
+`4278de75`), cinco tags, System com persona, regras novas e `## Exemplos`, User com `{bug_report}`.
 
 ### CIC-03
 
@@ -854,6 +891,10 @@ explícita do autor). A comparação qualitativa v1/v2 fica para a documentaçã
 
 ## Decisão de parada
 
+**Reaberta** em 2026-10-19 pela abertura de `CIC-02` por decisão do autor. O registro abaixo é histórico e não é mais a decisão vigente.
+
+### Registro anterior — aprovação antecipada em CIC-01
+
 **Aprovação antecipada (C09/FR-009)** em `CIC-01`, 2026-10-19. Ciclos efetivamente
 executados: **1**. Justificativa: experimento completo (15 respostas, 75 notas válidas),
 estável e vinculado à revisão `4278de75…9595`, com as cinco médias e a média geral
@@ -868,7 +909,7 @@ seis exemplos (análise C07). Temperatura 0 não garante determinismo; uma nova 
 pode oscilar. Por D09, nenhuma reexecução foi feita para buscar resultado favorável, e
 qualquer edição futura da v2 reabre um ciclo completo (FR-010).
 
-### Correspondência final — SC-005 (T031)
+#### Correspondência final de CIC-01 — SC-005 (T031)
 
 2026-10-19: YAML local (`49ffb358…c46d` / `ab661782…b89c`, sem alterações pendentes),
 HEAD do Hub (`4278de75…9595`, lido no gate e na auditoria) e `lc_hub_commit_hash` dos 15
